@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+
+{% block title %}Classes{% endblock %}
+
+{% block body %}
+
+
+
+<div class="container">
+  <div class="row">
+    <div class="col-xs-12 col-sm-6">
+      <h1>>{% if currentClass %}{{ currentClass.name|capfirst }}{%endif%}</h1>
+    </div>
+    <div class="col-xs-12 col-sm-6">
+        {% if classUser.teacher %}
+          {% if currentClass %}
+          <div class="col-xs-12 col-sm-6">
+              <button id="class-code-container" class="btn btn-block btn-lg btn-warning rounded space" data-toggle="modal" data-target="#class-code">
+                Class code: <span class="class-code">{{ currentClass.code }}</button>
+              </button>
+          </div>
+          {% endif %}
+          <br class="visible-xs">
+        {%endif%}
+    </div>
+  </div> <!-- end of row -->
+  
+  <div class="row">
+        <h3 class="text-default">Assignments</h3>
+{% if currentClass and currentClass.worksheets.all %}
+        <ul class="row list-unstyled">
+          
+          {% for worksheet in currentClass.worksheets.all %}
+          <!------------------------------ Worksheet Display ------------------------------------->
+          <div class="col-lg-4 col-md-4 col-sm-4 mb">
+            <div class="content-panel pn">
+              <div id="profile-01" class="bg{{ randomNumber|random }}">
+                <img src="{{ worksheet.thumb }}" alt="worksheet">
+              </div>
+              <div class="profile-01 centered">
+                <p>{{ worksheet.title|capfirst }}</p>
+              </div>
+              <div class="centered">
+                <button type="button" class="col-xs-4 btn btn-default" data-container="body"
+                  data-toggle="popover" data-placement="bottom" data-trigger="hover"
+                  data-content="Edit">
+                  <i class="fa fa-edit fa-2x"></i>
+                </button>
+                <button type="button" class="col-xs-4 btn btn-default" data-container="body"
+                  data-toggle="popover" data-placement="bottom" data-trigger="hover"
+                  data-content="Monitor">
+                  <i class="fa fa-bar-chart-o fa-2x"></i>
+                </button>
+                <button type="button" class="col-xs-4 btn btn-default" data-container="body"
+                  data-toggle="popover" data-placement="bottom" data-trigger="hover"
+                  data-content="Delete">
+                  <i class="fa fa-trash-o fa-2x"></i>
+                </button>
+              </div>
+            </div>
+          </div><! --/col-md-4 -->
+          <!------------------------------ End of Worksheet Display ------------------------------------->
+          {% endfor %}
+          
+        </ul>
+{% else %}
+  <h5>Sorry, there are no assignments yet.</h5>
+{% endif %}
+  </div>
+</div>
+
+{% if currentClass %}
+<!---------------- modal ------------------------------------->
+<div id="class-code" class="modal fade" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content rounded">
+      <div class="modal-header top-rounded">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">class code</h4>
+      </div>
+      <div class="modal-body text-center text-danger">
+        
+        <span style="font-size: 600%;font-weight: bold;">{{ currentClass.code }}</span>
+        
+      </div>
+    </div>
+  </div>
+</div>
+{%endif%}
+
+
+{% endblock %}
+
+
+
+
+{% block extraScript %}
+  <script>var getWorksheetsURL="{% url "worksheet_creator.page_view_ajax.getWorksheets" %}"</script>
+  <script src="{% static "page_view/js/spin.js" %}"></script>
+  <script src="{% static "main_project/js/assign.js" %}"></script>
+  <script src="{% static "adminBoot/js/classes.js" %}"></script>
+{% endblock %}

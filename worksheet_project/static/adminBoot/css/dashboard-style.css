@@ -1,0 +1,46 @@
+
+#profile-01{
+    overflow: hidden;
+    height: 150px;
+    padding-top: 50px;
+}
+
+#profile-01 img {
+    display: table;
+    margin: 0 auto;
+}
+
+.content-panel{
+    opacity: 0.8;
+}
+
+.centered button{
+    height: 100%;
+    border: none;
+    background: none;
+    margin-top: 5px;
+    padding-top: 10px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
