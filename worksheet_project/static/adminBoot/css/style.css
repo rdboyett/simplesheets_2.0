@@ -2285,7 +2285,7 @@ color: #424a5d;
     background-color: #4fc1e9;
 }
 
-.centered button{
+profile-01.centered button{
     height: 100%;
     border: none;
     background: none;
@@ -2310,6 +2310,32 @@ background: url(../img/worksheet-bg5.jpg) no-repeat center top;
 }
 #profile-01.bg6 {
 background: url(../img/worksheet-bg6.jpg) no-repeat center top;
+}
+
+#profile-01.noBg {
+background: none;
+padding-top: 10px;
+height: auto;
+min-height: inherit;
+}
+#profile-01 h3 {
+color: inherit;
+padding-top: 0px;
+margin: 0px;
+text-align: inherit;
+vertical-align: middle;
+line-height: 35px;
+}
+
+#profile-02.bg1 {
+background: url(../img/profile-bg1.jpg) no-repeat center top;
+background-size: 100% 80px;
+padding: 20px;
+}
+#profile-02 h4 {
+color: inherit;
+margin-top: -50px;
+padding-top: 0px;
 }
 
 
@@ -2361,12 +2387,34 @@ background: url(../img/worksheet-bg6.jpg) no-repeat center top;
 
 
 
+#topImage-01 {
+background: url(../img/profile-bg1.jpg) no-repeat center top;
+background-size: 100% 80px;
+padding: 20px;
+margin-top: -15px;
+background-attachment: relative;
+background-position: center center;
+min-height: 80px;
+height: 80px;
+width: 100%;
+-webkit-background-size: 100%;
+-moz-background-size: 100%;
+-o-background-size: 100%;
+background-size: 100%;
+-webkit-background-size: cover;
+-moz-background-size: cover;
+-o-background-size: cover;
+background-size: cover;
+}
 
+#profile-float-photo{
+    position: absolute;
+    top: 25px;
+    right: 40px;
+    width: 110px;
+}
 
-
-
-
-
+.error{color: #FF0000;}
 
 
 

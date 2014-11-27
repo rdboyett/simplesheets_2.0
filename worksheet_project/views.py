@@ -280,6 +280,7 @@ def profile(request):
             "userInfo":userInfo,
             "googleUserInfo":googleUserInfo,
             "teacherStudent":teacherStudent,
+            "classUser":classUser,
             "allClasses":allClasses,
         }
     args.update(csrf(request))
