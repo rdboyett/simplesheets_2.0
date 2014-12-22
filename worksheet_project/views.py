@@ -12,6 +12,9 @@ from classrooms.models import ClassUser, Classroom, HashTag, Message
 from google_login.models import GoogleUserInfo
 
 
+#this is commited
+
+
 def loginRedirect(request):
     return redirect('/google/auth/')
 
