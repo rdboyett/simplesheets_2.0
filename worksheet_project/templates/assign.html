@@ -9,7 +9,7 @@
 
 
         {% if classUser.teacher %}
-        <div class="row">
+        <div class="row mt">
           <div class="col-xs-12 col-sm-6">
 		<button id="new-worksheet" class="btn btn-block btn-lg btn-primary rounded space disabled" data-toggle="modal" data-target="#assign-worksheets">
                 <span class="glyphicon glyphicon-asterisk"></span>  assign worksheets
@@ -38,19 +38,19 @@
                 <p>{{ worksheet.title|capfirst }}</p>
               </div>
               <div class="centered">
-                <button type="button" class="col-xs-4 btn btn-default" data-container="body"
+                <a href="{% url "worksheet_project.views.showNextPage" worksheet.id 1 %}"><button type="button" class="col-xs-4 btn btn-default" data-container="body"
                   data-toggle="popover" data-placement="bottom" data-trigger="hover"
                   data-content="Edit">
                   <i class="fa fa-edit fa-2x"></i>
                 </button>
-                <button type="button" class="col-xs-4 btn btn-default" data-container="body"
+                <a href="{% url "worksheet_project.views.monitor" worksheet.id %}"><button type="button" class="col-xs-4 btn btn-default" data-container="body"
                   data-toggle="popover" data-placement="bottom" data-trigger="hover"
                   data-content="Monitor">
                   <i class="fa fa-bar-chart-o fa-2x"></i>
-                </button>
+                </button></a>
                 <button type="button" class="col-xs-4 btn btn-default" data-container="body"
                   data-toggle="popover" data-placement="bottom" data-trigger="hover"
-                  data-content="Delete">
+                  data-content="Delete" onclick="$('#worksheetID-hidden-input').val({{ worksheet.id }});$('#delete-worksheet').modal('show');">
                   <i class="fa fa-trash-o fa-2x"></i>
                 </button>
               </div>
@@ -62,6 +62,14 @@
 {% else %}
   <h5>Sorry, there are no assignments yet.</h5>
 {% endif %}
+
+
+
+{% endblock %}  <!-- end of body block -->
+
+{% block modal %}
+
+
 
 
 {% if allClasses and classUser.teacher %}
@@ -103,7 +111,7 @@
 </div>
 {%endif%}
 
-{% endblock %}
+{% endblock %}  <!-- end of modal block -->
 
 
 

@@ -8,12 +8,13 @@
 
 
 
-<div class="container">
-  <div class="row">
+  <div class="row mt">
     <div class="col-xs-12 col-sm-6">
-      <h1>>{% if currentClass %}{{ currentClass.name|capfirst }}{%endif%}</h1>
+      <a id="class-title" data-toggle="modal" data-target="#class-settings">
+        <h1><i class="fa fa-angle-double-right"></i>  {% if currentClass %}{{ currentClass.name|capfirst }}{%endif%}  <i class="fa fa-gears"></i></h1>
+      </a>
     </div>
-    <div class="col-xs-12 col-sm-6">
+    <div class="col-xs-12 col-sm-6 mt">
         {% if classUser.teacher %}
           {% if currentClass %}
           <div class="col-xs-12 col-sm-6">
@@ -28,11 +29,12 @@
   </div> <!-- end of row -->
   
   <div class="row">
+    <div class="col-xs-12">
         <h3 class="text-default">Assignments</h3>
 {% if currentClass and currentClass.worksheets.all %}
         <ul class="row list-unstyled">
           
-          {% for worksheet in currentClass.worksheets.all %}
+          {% for worksheet in currentClass.worksheets.all reversed %}
           <!------------------------------ Worksheet Display ------------------------------------->
           <div class="col-lg-4 col-md-4 col-sm-4 mb">
             <div class="content-panel pn">
@@ -40,22 +42,22 @@
                 <img src="{{ worksheet.thumb }}" alt="worksheet">
               </div>
               <div class="profile-01 centered">
-                <p>{{ worksheet.title|capfirst }}</p>
+                <a href="{% url "worksheet_project.views.worksheet_display" worksheet.id %}"><p>{{ worksheet.title|capfirst }}</p></a>
               </div>
               <div class="centered">
-                <button type="button" class="col-xs-4 btn btn-default" data-container="body"
+                <a href="{% url "worksheet_project.views.showNextPage" worksheet.id 1 %}"><button type="button" class="col-xs-4 btn btn-default" data-container="body"
                   data-toggle="popover" data-placement="bottom" data-trigger="hover"
                   data-content="Edit">
                   <i class="fa fa-edit fa-2x"></i>
                 </button>
-                <button type="button" class="col-xs-4 btn btn-default" data-container="body"
+                <a href="{% url "worksheet_project.views.monitor" worksheet.id %}"><button type="button" class="col-xs-4 btn btn-default" data-container="body"
                   data-toggle="popover" data-placement="bottom" data-trigger="hover"
                   data-content="Monitor">
                   <i class="fa fa-bar-chart-o fa-2x"></i>
-                </button>
+                </button></a>
                 <button type="button" class="col-xs-4 btn btn-default" data-container="body"
                   data-toggle="popover" data-placement="bottom" data-trigger="hover"
-                  data-content="Delete">
+                  data-content="Delete" onclick="$('#worksheetID-hidden-input').val({{ worksheet.id }});$('#delete-worksheet').modal('show');">
                   <i class="fa fa-trash-o fa-2x"></i>
                 </button>
               </div>
@@ -68,8 +70,14 @@
 {% else %}
   <h5>Sorry, there are no assignments yet.</h5>
 {% endif %}
+    </div>
   </div>
-</div>
+
+
+{% endblock %}  <!-- end of body block -->
+
+{% block modal %}
+
 
 {% if currentClass %}
 <!---------------- modal ------------------------------------->
@@ -88,17 +96,123 @@
     </div>
   </div>
 </div>
+
+
+
+
+<!---------------- modal ------------------------------------->
+<div id="class-settings" class="modal fade" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content rounded">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">class settings</h4>
+      </div>
+      <div class="modal-body text-center">
+        
+            <form id="change-className-form" class="form-horizontal style-form" action="{% url "classrooms.ajax.changeGroupName" %}" enctype='multipart/form-data' method="post" autocomplete="off">{% csrf_token %}
+              <div class="form-group">
+                <input type="hidden" name="groupID" value="{{ currentClass.id }}" />
+		<label class="col-sm-3 control-label">Class Name</label>
+		<div class="col-sm-9">
+		  <input class="form-control" type="text" name="group_name" minlength="3" maxlength="40" required placeholder="Class Name..." value="{{ currentClass.name|capfirst }}" autofocus />
+		  <span class="register-check register-check-error"></span>
+		</div>
+	      </div>
+            </form>
+                  
+                  
+            <form id="toggle-lock-form" class="form-horizontal style-form" action="{% url "classrooms.ajax.toggleLockGroup" %}" enctype='multipart/form-data' method="post" autocomplete="off">{% csrf_token %}
+              <div class="form-group">
+                <input type="hidden" name="groupID" value="{{ currentClass.id }}">
+                <div class="col-sm-offset-4 col-sm-4">
+                  {% if not currentClass.allowJoin %}
+                  <button type="submit" class="btn btn-success btn-block"><i class="fa fa-unlock"></i>  unlock</button>
+                  {% else %}
+                  <button type="submit" class="btn btn-danger btn-block"><i class="fa fa-lock"></i>  lock</button>
+                  {% endif %}
+                </div>
+              </div>
+            </form>
+        
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger pull-left" aria-hidden="true" data-toggle="modal" data-target="#delete-yes-no">Delete this class</button>
+        <button type="button" class="btn btn-default rounded" data-dismiss="modal">close</button>
+        <button type="submit" form="change-className-form" class="btn btn-primary rounded">update</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!---------------- modal ------------------------------------->
+<div id="delete-yes-no" class="modal fade" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content rounded">
+      <div class="modal-header top-rounded">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">delete this class?</h4>
+      </div>
+      <div class="modal-body text-center bottom-rounded">
+        <div class="row">
+          <form id="delete-class-form" class="form-horizontal style-form" action="{% url "classrooms.ajax.deleteGroup" %}" enctype='multipart/form-data' method="post">{% csrf_token %}
+            <input name="myGroups" type="hidden" value="{{ currentClass.id }}" />
+            <div class="col-xs-6">
+              <button type="submit" class="btn btn-block btn-lg btn-danger">yes</button>
+            </div>
+            <div class="col-xs-6">
+              <button type="button" class="btn btn-block btn-lg btn-default" data-dismiss="modal">no</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+{% if not currentClass.worksheets.all %}
+  
+<!---------------- modal ------------------------------------->
+<div id="no-worksheets" class="modal fade" role="dialog" aria-labelledby="basicModal" aria-hidden="false">
+  <div class="modal-dialog">
+    <div class="modal-content rounded">
+      <div class="modal-header top-rounded">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">Oops! There are no worksheets.</h4>
+      </div>
+      <div class="modal-body text-center">
+        <div class="row">
+            <div class="col-xs-6">
+              {% if userInfo.projects.all %}
+              <a href="{% url "worksheet_project.views.assign" %}" ><button type="button" class="btn btn-block btn-lg btn-primary">assign worksheets</button></a>
+              {% endif %}
+            </div>
+            <div class="col-xs-6">
+              <a href="{% url "google_drive.views.google_picker" %}"><button type="button" class="btn btn-block btn-lg btn-primary">create worksheets</button></a>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>$(document).ready(function(){$("#no-worksheets").modal('show');});</script>
+{% endif %}
+
+
+
+
 {%endif%}
 
 
-{% endblock %}
+{% endblock %}  <!-- end of modal block -->
 
 
 
 
 {% block extraScript %}
-  <script>var getWorksheetsURL="{% url "worksheet_creator.page_view_ajax.getWorksheets" %}"</script>
-  <script src="{% static "page_view/js/spin.js" %}"></script>
-  <script src="{% static "main_project/js/assign.js" %}"></script>
   <script src="{% static "adminBoot/js/classes.js" %}"></script>
 {% endblock %}

@@ -33,6 +33,11 @@ class FormInput(models.Model):
   helpLink = models.URLField(blank=True, null=True)
   workImagePath = models.FilePathField(blank=True, null=True)
   
+  class Meta:
+      ordering = ['questionNumber']
+      
+
+  
 
 class Project(models.Model):
   title = models.CharField(max_length=100)
@@ -43,6 +48,7 @@ class Project(models.Model):
   uploadedFileID = models.CharField(max_length=65, blank=True, null=True)
   thumb = models.FilePathField(blank=True, null=True)
   status = models.CharField(max_length=10, default="active")
+  numberOfRetry = models.IntegerField(default=2)
   
   def __unicode__(self):
         return u'%s %s' % (self.title, self.dateTime)

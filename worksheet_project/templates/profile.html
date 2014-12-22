@@ -8,7 +8,6 @@
 
 
 
-<div class="container">
   <div id="main-region" class="">
     <div>
       <div class="row">
@@ -157,10 +156,13 @@
         </div>
     </div>
   </div>
-</div>
         
         
         
+
+{% endblock %}  <!-- end of body block -->
+
+{% block modal %}
 <!---------------- modal ------------------------------------->
 <div id="update-school" class="modal fade" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
   <div class="modal-dialog">
@@ -202,10 +204,10 @@
           <form id="update-teacherStudent-form" class="form-horizontal style-form" action="{% url "userInfo_profile.views.teacherStudent" %}" enctype='multipart/form-data' method="post">{% csrf_token %}
             <input id="teacher_or_student" name="teacherStudent" type="hidden" value="" />
             <div class="col-xs-6">
-              <button type="submit" class="btn btn-block btn-lg btn-success rounded" onclick="$('#teacher-student').modal('hide');$('#teacher_or_student').val('teacher');">teacher</button>
+              <button type="submit" class="btn btn-block btn-lg btn-success rounded" onclick="$('#teacher_or_student').val('teacher');">teacher</button>
             </div>
             <div class="col-xs-6">
-              <button type="submit" class="btn btn-block btn-lg btn-success rounded" onclick="$('#teacher-student').modal('hide');$('#teacher_or_student').val('student');">student</button>
+              <button type="submit" class="btn btn-block btn-lg btn-success rounded" onclick="$('#teacher_or_student').val('student');">student</button>
             </div>
           </form>
         </div>
@@ -216,7 +218,11 @@
 
 
 
-<!---------------- modal ------------------------------------->
+
+
+
+
+<!---------------- modal ----------------------------------->
 <div id="reset-password" class="modal fade" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content rounded">
@@ -236,7 +242,7 @@
               <div class="form-group">
                       <div class="col-xs-12 col-sm-8 col-md-offset-2 text-center">
                           <input class="form-control" type="password" name="password2" required value="" placeholder="confirm...">
-                          <span class="register-check register-check-error"></span
+                          <span class="register-check register-check-error"></span>
                       </div>
               </div>
             </form>
@@ -251,6 +257,16 @@
 </div>
 
 
+
+
+
+
+
+
+
+
+
+
 <!---------------- modal ------------------------------------->
 <div id="change-username" class="modal fade" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
   <div class="modal-dialog">
@@ -261,16 +277,20 @@
       </div>
       <div class="modal-body centered">
             <form id="change-username-form" class="form-horizontal style-form" action="{% url "google_login.views.changeUsername" %}" enctype='multipart/form-data' method="post" autocomplete="off">{% csrf_token %}
-              <div class="row">
-                      <div class="col-xs-12 col-sm-8 col-md-offset-2 text-center">
-                        <div class="google-input-holder">
-                          <span class="glyphicon glyphicon-user"></span>
-                          <input type="text" name="userName" minlength="6" maxlength="15" required value="" placeholder="username..." autofocus>
-                          <span class="register-check register-check-error"></span>
-                        </div>
-                      </div>
+              
+	      <div class="form-group">
+                <label class="col-sm-3 control-label">Username</label>
+                <div class="col-sm-9">
+                  <input class="form-control" type="text" name="userName" minlength="6" maxlength="15" required value="" placeholder="Username..." autofocus>
+                  <span class="register-check register-check-error"></span>
+                </div>
               </div>
+              
             </form>
+	    
+	    
+	    
+	    
       </div>
       <div class="modal-footer bottom-rounded">
         <div class="col-xs-12 col-sm-8 col-md-offset-2">
@@ -284,7 +304,7 @@
 
         
         
-{% endblock %}
+{% endblock %}  <!-- end of modal block -->
 
 
 {% block extraScript %}

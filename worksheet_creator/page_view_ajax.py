@@ -14,7 +14,6 @@ import base64
 from django.shortcuts import render_to_response, redirect
 from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseBadRequest
 from django.core.exceptions import ObjectDoesNotExist
-from django.utils import simplejson
 from django.contrib.auth.models import *
 from django.contrib.auth import logout, login
 from django.contrib.auth.decorators import login_required
@@ -35,6 +34,7 @@ from apiclient import errors
 
 from userInfo_profile.models import UserInfo, MyAnswer, MyGrade
 from worksheet_creator.models import Project, BackImage, FormInput
+from google_login.models import CredentialsModel
 from worksheet_creator import settings
 
 #Test where the settings file is located (in home computer or on the server)
@@ -469,7 +469,7 @@ def deleteOldProject(request):
                             oldProject.formInputs.all().delete()
                             
                             userInfo.projects.remove(oldProject)
-                            oldProject.delete();
+                            oldProject.delete()
                             
                             
                             data = {
@@ -490,7 +490,120 @@ def deleteOldProject(request):
     return HttpResponse(json.dumps(data))
 
 
+@login_required
+def deleteProject(request):
+    if request.method == 'POST':
+        project_id = request.POST["worksheetID"]
+        
+        
+        if UserInfo.objects.filter(user=request.user):
+            userInfo = UserInfo.objects.get(user=request.user)
+            if Project.objects.filter(id=project_id):
+                oldProject = Project.objects.get(id=project_id)
+                for testUser in oldProject.userinfo_set.all():
+                    if userInfo == testUser:
+                        for image in oldProject.backgroundImages.all():
+                            imagePath = image.imagePath
+                                
+                        a, b = os.path.split(imagePath)
+                        fdir, folderName = os.path.split(a)
+                            
+                        #check if other projects with the same googleID are using the files
+                        if Project.objects.filter(originalFileID=oldProject.originalFileID):
+                            if Project.objects.filter(originalFileID=oldProject.originalFileID).count()<2:
+                                basePath = os.path.join(settings.ROOT_PATH,'media', request.user.first_name+request.user.last_name+str(request.user.id), str(folderName))
+                                make_sure_path_exists(basePath)
+                                shutil.rmtree(basePath)
+                            
+                        #build Service
+                        service = get_service(request.user)
+                            
+                        #put the file in trash
+                        file = delete_file(service, oldProject.uploadedFileID)
+                            
+                        oldProject.backgroundImages.all().delete()
+                        oldProject.formInputs.all().delete()
+                            
+                        userInfo.projects.remove(oldProject)
+                        oldProject.delete()
+                            
+                            
+                        data = {
+                            'success': "success",
+                        }
+                        
+                    else:
+                        data = {
+                            'error': "This project does not belong to this user.",
+                        }
+                        
+            
+            else:
+                data = {
+                    'error': "There is no project with that ID",
+                }
+                
+        
+        else:
+            data = {
+                'error': "There is no user with that ID",
+            }
+    else:
+        data = {
+            'error': "There was an error posting this request. Please try again.",
+        }
+        
+    
+    return HttpResponse(json.dumps(data))
 
+
+
+@login_required
+def changeWorksheetName(request):
+    if request.method == 'POST':
+        project_id = request.POST["worksheetID"]
+        worksheetName = request.POST["worksheet_name"].strip().title()
+        numberOfRetry = int(request.POST["numberOfRetry"].strip())
+        
+        
+        if UserInfo.objects.filter(user=request.user):
+            userInfo = UserInfo.objects.get(user=request.user)
+            if Project.objects.filter(id=project_id):
+                oldProject = Project.objects.get(id=project_id)
+                for testUser in oldProject.userinfo_set.all():
+                    if userInfo == testUser:
+                        oldProject.title = str(worksheetName)
+                        oldProject.numberOfRetry = numberOfRetry
+                        oldProject.save()
+                            
+                            
+                        data = {
+                            'success': "success",
+                        }
+                        
+                    else:
+                        data = {
+                            'error': "This project does not belong to this user.",
+                        }
+                        
+            
+            else:
+                data = {
+                    'error': "There is no project with that ID",
+                }
+                
+        
+        else:
+            data = {
+                'error': "There is no user with that ID",
+            }
+    else:
+        data = {
+            'error': "There was an error posting this request. Please try again.",
+        }
+        
+    
+    return HttpResponse(json.dumps(data))
 
 
 @login_required
@@ -499,7 +612,6 @@ def sendStudentAnswer(request):
         userInfo_id = request.POST["userInfo_id"]
         answerID = request.POST["inputNumber"]
         myAnswer = request.POST["answer"]
-        
         
         myAnswer = myAnswer.strip()
         myAnswer = myAnswer.lower()
@@ -521,8 +633,8 @@ def sendStudentAnswer(request):
                 data = {'answer':"incorrect"}
                 
             #record my answer
-            if MyAnswer.objects.filter(userInfo=userInfo, answerId=answerID):
-                myAnswerObject = MyAnswer.objects.get(userInfo=userInfo, answerId=answerID)
+            if MyAnswer.objects.filter(userInfo=userInfo, answer=question):
+                myAnswerObject = MyAnswer.objects.get(userInfo=userInfo, answer=question)
                 myAnswerObject.myAnswer = myAnswer
                 myAnswerObject.bCorrect = bCorrect
                 myAnswerObject.save()
@@ -531,7 +643,7 @@ def sendStudentAnswer(request):
                 myAnswerObject = MyAnswer.objects.create(
                     project = question.project_set.all()[0],
                     userInfo=userInfo,
-                    answerId = answerID,
+                    answer = question,
                     myAnswer = myAnswer,
                     bCorrect = bCorrect,
                 )
@@ -567,22 +679,25 @@ def submitGradeWorksheet(request):
             if Project.objects.filter(id=project_id):
                 project = Project.objects.get(id=project_id)
             else:
-                data = {
-                    'error': "There is no project with ID: "+str(project_id),
-                }
+                error = "There is no project with ID: "+str(project_id)
                 
-            #Get the grade file
+            #Get the Old grade file
             if MyGrade.objects.filter(userInfo=userInfo, project=project):
-                myGrade = MyGrade.objects.get(userInfo=userInfo, project=project)
+                oldTimesGraded = MyGrade.objects.filter(userInfo=userInfo, project=project).count()
             else:
-                myGrade = MyGrade.objects.create(
-                    project = project,
-                    userInfo=userInfo,
-                    pointsPossible = 0,
-                    pointsEarned = 0,
-                    average = 0,
-                    timesGraded = 0,
-                )
+                oldTimesGraded = 0
+            
+            
+            
+            #Create a grade file every time in order to show progress and average 
+            myGrade = MyGrade.objects.create(
+                project = project,
+                userInfo=userInfo,
+                pointsPossible = 0,
+                pointsEarned = 0,
+                average = 0,
+                timesGraded = oldTimesGraded,
+            )
                 
             #Get the points possible by adding each input question
             pointsPossible = 0
@@ -591,10 +706,14 @@ def submitGradeWorksheet(request):
             
             #get all the input questions for the project and loop through them
             if project.formInputs.all():
-                for question in project.formInputs.all():  #question is a FormInput
+                
+                myAnswers = {}
+                counter = 1
+                
+                for question in project.formInputs.all().order_by('pageNumber'):  #question is a FormInput
                     #get myAnswer for this question
-                    if MyAnswer.objects.filter(project=project, userInfo=userInfo, answerId=question.id):
-                        myAnswer = MyAnswer.objects.get(project=project, userInfo=userInfo, answerId=question.id)
+                    if MyAnswer.objects.filter(project=project, userInfo=userInfo, answer=question):
+                        myAnswer = MyAnswer.objects.get(project=project, userInfo=userInfo, answer=question)
                         
                         pointsPossible += float(question.points)
                         if myAnswer.bCorrect:
@@ -636,9 +755,7 @@ def submitGradeWorksheet(request):
                         pointsPossible += float(question.points)
                         
             else:
-                data = {
-                    'error': "There are no questions for the project with ID: "+str(project_id),
-                }
+                error = "There are no questions for the project with ID: "+str(project_id)
             
             #calculate an average at the end and add to the timesGraded
             average = float(float(pointsEarned)/float(pointsPossible)*float(100))
@@ -650,26 +767,25 @@ def submitGradeWorksheet(request):
             myGrade.timesGraded += 1
             myGrade.save()
             
-            data = {
-                'success':'success',
-                'pointsPossible':("%.2f" % round(pointsPossible,2)), #("%.2f" % round(x,2))
-                'pointsEarned':("%.2f" % round(pointsEarned,2)),
-                'average':("%.2f" % round(average,2)),
-                'timesGraded':myGrade.timesGraded,
+            numberAttemptsLeft = int(project.numberOfRetry) - int(myGrade.timesGraded)
+            
+            allMyAnswers = MyAnswer.objects.filter(project=project, userInfo=userInfo)
+            
+            args = {
+                'myGrade':myGrade,
+                'project': project,
+                "numberAttemptsLeft": numberAttemptsLeft,
+                'allMyAnswers':allMyAnswers,
             }
                 
                 
         else:
-            data = {
-                'error': "There is no user with ID: "+str(userInfo_id),
-            }
+            error = "There is no user with ID: "+str(userInfo_id)
     else:
-        data = {
-            'error': "There was an error posting this request. Please try again.",
-        }
+        error = "There was an error posting this request. Please try again."
         
     
-    return HttpResponse(json.dumps(data))
+    return render_to_response('grade_display.html', args)
 
 
 
@@ -954,10 +1070,11 @@ def uploadWorkboxImage(request):
             
             newPath = '/media/'+request.user.first_name+request.user.last_name+str(request.user.id)+'/'+ str(project.title[:5]+str(project.id))+'/'+'workBoxImage'+str(inputNumber)+'.jpg'
             
+            formInput = FormInput.objects.get(id=inputNumber)
             
             #record my answer
-            if MyAnswer.objects.filter(userInfo=userInfo, answerId=inputNumber):
-                myAnswerObject = MyAnswer.objects.get(userInfo=userInfo, answerId=inputNumber)
+            if MyAnswer.objects.filter(userInfo=userInfo, answer=formInput):
+                myAnswerObject = MyAnswer.objects.get(userInfo=userInfo, answer=formInput)
                 myAnswerObject.workImagePath = newPath
                 myAnswerObject.save()
                 
@@ -965,7 +1082,8 @@ def uploadWorkboxImage(request):
                 myAnswerObject = MyAnswer.objects.create(
                     project = project,
                     userInfo=userInfo,
-                    answerId = inputNumber,
+                    answer = formInput,
+                    bCorrect = True,
                     workImagePath = newPath,
                 )
                 
@@ -1033,6 +1151,55 @@ def getWorksheets(request):
 
 
 
+@login_required
+def toggleLockWorksheet(request):
+    if request.method == 'POST':
+        project_id = request.POST["worksheetID"]
+        
+        
+        if UserInfo.objects.filter(user=request.user):
+            userInfo = UserInfo.objects.get(user=request.user)
+            if Project.objects.filter(id=project_id):
+                oldProject = Project.objects.get(id=project_id)
+                for testUser in oldProject.userinfo_set.all():
+                    if userInfo == testUser:
+                        if oldProject.status == 'active':
+                            oldProject.status = 'locked'
+                        else:
+                            oldProject.status = 'active'
+                            
+                        oldProject.save()
+                            
+                            
+                        data = {
+                            'status': oldProject.status,
+                        }
+                        
+                    else:
+                        data = {
+                            'error': "This project does not belong to this user.",
+                        }
+                        
+            
+            else:
+                data = {
+                    'error': "There is no project with that ID",
+                }
+                
+        
+        else:
+            data = {
+                'error': "There is no user with that ID",
+            }
+        
+        
+        
+    else:
+        data = {
+            'error': "There was an error posting this request. Please try again.",
+        }
+            
+    return HttpResponse(json.dumps(data))
 
 
 

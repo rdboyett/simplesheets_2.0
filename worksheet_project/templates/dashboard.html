@@ -16,35 +16,43 @@
 					<! -- ROW OF PANELS -->
 					<!-- Product Panel -->
 					<div class="row">
-						<div class="col-lg-4 col-md-4 col-sm-4 mb">
-							<div class="content-panel pn">
-								<div id="profile-01" class="bg{{ randomNumber|random }}">
-									<img src="../media/RobertBoyett1/Simpl0B5JU/thumbnail.png" alt="worksheet">
-								</div>
-								<div class="profile-01 centered">
-									<p>Name of Worksheet</p>
-								</div>
-								<div class="centered">
-								    <button type="button" class="col-xs-4 btn btn-default" data-container="body"
-									    data-toggle="popover" data-placement="bottom" data-trigger="hover"
-									    data-content="Edit">
-										<i class="fa fa-edit fa-2x"></i>
-								    </button>
-								    <button type="button" class="col-xs-4 btn btn-default" data-container="body"
-									    data-toggle="popover" data-placement="bottom" data-trigger="hover"
-									    data-content="Monitor">
-										<i class="fa fa-bar-chart-o fa-2x"></i>
-								    </button>
-								    <button type="button" class="col-xs-4 btn btn-default" data-container="body"
-									    data-toggle="popover" data-placement="bottom" data-trigger="hover"
-									    data-content="Delete">
-										<i class="fa fa-trash-o fa-2x"></i>
-								    </button>
-								</div>
-							</div>
-						</div><! --/col-md-4 -->
-						
-						
+{% if allProjects %}
+          
+          {% for worksheet in allProjects %}
+          <!------------------------------ Worksheet Display ------------------------------------->
+          <div class="col-lg-4 col-md-4 col-sm-4 mb">
+            <div class="content-panel pn">
+              <div id="profile-01" class="bg{{ randomNumber|random }}">
+                <img src="{{ worksheet.thumb }}" alt="worksheet">
+              </div>
+              <div class="profile-01 centered">
+                <a href="{% url "worksheet_project.views.worksheet_display" worksheet.id %}"><p>{{ worksheet.title|capfirst }}</p></a>
+              </div>
+              <div class="centered">
+                <a href="{% url "worksheet_project.views.showNextPage" worksheet.id 1 %}"><button type="button" class="col-xs-4 btn btn-default" data-container="body"
+                  data-toggle="popover" data-placement="bottom" data-trigger="hover"
+                  data-content="Edit">
+                  <i class="fa fa-edit fa-2x"></i>
+                </button>
+                <a href="{% url "worksheet_project.views.monitor" worksheet.id %}"><button type="button" class="col-xs-4 btn btn-default" data-container="body"
+                  data-toggle="popover" data-placement="bottom" data-trigger="hover"
+                  data-content="Monitor">
+                  <i class="fa fa-bar-chart-o fa-2x"></i>
+                </button></a>
+                <button type="button" class="col-xs-4 btn btn-default" data-container="body"
+                  data-toggle="popover" data-placement="bottom" data-trigger="hover"
+                  data-content="Delete" onclick="$('#worksheetID-hidden-input').val({{ worksheet.id }});$('#delete-worksheet').modal('show');">
+                  <i class="fa fa-trash-o fa-2x"></i>
+                </button>
+              </div>
+            </div>
+          </div><! --/col-md-4 -->
+          <!------------------------------ End of Worksheet Display ------------------------------------->
+          {% endfor %}
+          
+{% else %}
+  <h5>Sorry, there are no assignments yet.</h5>
+{% endif %}
 					</div><! --  ROW OF PANELS -->
           		
 					
@@ -55,7 +63,13 @@
 
 
 {% block extraScript %}
-    <script src="{% static "adminBoot/js/dashboard.js" %}"></script>  
+    <script src="{% static "adminBoot/js/dashboard.js" %}"></script>
+    
+      {% if not classUser.teacher %}
+	<script>
+		window.location.href = "/classes/";
+	</script>
+      {% endif %}
 {% endblock %}
 
 

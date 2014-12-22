@@ -114,10 +114,105 @@ var Script = function () {
             }, 2000)
         })
     }
+    
+    
+    
+jQuery.validator.addMethod("complete_url", function(val, elem) {
+    // if no url, don't do anything
+    if (val.length == 0) { return true; }
+
+    // if user has not entered http:// https:// or ftp:// assume they mean http://
+    if(!/^(https?|ftp):\/\//i.test(val)) {
+        val = 'http://'+val; // set both the value
+        $(elem).val(val); // also update the form element
+    }
+    // now check if valid url
+    // http://docs.jquery.com/Plugins/Validation/Methods/url
+    // contributed by Scott Gonzalez: http://projects.scottsplayground.com/iri/
+    return /^(https?|ftp):\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&amp;'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&amp;'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&amp;'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&amp;'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&amp;'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i.test(val);
+}, "oops, link is not valid");
+
+
+    $("form").each(function(){
+        $(this).validate();
+    });
+    
+    $("#create-class-form").validate({
+            errorPlacement: function(error, element){
+		element.parent().parent().prepend(error);
+            },
+	    highlight: function(element, errorClass, validClass) {
+		$(element).addClass(errorClass).removeClass(validClass);
+		$(element.form).find("label[for=" + element.id + "]")
+		  .addClass(errorClass);
+		var check = $(element).next();
+		if (check.hasClass("register-check-good")) {
+		    check.removeClass("register-check-good").addClass("register-check-error");
+		}else{
+		    
+		}
+		check.fadeIn(300);
+	    },
+	    unhighlight: function(element, errorClass, validClass) {
+		$(element).removeClass(errorClass).addClass(validClass);
+		$(element.form).find("label[for=" + element.id + "]")
+		  .removeClass(errorClass);
+		var check = $(element).next();
+		if (check.hasClass("register-check-error")) {
+		    check.removeClass("register-check-error").addClass("register-check-good");
+		}
+		check.fadeIn(300);
+	    },
+    });
+    
+    
+    $("#create-class-form").ajaxForm({ 
+            success:       function(responseText){
+                console.log(responseText);
+                if (responseText.error) {
+                    alert(responseText.error);
+                }else if (responseText.groupID) {
+                    $('#new-class').modal('hide');
+                    window.location.href = "/classes/"+responseText.groupID+"/";
+                }
+            },
+            dataType:  'json',
+            timeout:   4000 
+        });
+    
+    
 
     
+    $("#delete-worksheet-form").ajaxForm({ 
+            success:       function(responseText){
+                var error = (responseText.error);
+                if (error) {
+                    alert(responseText.error);
+                }else {
+                    
+                    location.reload();
+                }
+            },
+            dataType:  'json',
+            timeout:   4000 
+        });
     
     
+    
+    
+    $("#join-class-form").ajaxForm({ 
+            success:       function(responseText){
+                var error = (responseText.error);
+                if (error) {
+                    alert(responseText.error);
+                }else {
+                    $('#join-class').modal('hide');
+                    window.location.href = "/classes/"+responseText.groupID+"/";
+                }
+            },
+            dataType:  'json',
+            timeout:   4000 
+        });
     
     
     

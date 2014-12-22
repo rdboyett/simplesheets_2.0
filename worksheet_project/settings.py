@@ -95,7 +95,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
 STATIC_URL = '/static/'
-TEMPLATE_DIRS = (os.path.join(ROOT_PATH,'templates'))
+TEMPLATE_DIRS = (os.path.join(ROOT_PATH,'templates'),)
 STATICFILES_DIRS = (os.path.join(ROOT_PATH,'static'),)
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.

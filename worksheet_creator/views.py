@@ -13,7 +13,6 @@ import shutil
 from django.shortcuts import render_to_response, redirect
 from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseBadRequest
 from django.core.exceptions import ObjectDoesNotExist
-from django.utils import simplejson
 from django.contrib.auth.models import User
 from django.contrib.auth import logout, login
 from django.contrib.auth.decorators import login_required
@@ -57,6 +56,7 @@ def startCreate(request, fileId=False):
         return render_to_response('google-login-wait.html', {
             "worksheet":True,
             "fileId":fileId,
+            
         })
 
 #worksheet/create/0B5JUxbetYkEaeHVKTEw1TFpBelE  (here is good practice link)
@@ -144,10 +144,17 @@ def create(request):
                             filenames.append(os.path.join(baseFilePath,title + '.jpg'))
                             
                             
-                        
+                            
+                        if Project.objects.filter(title__istartswith=rawTitle):
+                            nameCount = Project.objects.filter(title__istartswith=rawTitle).count()
+                            nameCount+=1
+                            nameNumber=" ("+str(nameCount)+")"
+                        else:
+                            nameNumber=""
+                            
                         #create a project-----------------------------------------------------------------------------------
                         newProject = Project.objects.create(
-                            title = title,
+                            title = rawTitle+str(nameNumber),
                             originalFileID = fileId,
                         )
                         userInfo.projects.add(newProject)
@@ -245,6 +252,44 @@ def create(request):
         
     
     return HttpResponse(json.dumps(data))
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         
         
         

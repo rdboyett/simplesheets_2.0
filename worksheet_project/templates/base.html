@@ -21,19 +21,24 @@
     <!-- Custom styles for this template -->
     <link href="{% static "adminBoot/css/style.css" %}" rel="stylesheet">
     <link href="{% static "adminBoot/css/style-responsive.css" %}" rel="stylesheet">
-      
+    
+    <!--
     <link rel="stylesheet" type="text/css" href="{% static "adminBoot/css/zabuto_calendar.css" %}">
     <link rel="stylesheet" type="text/css" href="{% static "adminBoot/js/gritter/css/jquery.gritter.css" %}" />
     <link rel="stylesheet" type="text/css" href="{% static "adminBoot/lineicons/style.css" %}">    
 
     
     <script src="{% static "adminBoot/js/chart-master/Chart.js" %}"></script>
+    -->
     
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
       <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
       <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="//ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"></script>
     
     {% block extraBottomHead %}{% endblock %}
     
@@ -51,8 +56,8 @@
                   <div class="fa fa-bars tooltips" data-placement="right" data-original-title="Toggle Navigation"></div>
               </div>
             <!--logo start-->
-            <a href="index.html" class="logo">
-              <img style="width:120%;max-width: 200px;margin:-5px 0 0 10px;" src="{% static "main_project/images/Simplesheets-dot-logo.png" %}" alt="SimpleSheets" />
+            <a href="{% url "worksheet_project.views.index" %}" class="logo">
+              <img style="width:120%;max-width: 220px;margin:-5px 0 0 10px;" src="{% static "adminBoot/img/duck-bowl-spoon.svg" %}" alt="SimpleSheets" />
             </a>
             <!--logo end-->
             <div class="top-menu">
@@ -88,6 +93,7 @@
                   </a></p>
               	
                 
+                {% if classUser.teacher %}
                   <li class="mt">
                       <a class="{% if dashboard %}active{% endif %}" href="{% url "worksheet_project.views.dashboard" %}">
                           <i class="fa fa-dashboard"></i>
@@ -103,9 +109,9 @@
                       <ul class="sub">
                           <li class="{% if create %}active{%endif%}"><a  href="{% url "google_drive.views.google_picker" %}">Create</a></li>
                           <li class="{% if assign %}active{%endif%}"><a  href="{% url "worksheet_project.views.assign" %}">Assign</a></li>
-                          <li class="{% if monitor %}active{%endif%}"><a  href="{% url "worksheet_project.views.monitor" %}">Monitor</a></li>
                       </ul>
                   </li>
+		{% endif %}
 
               {% if allClasses %}
                   <li class="sub-menu">
@@ -122,12 +128,21 @@
                       </ul>
                   </li>
               {% else %}
-                  <li class="sub-menu">
-                      <a href="#">
+                {% if classUser.teacher %}
+                  <li id="blinky-class" class="sub-menu">
+                      <a href="#" class="active" data-toggle="modal" data-target="#new-class">
                         <i class="fa fa-warning text-danger"></i>
                         <span class="text-danger" style="font-weight: bold;">CREATE A CLASS</span>
                       </a>
                   </li>
+		{% else %}
+                  <li id="blinky-class" class="sub-menu">
+                      <a href="#" class="active" data-toggle="modal" data-target="#join-class">
+                        <i class="fa fa-warning text-danger"></i>
+                        <span class="text-danger" style="font-weight: bold;">JOIN A CLASS</span>
+                      </a>
+                  </li>
+		{% endif %}
               {% endif %}
               
                 {% if classUser.teacher %}
@@ -138,8 +153,10 @@
                   </a>
                 </li>
                 {%endif%}
+		
+		
                 <li class="sub-menu">
-                  <a class="btn btn-warning" data-toggle="modal" data-target="#new-class">
+                  <a class="btn btn-warning" data-toggle="modal" data-target="{% if classUser.teacher %}#new-class{%else%}#join-class{%endif%}">
                         <i class="fa fa-users" style="color: #424a5d;"></i>
                         <span class="" style="color: #424a5d;">{% if classUser.teacher %} new class{%else%} join a class{%endif%}</span>
                   </a>
@@ -159,17 +176,28 @@
       *********************************************************************************************************************************************************** -->
       <!--main content start-->
       <section id="main-content">
-          <section class="wrapper" style="margin-top: 70px;">
+          <section class="wrapper" style="">
                         
                         {% block body %}{% endblock %}
                         
-		</section><! --/wrapper -->
+		</section>  <!--/wrapper -->
       </section><!-- /MAIN CONTENT -->
 
       <!--main content end-->
   </section>
 
-<!---------------- modal ------------------------------------->
+
+
+
+      <!-- **********************************************************************************************************************************************************
+      BASE MODAL POPUPS
+      *********************************************************************************************************************************************************** -->
+
+      {% block modal %}{% endblock %}
+      
+      
+{% if classUser.teacher %}
+<!-- *****************    Create a New Class   ******************************************************* -->
 <div id="new-class" class="modal fade" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content rounded">
@@ -177,18 +205,19 @@
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
         <h4 class="modal-title">create a class</h4>
       </div>
-      <div class="modal-body">
-            <form id="create-class-form" action="{% url "classrooms.ajax.createGroup" %}" enctype='multipart/form-data' method="post" autocomplete="off">{% csrf_token %}
-              <div class="row">
-                      <div class="col-xs-12 col-sm-8 col-md-offset-2 text-center">
-                        <div class="google-input-holder">
-                          <span class="glyphicon glyphicon-home"></span>
-                          <input type="text" name="group_name" minlength="3" maxlength="40" required value="" placeholder="Class Name..." autofocus>
-                          <span class="register-check register-check-error"></span>
-                        </div>
-                      </div>
-              </div>
+      <div class="modal-body centered">
+            <form id="create-class-form" class="form-horizontal style-form" action="{% url "classrooms.ajax.createGroup" %}" enctype='multipart/form-data' method="post" autocomplete="off">{% csrf_token %}
+              
+		      <div class="form-group">
+			<label class="col-sm-3 control-label">Class Name</label>
+			<div class="col-sm-9">
+			  <input class="form-control" type="text" name="group_name" minlength="3" maxlength="40" required value="" placeholder="Class Name..." autofocus>
+			  <span class="register-check register-check-error"></span>
+			</div>
+		      </div>
+              
             </form>
+	    
       </div>
       <div class="modal-footer bottom-rounded">
         <button type="button" class="btn btn-default rounded" data-dismiss="modal">close</button>
@@ -197,10 +226,70 @@
     </div>
   </div>
 </div>
+{% else %}
+<!-- *****************    Join a New Class   ******************************************************* -->
+<div id="join-class" class="modal fade" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content rounded">
+      <div class="modal-header top-rounded">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">join a class</h4>
+      </div>
+      <div class="modal-body centered">
+            <form id="join-class-form" class="form-horizontal style-form" action="{% url "classrooms.ajax.joinGroup" %}" enctype='multipart/form-data' method="post" autocomplete="off">{% csrf_token %}
+              
+		      <div class="form-group">
+			<label class="col-sm-3 control-label">Class Code</label>
+			<div class="col-sm-9">
+			  <input class="form-control" type="text" name="groupCode" minlength="3" maxlength="6" required value="" placeholder="Class Code..." autofocus>
+			  <span class="register-check register-check-error"></span>
+			</div>
+		      </div>
+              
+            </form>
+	    
+      </div>
+      <div class="modal-footer bottom-rounded">
+        <button type="button" class="btn btn-default rounded" data-dismiss="modal">close</button>
+        <button type="submit" form="join-class-form" class="btn btn-primary rounded">join</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+
+
+<!-- *****************    Delete A Worksheet   ******************************************************* -->
+<div id="delete-worksheet" class="modal fade" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content rounded">
+      <div class="modal-header top-rounded">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">Delete?</h4>
+      </div>
+      <div class="modal-body centered">
+            <form id="delete-worksheet-form" class="form-horizontal style-form" action="{% url "worksheet_creator.page_view_ajax.deleteProject" %}" enctype='multipart/form-data' method="post" autocomplete="off">{% csrf_token %}
+              <input id="worksheetID-hidden-input" type="hidden" name="worksheetID" value="">
+	      <div>Are you sure you want to <span class="text-danger">delete</span> this worksheet?</div>
+            </form>
+	    
+      </div>
+      <div class="modal-footer bottom-rounded">
+        <button type="button" class="btn btn-default rounded" data-dismiss="modal">no</button>
+        <button type="submit" form="delete-worksheet-form" class="btn btn-danger rounded">DELETE</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+      <!-- **********************************************************************************************************************************************************
+      END OF MODAL POPUPS
+      *********************************************************************************************************************************************************** -->
 
     <!-- js placed at the end of the document so the pages load faster -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-    <script src="//ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"></script>
     
     <script src="{% static "adminBoot/js/bootstrap.min.js" %}"></script>
     <script src="{% static "adminBoot/js/jquery-ui-1.9.2.custom.min.js" %}"></script>
@@ -229,7 +318,13 @@
     
     
     <!--script for this page-->
-    
+    <script>
+      {% if not allClasses %}
+	setInterval(function(){
+	  $("#blinky-class a").toggleClass("active");
+	},500);
+      {% endif %}
+    </script>
 
   {% block extraScript %}{% endblock %}
   

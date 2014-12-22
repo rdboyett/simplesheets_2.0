@@ -30,10 +30,11 @@ urlpatterns += patterns('worksheet_project.views',
     (r'^nextPage/(?P<projectID>(\d+))/(?P<pageNumber>(\d+))/$', 'showNextPage'),
     (r'^classes/(?P<classID>(\d+))/$', 'classes'),
     (r'^classes/$', 'classes'),
-    (r'^monitor/$', 'monitor'),
+    (r'^monitor/(?P<projectID>(\d+))/$', 'monitor'),
     (r'^edit-profile/$', 'profile'),
     (r'^assign/(?P<projectID>(\d+))/$', 'assign'),
     (r'^assign/$', 'assign'),
+    (r'^worksheet_display/(?P<projectID>(\d+))/$', 'worksheet_display'),
     
 
     (r'^test/$', 'test'),

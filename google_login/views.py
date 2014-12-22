@@ -12,7 +12,6 @@ from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 from django.core.context_processors import csrf
-from django.utils import simplejson
 from django.core.mail import send_mail
 from django.utils import timezone
 

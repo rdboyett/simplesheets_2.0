@@ -1,9 +1,11 @@
+import datetime
+
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django.db import models
 
 
-from worksheet_creator.models import Project
+from worksheet_creator.models import Project, FormInput
 
 class UserInfo(models.Model):
     user = models.ForeignKey(User)
@@ -24,6 +26,7 @@ class MyGrade(models.Model):
   pointsEarned = models.IntegerField()
   average = models.IntegerField()
   timesGraded = models.IntegerField()
+  dateTime = models.DateTimeField(auto_now_add=True, blank=True)
 
   def __unicode__(self):
         return u'%s %s' % (self.project, self.userInfo)
@@ -36,9 +39,11 @@ class MyGrade(models.Model):
 class MyAnswer(models.Model):
   project = models.ForeignKey(Project)
   userInfo = models.ForeignKey(UserInfo)
-  answerId = models.IntegerField()
+  
+  answer = models.ForeignKey(FormInput)
+  
   myAnswer = models.TextField(blank=True, null=True)
-  bCorrect = models.BooleanField()
+  bCorrect = models.BooleanField(default=True)
   workImagePath = models.FilePathField(blank=True, null=True)
 
   def __unicode__(self):

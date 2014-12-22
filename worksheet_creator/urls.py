@@ -32,5 +32,8 @@ urlpatterns += patterns('worksheet_creator.page_view_ajax',
     url(r'^updateInputPosition/$', 'updateInputPosition', name='updateInputPosition'),
     url(r'^uploadWorkboxImage/$', 'uploadWorkboxImage', name='uploadWorkboxImage'),
     (r'^getWorksheets/$', 'getWorksheets'),
+    (r'^deleteProject/$', 'deleteProject'),
+    (r'^changeWorksheetName/$', 'changeWorksheetName'),
+    (r'^toggleLockWorksheet/$', 'toggleLockWorksheet'),
     
 )

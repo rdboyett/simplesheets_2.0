@@ -36,7 +36,7 @@ $(document).ready(function(){
             //console.log(responseText.teacherStudent);
             if (responseText.error) {
                 alert(responseText.error);
-            }else{$('#teacher-student').modal('hide');}
+            }else{location.reload();}
         },
         //error: function(xhr, statusText, error){},  //when an error occurs
         

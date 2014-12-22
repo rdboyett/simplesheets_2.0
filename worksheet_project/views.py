@@ -4,7 +4,6 @@ from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 from django.core.context_processors import csrf
-from django.utils import simplejson
 from django.core.mail import send_mail
 
 from userInfo_profile.models import UserInfo, MyAnswer, MyGrade
@@ -56,7 +55,65 @@ def dashboard(request):
     else:
         googleUserInfo = False
         
+    
+    if userInfo.projects.all():
+        allProjects = userInfo.projects.all().order_by('-id')
+    else:
+        allProjects = False
+    
+    #Get all users Classes
+    if ClassUser.objects.filter(user=request.user):
+        classUser = ClassUser.objects.get(user=request.user)
+    else:
+        if userInfo.teacher_student == 'teacher':
+            teacher = True
+        else:
+            teacher = False
+        classUser = ClassUser.objects.create(
+            user = request.user,
+            teacher = teacher,
+        )
         
+    #Get all users Class
+    if classUser.classrooms.all():
+        allClasses = classUser.classrooms.all().order_by('name')
+    else:
+        allClasses = False
+    
+    
+    
+    
+    args = {
+            "dashboard":True,
+            "userInfo":userInfo,
+            "googleUserInfo":googleUserInfo,
+            "allClasses":allClasses,
+            "classUser":classUser,
+            "randomNumber":['1','2','3','4','5','6'],
+            "allProjects":allProjects,
+        }
+    args.update(csrf(request))
+    
+    
+    return render_to_response('dashboard.html', args)
+
+
+
+@login_required
+def showNextPage(request, projectID=False, pageNumber=False):
+    if not projectID:
+        return HttpResponseRedirect("/worksheet/pickFile/")
+    
+    if not pageNumber:
+        pageNumber = 1
+    
+    (newProject, userInfo, bTeacher) = checkIfTeacher(request.user, projectID)
+    
+    
+    #Check if it's a new user
+    if not request.user.first_name or not request.user.last_name or not userInfo.teacher_student:
+        return HttpResponseRedirect("/edit-profile/")
+    
     if GoogleUserInfo.objects.filter(user=request.user):
         googleUserInfo = GoogleUserInfo.objects.get(user=request.user)
     else:
@@ -84,23 +141,8 @@ def dashboard(request):
     
     
     
-    return render_to_response('dashboard.html', {
-            "dashboard":True,
-            "userInfo":userInfo,
-            "googleUserInfo":googleUserInfo,
-            "allClasses":allClasses,
-            "classUser":classUser,
-            "randomNumber":['1','2','3','4','5','6'],
-        })
-
-
-
-@login_required
-def showNextPage(request, projectID=False, pageNumber=False):
-    if not projectID or not pageNumber:
-        return HttpResponseRedirect("/worksheet/pickFile/")
     
-    (newProject, userInfo, bTeacher) = checkIfTeacher(request.user, projectID)
+    
     
     if newProject:
         totalPages = int(newProject.backgroundImages.all().count())
@@ -115,21 +157,32 @@ def showNextPage(request, projectID=False, pageNumber=False):
             myAnswers = False
             
         if bTeacher:
-            webPage = 'show_file.html'
+            webPage = 'edit_worksheet.html'
         else:
-            webPage = 'student_file.html'
+            webPage = 'student_worksheet.html'
             
-        return render_to_response(webPage, {
-              'user':request.user,
-              'userInfo': userInfo,
-              'newProject':newProject,
-              'myAnswers':myAnswers,
-              'pageNumber':int(pageNumber),
-              'totalPages':int(totalPages),
-              'pageRange':range(int(totalPages)),
-              'formInputs':formInputs,
-              'bTeacher':bTeacher,
-              })
+            
+        args = {
+                "worksheet":True,
+                  'user':request.user,
+                "userInfo":userInfo,
+                "googleUserInfo":googleUserInfo,
+                "allClasses":allClasses,
+                "classUser":classUser,
+                  'newProject':newProject,
+                  'myAnswers':myAnswers,
+                  'pageNumber':int(pageNumber),
+                  'totalPages':int(totalPages),
+                  'pageRange':range(int(totalPages)),
+                  'formInputs':formInputs,
+                  'bTeacher':bTeacher,
+            }
+        args.update(csrf(request))
+    
+            
+            
+            
+        return render_to_response(webPage, args)
     else:
         return render_to_response('error_page.html', {'error':"Oops! We can't find that worksheet.",})
 
@@ -194,7 +247,7 @@ def classes(request, classID=False):
 
 
 @login_required
-def monitor(request):
+def monitor(request, projectID=False):
     if UserInfo.objects.filter(user=request.user):
         userInfo = UserInfo.objects.get(user=request.user)
 
@@ -216,6 +269,15 @@ def monitor(request):
             teacher = teacher,
         )
         
+    #Get current Worksheet Project
+    if projectID:
+        if Project.objects.filter(id=projectID):
+            currentProject = Project.objects.get(id=projectID)
+        else:
+            currentProject = False
+    else:
+        return redirect('/dashboard/')
+        
     #Get all users Class
     if classUser.classrooms.all():
         allClasses = classUser.classrooms.all().order_by('name')
@@ -223,14 +285,18 @@ def monitor(request):
         allClasses = False
     
     
-
-    return render_to_response('monitor.html', {
+    args = {
             "worksheet":True,
             "googleUserInfo":googleUserInfo,
             "allClasses":allClasses,
             "monitor":True,
             "classUser":classUser,
-        })
+            "currentProject":currentProject,
+        }
+    args.update(csrf(request))
+        
+
+    return render_to_response('monitor.html', args)
 
 
 
@@ -348,6 +414,84 @@ def assign(request, projectID=False):
     args.update(csrf(request))
         
     return render_to_response('assign.html', args)
+
+
+
+
+
+
+
+@login_required
+def worksheet_display(request, projectID=False):
+    if UserInfo.objects.filter(user=request.user):
+        userInfo = UserInfo.objects.get(user=request.user)
+    else:
+        userInfo = False
+    
+    #Get all users Classes
+    if ClassUser.objects.filter(user=request.user):
+        classUser = ClassUser.objects.get(user=request.user)
+    else:
+        if userInfo.teacher_student == 'teacher':
+            teacher = True
+        else:
+            teacher = False
+        classUser = ClassUser.objects.create(
+            user = request.user,
+            teacher = teacher,
+        )
+        
+    #Get current Worksheet Project
+    if projectID:
+        if Project.objects.filter(id=projectID):
+            currentProject = Project.objects.get(id=projectID)
+        else:
+            return redirect('/dashboard/')
+    else:
+        return redirect('/dashboard/')
+        
+    #Get all users Worksheet Projects
+    if classUser.classrooms.all():
+        allClasses = classUser.classrooms.all().order_by('name')
+    else:
+        allClasses = False
+    
+    
+    if GoogleUserInfo.objects.filter(user=request.user):
+        googleUserInfo = GoogleUserInfo.objects.get(user=request.user)
+    else:
+        googleUserInfo = False
+
+
+    args = {
+            "worksheet":True,
+            "userInfo":userInfo,
+            "classUser":classUser,
+            "allClasses":allClasses,
+            "googleUserInfo":googleUserInfo,
+            "randomNumber":['1','2','3','4','5','6'],
+            "currentProject":currentProject
+        }
+    args.update(csrf(request))
+        
+    return render_to_response('worksheet_display.html', args)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

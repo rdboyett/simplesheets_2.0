@@ -11,7 +11,7 @@ from django.contrib.auth.decorators import login_required
 
 from userInfo_profile.models import UserInfo
 from userInfo_profile import settings
-
+from classrooms.models import ClassUser
 
 
 @login_required
@@ -56,10 +56,28 @@ def teacherStudent(request):
             userInfo = UserInfo.objects.get(user=request.user)
             userInfo.teacher_student = teacherStudent
             userInfo.save()
+            
         else:
             data = {
                 'error': "There is now userInfo for the user",
             }
+            
+        
+        if teacherStudent == 'teacher':
+            teacher = True
+        else:
+            teacher = False
+            
+        #Get all users Classes
+        if ClassUser.objects.filter(user=request.user):
+            classUser = ClassUser.objects.get(user=request.user)
+            classUser.teacher = teacher
+            classUser.save()
+        else:
+            classUser = ClassUser.objects.create(
+                user = request.user,
+                teacher = teacher,
+            )
         
     else:
         data = {
