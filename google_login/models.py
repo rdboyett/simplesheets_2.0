@@ -29,6 +29,7 @@ class GoogleUserInfo(models.Model):
 class ForgottenPassword(models.Model):
     dateTime = models.DateTimeField(auto_now=True)
     used = models.BooleanField(default=False)
+    user = models.ForeignKey(User)
 
     def __unicode__(self):
       return u'%s %s ' % (self.id, self.dateTime)

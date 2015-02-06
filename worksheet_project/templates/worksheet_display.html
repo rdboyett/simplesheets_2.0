@@ -1,0 +1,279 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+
+{% block title %}{{ currentProject.title|capfirst }}{% endblock %}
+
+
+    {% block extraBottomHead %}
+    <link href="{% static "adminBoot/css/table-responsive.css" %}" rel="stylesheet">
+    {% endblock %}
+
+{% block body %}
+
+
+
+  <div class="row">
+    <div class="col-sm-9 col-md-10">
+      <a id="class-title" data-toggle="modal" data-target="#worksheet-settings">
+        <h1><i class="fa fa-angle-double-right"></i>  {% if currentProject %}{{ currentProject.title|capfirst }}{%endif%}  <i class="fa fa-gears"></i></h1>
+      </a>
+    </div>
+    <div class="col-xs-6 col-xs-offset-3 col-sm-offset-0 col-sm-3 col-md-2 mt">
+                
+            <form id="toggle-lock-worksheet-form" class="" action="{% url "worksheet_creator.page_view_ajax.toggleLockWorksheet" %}" enctype='multipart/form-data' method="post" autocomplete="off">{% csrf_token %}
+              <div class="">
+                <input type="hidden" name="worksheetID" value="{{ currentProject.id }}">
+                <div class="">
+                  {% ifequal currentProject.status "locked" %}
+                  <button type="submit" class="btn btn-success btn-block pull-right"><i class="fa fa-unlock"></i>  activate</button>
+                  {% else %}
+                  <button type="submit" class="btn btn-danger btn-block pull-right"><i class="fa fa-lock"></i>  lock</button>
+                  {% endifequal %}
+                </div>
+              </div>
+            </form>
+    </div>
+  </div> <!-- end of row -->
+  
+  <div class="row">
+        <ul class="list-unstyled col-lg-4 col-md-6 col-sm-6 mb">
+          <!------------------------------ Worksheet Display ------------------------------------->
+          <div class="">
+            <div class="content-panel pn">
+              <div id="profile-01" class="bg{{ randomNumber|random }}">
+                <img src="{{ currentProject.thumb }}" alt="worksheet">
+              </div>
+              <div class="profile-01 centered">
+                <p  data-toggle="modal" data-target="#worksheet-settings">{{ currentProject.title|capfirst }}</p>
+              </div>
+              <div class="centered">
+                <a href="{% url "worksheet_project.views.showNextPage" currentProject.id 1 %}"><button type="button" class="col-xs-4 btn btn-default" data-container="body"
+                  data-toggle="popover" data-placement="bottom" data-trigger="hover"
+                  data-content="Edit">
+                  <i class="fa fa-edit fa-2x"></i>
+                </button>
+                <a href="{% url "worksheet_project.views.monitor" currentProject.id %}"><button type="button" class="col-xs-4 btn btn-default" data-container="body"
+                  data-toggle="popover" data-placement="bottom" data-trigger="hover"
+                  data-content="Monitor">
+                  <i class="fa fa-bar-chart-o fa-2x"></i>
+                </button></a>
+                <button type="button" class="col-xs-4 btn btn-default" data-container="body"
+                  data-toggle="popover" data-placement="bottom" data-trigger="hover"
+                  data-content="Delete" onclick="$('#worksheetID-hidden-input').val({{ worksheet.id }});$('#delete-worksheet').modal('show');">
+                  <i class="fa fa-trash-o fa-2x"></i>
+                </button>
+              </div>
+            </div>
+          </div><! --/col-md-4 -->
+          <!------------------------------ End of Worksheet Display ------------------------------------->
+        </ul>
+        
+        <div class="worksheet-info col-lg-5 col-md-6 col-sm-6 mb">
+          <div class="showback col-xs-12 mb">
+	    <div id="profile-01" class="noBg">
+              <ul class="list-group" style="margin-bottom: 0;">
+                <li class="list-group-item">
+                  created on:
+                  <span class="label label-primary label-as-badge">{{ currentProject.dateTime|date }}</span>
+                </li>
+                {% with total=currentProject.backgroundImages.count %}
+                    <li class="list-group-item">
+                      total pages:
+                      <span class="label label-primary label-as-badge">{{ total }}</span>
+                    </li>
+                {% endwith %}
+                {% with total=currentProject.formInputs.count %}
+                    <li class="list-group-item">
+                      total questions:
+                      <span class="label label-primary label-as-badge">{{ total }}</span>
+                    </li>
+                {% endwith %}
+                <a href="#"><li class="list-group-item"  data-toggle="modal" data-target="#worksheet-settings">
+                  number of attempts per student:
+                  <span class="label label-primary label-as-badge">{{ currentProject.numberOfRetry }}</span>
+                </li></a>
+                <li class="list-group-item">
+                  total students complete:
+                  <span class="label label-primary label-as-badge">14</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+  </div>  <!-- end of row -->
+  
+  
+        <div class="row">
+          <div class="showback col-xs-12 mb">
+	    <div id="profile-01" class="noBg">
+              <h4><i class="fa fa-angle-right"></i>&nbsp;&nbsp;Questions
+              <a href="{% url "worksheet_project.views.showNextPage" currentProject.id 1 %}"
+                 class="btn btn-primary pull-right" style="margin-bottom: 5px;margin-top: -10px;">Add Questions</a></h4>
+              
+              <div class="row">
+                
+                    <div class="col-xs-12">
+                          <section id="no-more-tables">
+                            <table class="table table-bordered table-striped table-condensed cf">
+                              <thead class="cf">
+                              <tr>
+                                  <th class="numeric">Page No.</th>
+                                  <th class="numeric">No.</th>
+                                  <th>Type</th>
+                                  <th class="text-center" colspan="4">Answer</th>
+                                  <th class="numeric">Value</th>
+                                  <th class="numeric">Avg <span class="fa fa-check"></span></th>
+                              </tr>
+                              </thead>
+                              <tbody>
+                              {% if currentProject.formInputs.count > 0 %}
+                                {% for input in currentProject.formInputs.all|dictsort:"questionNumber" %}
+                              <tr>
+                                  <td class="numeric" data-title="Page No.">{{ input.pageNumber }}</td>
+                                  <td class="numeric" data-title="No.">{{ input.questionNumber }}</td>
+                                  {% if input.inputType == "select" %}
+                                  <td data-title="Type">Multiple Choice</td>
+                                  {% elif input.inputType == "textarea" %}
+                                  <td data-title="Type">Paragraph</td>
+                                  {% else %}
+                                  <td data-title="Type">{{ input.inputType|capfirst }}</td>
+                                {% endif %}
+                                
+                                {% if input.inputType == "select" or input.inputType == "textarea" %}
+                                  <td data-title="Answer" class="text-center {% if input.correctAnswer == 'option1' %}correct{% endif %}">
+                                    {{ input.option1 }}</td>
+                                  <td class="text-center {% if input.correctAnswer == 'option2' %}correct{% endif %}">
+                                    {{ input.option2 }}</td>
+                                  <td class="text-center {% if input.correctAnswer == 'option3' %}correct{% endif %}">
+                                    {{ input.option3 }}</td>
+                                  <td class="text-center {% if input.correctAnswer == 'option4' %}correct{% endif %}">
+                                    {{ input.option4 }}</td>
+                                {% else %}
+                                  {% if input.inputType == "checkbox"  and input.correctAnswer == "true" %}
+                                    <td colspan="4" class="text-center correct">Checked</td>
+                                  {% elif input.inputType == "checkbox"  and input.correctAnswer == "false" %}
+                                    <td colspan="4" class="text-center correct">Not Checked</td>
+                                  {% else %}
+                                    <td colspan="4" class="text-center correct">{{ input.correctAnswer }}</td>
+                                  {% endif %}
+                                {% endif %}
+                                  
+                                  <td class="numeric" data-title="Value">{{ input.points }}</td>
+                                  <td class="numeric" data-title="Avg Correct">{{ input.pageNumber }}%</td>
+                              </tr>
+                                {% endfor %}
+                              {% else %}
+                              <tr>
+                                  <td class="text-center" colspan="9">Sorry, no questions yet.</td>
+                              </tr>
+                              
+                              {% endif %}
+                              </tbody>
+                          </table>
+                        </section>
+                            
+                              
+                  </div>
+                    
+                    
+
+		
+                
+              </div>
+            </div>
+          </div>
+        </div> <!-- end of row -->
+
+
+
+{% endblock %}  <!-- end of body block -->
+
+
+{% block modal %}
+  
+{% if currentProject %}
+<!---------------- modal ------------------------------------->
+<div id="worksheet-settings" class="modal fade" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content rounded">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">worksheet settings</h4>
+      </div>
+      <div class="modal-body text-center">
+        
+            <form id="change-worksheetName-form" class="form-horizontal style-form" action="{% url "worksheet_creator.page_view_ajax.changeWorksheetName" %}" enctype='multipart/form-data' method="post" autocomplete="off">{% csrf_token %}
+              <div class="form-group">
+                <input type="hidden" name="worksheetID" value="{{ currentProject.id }}">
+		<label class="col-sm-3 control-label">Worksheet Name</label>
+		  <div class="col-sm-9">
+		    <input class="form-control" type="text" name="worksheet_name" minlength="3" maxlength="95" required placeholder="Worksheet Name..." value="{{ currentProject.title|capfirst }}" autofocus>
+		    <span class="register-check register-check-error"></span>
+		  </div>
+	      </div>
+              <div class="form-group">
+		<label class="col-sm-3 control-label">Number of Attempts per Student</label>
+		  <div class="col-sm-9">
+		    <input class="form-control" type="number" name="numberOfRetry" min="1" step="1" pattern="\d+" value="{{ currentProject.numberOfRetry }}" required>
+		    <span class="register-check register-check-error"></span>
+		  </div>
+	      </div>
+            </form>
+                  
+                  
+        
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger pull-left" aria-hidden="true" data-toggle="modal" data-target="#delete-yes-no">Delete this worksheet</button>
+        <button type="button" class="btn btn-default rounded" data-dismiss="modal">close</button>
+        <button type="submit" form="change-worksheetName-form" class="btn btn-primary rounded">update</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!---------------- modal ------------------------------------->
+<div id="delete-yes-no" class="modal fade" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content rounded">
+      <div class="modal-header top-rounded">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">delete this worksheet?</h4>
+      </div>
+      <div class="modal-body text-center bottom-rounded">
+        <div class="row">
+          <form id="delete-worksheet-form" class="form-horizontal style-form" action="{% url "worksheet_creator.page_view_ajax.deleteProject" %}" enctype='multipart/form-data' method="post">{% csrf_token %}
+            <input name="worksheetID" type="hidden" value="{{ currentProject.id }}" />
+            <div class="col-xs-6">
+              <button type="submit" class="btn btn-block btn-lg btn-danger">yes</button>
+            </div>
+            <div class="col-xs-6">
+              <button type="button" class="btn btn-block btn-lg btn-default" data-dismiss="modal">no</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+{%endif%}
+
+
+
+
+{% endblock %}  <!-- end of modal block -->
+
+
+
+
+{% block extraScript %}
+  <script src="{% static "adminBoot/js/worksheet.js" %}"></script>
+{% endblock %}

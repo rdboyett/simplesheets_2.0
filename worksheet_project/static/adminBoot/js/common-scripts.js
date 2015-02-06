@@ -115,7 +115,9 @@ var Script = function () {
         })
     }
     
-    
+jQuery.validator.addMethod("noSpace", function(value, element) { 
+     return value.indexOf(" ") < 0 && value != ""; 
+  }, "Space are not allowed");
     
 jQuery.validator.addMethod("complete_url", function(val, elem) {
     // if no url, don't do anything

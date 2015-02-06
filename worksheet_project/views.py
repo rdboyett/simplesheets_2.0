@@ -35,9 +35,9 @@ def index(request):
         user_id = False
     
     if not user_id:
-        return render_to_response('index.html', {
-            "index":True,
-        })
+        return render_to_response('index.html')
+    
+    
 
 @login_required
 def dashboard(request):

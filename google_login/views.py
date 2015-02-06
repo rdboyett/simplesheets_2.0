@@ -6,16 +6,18 @@ import logging
 import httplib2
 from datetime import datetime, timedelta
 
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, redirect
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 from django.core.context_processors import csrf
+from django.views.decorators.csrf import csrf_exempt
 from django.core.mail import send_mail
 from django.utils import timezone
 
 from google_login.models import CredentialsModel, GoogleUserInfo, ForgottenPassword
+from userInfo_profile.models import UserInfo
 from google_login import settings
 from forms import ContactForm
 
@@ -110,6 +112,10 @@ def auth_return(request):
             email = google_email,
             password = userName+google_id[:5],
         )
+	
+	UserInfo.objects.create(
+	    user = user
+	)
 
     #Update the User model with changes in google
     if not user.first_name:
@@ -196,15 +202,11 @@ def forgotPassword(request, forgotID=False):
             tdelta = now - forgot.dateTime
             seconds = tdelta.total_seconds()
 
-            if not seconds:# > 300 or forgot.used:
+            if seconds > 300 or forgot.used:
                 return HttpResponse('You reached this link in error.'+str(seconds))
             else:
-                forgot.used = True
-                forgot.save()
-
-                args = {}
+                args = {'forgotID':forgot.id}
                 args.update(csrf(request))
-                args['passwordForm'] = ContactForm()
                 return render_to_response('google_login/change_password.html', args)
         else:
             return HttpResponse('You reached this link in error.')
@@ -215,7 +217,105 @@ def forgotPassword(request, forgotID=False):
 
 
 def passwordReset(request):
-    return HttpResponse('You reached this link.')
+    if request.method == 'POST':
+        forgotID = request.POST['forgotID'].strip()
+        email = request.POST['email'].strip()
+        password1 = request.POST['password1'].strip()
+        password2 = request.POST['password2'].strip()
+	
+	
+	if ForgottenPassword.objects.filter(id=forgotID):
+	    forgot = ForgottenPassword.objects.get(id=forgotID)
+	else:
+	    return HttpResponse(json.dumps({'error':"incorrect forgot id Sorry, this email is not active.  Please resend your email."}))
+	
+        now = timezone.now()
+        tdelta = now - forgot.dateTime
+        seconds = tdelta.total_seconds()
+	    
+	#check that this is an active forgot password
+	if seconds > 300 or forgot.used:
+	    return HttpResponse(json.dumps({'error':"seconds incorrect Sorry, this forgot id email is not active.  Please resend your email."+ str(seconds)}))
+	
+	#check if the forgot password was set by this email user
+	if email == forgot.user.email:
+	    if password1 == password2:
+		user = forgot.user
+		user.set_password(password1)
+		user.save()
+		data = {'success':'success'}
+                forgot.used = True
+                forgot.save()
+
+	    else:
+		return HttpResponse(json.dumps({'error':"Sorry, these passwords don't match."}))
+	else:
+	    return HttpResponse(json.dumps({'error':"Sorry, this email is not active.  Please resend your email."}))
+	
+    else:
+        data = {'error':'Did not post correctly'}
+    return HttpResponse(json.dumps(data))
+
+
+
+def createAccount(request):
+    if 'user_id' in request.session:
+        user_id = request.session['user_id']
+        if User.objects.filter(id=user_id):
+            user = User.objects.get(id=user_id)
+            user.backend = 'django.contrib.auth.backends.ModelBackend'
+            login(request, user)
+            return HttpResponseRedirect(settings.LOGIN_SUCCESS)
+        
+        else:
+            user_id = False
+    else:
+        user_id = False
+    
+    if not user_id:
+        args = {}
+        args.update(csrf(request))
+        #redirect to user login page
+        return render_to_response('google_login/create_account.html', args)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -247,43 +347,53 @@ def ajaxAuth(request):
                 request.session.set_expiry(604800)
                 data = {'success':'success'}
             else:
-                data = {'error':'<div class="google-login-error">incorrect username or password</div>'}
+                data = {'error':'incorrect username or password'}
         else:
-			data = {'error':'<div class="google-login-error">incorrect username or password</div>'}
+			data = {'error':'incorrect username or password'}
     
     return HttpResponse(json.dumps(data))
     
     
     
 
-
+@csrf_exempt
 def checkUsername(request):
     if request.method == 'POST':
         username = request.POST['username']
         if User.objects.filter(username=username):
-            data = {'exists':'true'}
+            data = 'false'
         else:
-            data = {'exists':'false'}
+            data = 'true'
     else:
         data = {'error':'Did not post correctly'}
-    return HttpResponse(json.dumps(data))
+    return HttpResponse(data)
 
 
 
 
 def submitRegistration(request):
     if request.method == 'POST':
+	teacherStudent = request.POST['teacherStudent'].strip()
         username = request.POST['username'].strip()
         email = request.POST['email'].strip()
         password = request.POST['password'].strip()
-
+	
         if User.objects.filter(username=username):
             data = {'error':'This username is already taken.'}
-        elif User.objects.filter(email=email):
-            data = {'error':'This email is already used with another account.'}
-        else:
-            user = User.objects.create_user(username, email, password)
-            
+        elif email:
+	    if User.objects.filter(email=email):
+		data = {'error':'This email is already used with another account.'}
+        if True:
+	    if teacherStudent == "teacher":
+		user = User.objects.create_user(username, email, password)
+	    else:
+		user = User.objects.create_user(username, None, password)
+	    
+	    UserInfo.objects.create(
+		user = user,
+		teacher_student = teacherStudent
+	    )
+	    
             #check to see if user is logged in
             if user:
                 user.backend = 'django.contrib.auth.backends.ModelBackend'
@@ -299,16 +409,17 @@ def submitRegistration(request):
 
 
 
+@csrf_exempt
 def doesEmailExist(request):
     if request.method == 'POST':
         email = request.POST['email']
         if User.objects.filter(email=email):
-            data = {'exists':'true'}
+            data = 'false'
         else:
-            data = {'exists':'false'}
+            data = 'true'
     else:
         data = {'error':'Did not post correctly'}
-    return HttpResponse(json.dumps(data))
+    return HttpResponse(data)
 
 
 
@@ -318,7 +429,9 @@ def submitPasswordForgot(request):
         email = request.POST['email']
         if User.objects.filter(email=email):
             user = User.objects.get(email=email)
-            forgotLink = ForgottenPassword.objects.create()
+            forgotLink = ForgottenPassword.objects.create(
+		user = user,
+	    )
             try:
                 send_mail(
                     'Alert from '+ settings.WEBSITENAME,
@@ -333,7 +446,7 @@ def submitPasswordForgot(request):
             except:
                 data = {'error':'Your server email settings have not been set.  Please read the requirements text.'}
         else:
-            data = {'exists':'false'}
+            data = {'error':'This email does not exist in our database.'}
     else:
         data = {'error':'Did not post correctly'}
     return HttpResponse(json.dumps(data))
@@ -404,8 +517,8 @@ def syncGoogleAccount(request):
 @login_required
 def ajaxResetPassword(request):
     if request.method == 'POST':
-        password1 = request.POST['password1']
-        password2 = request.POST['password2']
+        password1 = request.POST['password1'].strip()
+        password2 = request.POST['password2'].strip()
 	
 	if password1 == password2:
 	    user = request.user

@@ -11,6 +11,6 @@ class MyRegistrationForm(UserCreationForm):
 
 class ContactForm(forms.Form):
     password1 = forms.CharField(max_length=30,
-                        widget=forms.PasswordInput(attrs={'title': 'password', 'class':'passwordInput', 'placeholder':'Password...'}))
+                        widget=forms.PasswordInput(attrs={'title': 'password', 'class':'form-control', 'placeholder':'Password...', 'autofocus':'true'}))
     password2 = forms.CharField(max_length=30,
-                        widget=forms.PasswordInput(attrs={'title': 'repeat password', 'class':'passwordInput', 'placeholder':'Re-Type Password...'}))
+                        widget=forms.PasswordInput(attrs={'title': 'repeat password', 'class':'form-control', 'placeholder':'Re-Type Password...'}))

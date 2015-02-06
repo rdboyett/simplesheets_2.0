@@ -32,6 +32,7 @@ class FormInput(models.Model):
   helpText = models.TextField(blank=True, null=True)
   helpLink = models.URLField(blank=True, null=True)
   workImagePath = models.FilePathField(blank=True, null=True)
+  bTeacherGraded = models.BooleanField(default=False)
   
   class Meta:
       ordering = ['questionNumber']

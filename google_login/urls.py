@@ -1,7 +1,7 @@
 from django.conf.urls import patterns, include, url
 
 urlpatterns = patterns('',
-    (r'^logout/$', 'django.contrib.auth.views.logout',{'next_page': 'worksheet_project.views.index'}),
+    (r'^logout/$', 'django.contrib.auth.views.logout',{'next_page': 'google_login.views.index'}),
 )
 
 urlpatterns += patterns('google_login.views',
@@ -11,6 +11,7 @@ urlpatterns += patterns('google_login.views',
     (r'^success/$', 'success'),
     (r'^error/$', 'error'),
     (r'^forgot/(?P<forgotID>\d+)/$', 'forgotPassword'),
+    (r'^createAccount/$', 'createAccount'),
     (r'^passwordReset/$', 'passwordReset'),
 
 #------------------ajax calls -------------------------------------

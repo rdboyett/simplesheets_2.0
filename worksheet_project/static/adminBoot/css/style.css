@@ -2769,3 +2769,45 @@ margin-left: -210px !important;
 }
 
 
+.btn-schoology {
+  color: #fff;
+  background-color: #333333;
+  border-color: #000;
+}
+.btn-schoology:hover,
+.btn-schoology:focus,
+.btn-schoology:active,
+.btn-schoology.active,
+.open > .dropdown-toggle.btn-schoology {
+  color: #fff;
+  background-color: #403940;
+  border-color: #403940;
+}
+.btn-schoology:active,
+.btn-schoology.active,
+.open > .dropdown-toggle.btn-schoology {
+  background-image: none;
+}
+.btn-schoology.disabled,
+.btn-schoology[disabled],
+fieldset[disabled] .btn-schoology,
+.btn-schoology.disabled:hover,
+.btn-schoology[disabled]:hover,
+fieldset[disabled] .btn-schoology:hover,
+.btn-schoology.disabled:focus,
+.btn-schoology[disabled]:focus,
+fieldset[disabled] .btn-schoology:focus,
+.btn-schoology.disabled:active,
+.btn-schoology[disabled]:active,
+fieldset[disabled] .btn-schoology:active,
+.btn-schoology.disabled.active,
+.btn-schoology[disabled].active,
+fieldset[disabled] .btn-schoology.active {
+  color: #CCC;
+  background-color: #403B39;
+  border-color: #403B39;
+}
+.btn-schoology .badge {
+  color: #4babca;
+  background-color: #fff;
+}

@@ -1,0 +1,222 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Dashboard">
+    <meta name="keyword" content="Dashboard, Bootstrap, Admin, Template, Theme, Responsive, Fluid, Retina">
+
+    <title>Duck Soup | sign in</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{% static "adminBoot/css/bootstrap.css" %}" rel="stylesheet">
+    <!--external css-->
+    <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" />
+        
+    <!-- Custom styles for this template -->
+    <link href="{% static "adminBoot/css/style.css" %}" rel="stylesheet">
+    <link href="{% static "adminBoot/css/style-responsive.css" %}" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="//ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"></script>
+    
+    
+    <script>
+        $('document').ready(function(){
+            
+            $("#teacher-student").modal({
+                "backdrop" : "static",
+                "keyboard" : "false",
+            });
+            $("#teacher-student").modal("show");
+            
+        });
+            function emailActivation() {
+                $("#email-input").attr('placeholder','Email').attr('required','true');
+            }
+	    
+    
+    </script>
+    
+  </head>
+  
+  
+
+  <body>
+
+      <!-- **********************************************************************************************************************************************************
+      MAIN CONTENT
+      *********************************************************************************************************************************************************** -->
+
+	  <div id="login-page">
+	  	<div class="container">
+	  	
+		      <form id="submit-registration-form" class="form-login" action="{% url 'google_login.views.submitRegistration' %}" enctype='multipart/form-data' method="post" autocomplete="off">{% csrf_token %}
+		        <h2 class="form-login-heading">create account</h2>
+		        <div class="login-wrap">
+                            <input id="teacher_or_student" type="hidden" name="teacherStudent" value="" required>
+		            <input name="username" type="text" class="form-control" placeholder="Username" autofocus minlength="6" maxlength="40" required noSpace="true">
+		            <br>
+                            <input id="email-input" type="email" name="email" placeholder="Email Optional" class="form-control placeholder-no-fix">
+                            <br>
+		            <input name="password" type="password" class="form-control" placeholder="Password" minlength="6" maxlength="40" required noSpace="true">
+		            <label class="checkbox">
+		                <span class="pull-right">
+		                    <a data-toggle="modal" href="login.html#myModal"> Forgot Password?</a>
+		
+		                </span>
+		            </label>
+		            <button class="btn btn-theme btn-block" type="submit"><i class="fa fa-lock"></i> Create</button>
+		            <hr>
+		            
+		            <div class="login-social-link centered">
+		            <p>or you can create an account with your social network</p>
+			      <div class="row">
+				<div class="col-xs-6">
+				  <div id="google-authorize" class="btn btn-danger btn-block"><i class="fa fa-google-plus fa-lg"></i>&nbsp;&nbsp;Google</div>
+				</div>
+				<div class="col-xs-6">
+				  <a href="#" class="btn btn-primary btn-block">
+				    <span> <img style="width: 15px;margin: 0;border: none;" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/41205/edmodo-icon_1.png" alt=""></span>
+				    <span>&nbsp;&nbsp;Edmodo</span>
+				  </a>
+				</div>
+			      </div>
+			      <div class="row" style="margin-top: 10px;">
+				<div class="col-xs-6">
+				  <a href="#" class="btn btn-primary btn-block"><i class="fa fa-apple"></i>&nbsp;&nbsp;Apple ID</a>
+				</div>
+				<div class="col-xs-6">
+				  <a href="#" class="btn btn-info btn-block"><i class="fa fa-windows"></i>&nbsp;&nbsp;OneDrive</a>
+				</div>
+			      </div>
+			      <div class="row" style="margin-top: 10px;">
+				<div class="col-xs-6 col-xs-offset-3">
+				  <a href="#" class="btn btn-schoology btn-block">
+				    <span class="fa-stack" style="font-size: 10px;">
+				      <i class="fa fa-circle-thin fa-stack-1x" style="font-size: 20px; color: #4babca;"></i>
+				      <i class="fa fa-stack-1x" style="font-size: 12px; font-weight: bold;">S</i>
+				    </span>
+				    &nbsp;School<span style="color: #4babca;">ogy</span></a>
+				</div>
+			      </div>
+		            </div>
+		
+		        </div>
+		      </form>
+		
+		          <!-- Modal -->
+		          <div aria-hidden="true" aria-labelledby="myModalLabel" role="dialog" tabindex="-1" id="myModal" class="modal fade">
+		              <div class="modal-dialog">
+		                  <div class="modal-content">
+		                      <div class="modal-header">
+		                          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		                          <h4 class="modal-title">Forgot Password ?</h4>
+		                      </div>
+		                      <div class="modal-body">
+					<div class="row">
+					  <div class="col-xs-12">
+					    <form id="reset-password-form" class="style-form" action="{% url 'google_login.views.submitPasswordForgot' %}" enctype='multipart/form-data' method="post" autocomplete="off">{% csrf_token %}
+					      
+					      <div class="form-group">
+						<label class="col-xs-12 text-center">Enter your e-mail address below to reset your password.</label>
+						<div class="col-sm-8 col-sm-offset-2">
+						  <input class="form-control" type="text" name="email" placeholder="Email" autocomplete="off" class="form-control placeholder-no-fix" required email="true">
+						</div>
+					      </div>
+						
+					    </form>
+					  </div>
+					</div>
+		                      </div>
+		                      <div class="modal-footer">
+		                          <button data-dismiss="modal" class="btn btn-default" type="button">Cancel</button>
+		                          <button class="btn btn-theme" type="submit" form="reset-password-form">Submit</button>
+		                      </div>
+		                  </div>
+		              </div>
+		          </div>
+		          <!-- modal -->
+		
+	  	
+	  	</div>
+	  </div>
+
+          
+          
+<!---------------- modal ------------------------------------->
+<div id="teacher-student" class="modal fade" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content rounded">
+      <div class="modal-header top-rounded">
+        <h4 class="modal-title">Who are you?</h4>
+      </div>
+      <div class="modal-body text-center bottom-rounded">
+        <div class="row">
+            <div class="col-xs-6">
+              <button type="button" class="btn btn-block btn-lg btn-success rounded" onclick="$('#teacher_or_student').val('teacher');$('#teacher-student').modal('hide');emailActivation();">teacher</button>
+            </div>
+            <div class="col-xs-6">
+              <button type="button" class="btn btn-block btn-lg btn-success rounded" onclick="$('#teacher_or_student').val('student');$('#teacher-student').modal('hide');">student</button>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+          
+          
+          
+          
+          
+          
+          
+    <!-- js placed at the end of the document so the pages load faster -->
+    <script src="{% static "adminBoot/js/bootstrap.min.js" %}"></script>
+    <script src="{% static "adminBoot/js/jquery.form.js" %}"></script>
+    
+    <script src="{% static "adminBoot/js/create_account.js" %}"></script>
+
+    <!--BACKSTRETCH-->
+    <!-- You can use an image of whatever size. This script will stretch to fit in any screen size.-->
+    <script type="text/javascript" src="{% static "adminBoot/js/jquery.backstretch.min.js" %}"></script>
+    <script>
+        $.backstretch("{% static "adminBoot/img/login-bg2.jpg" %}", {speed: 500});
+	
+	var doesUsernameExistURL = "{% url 'google_login.views.checkUsername' %}";
+	var doesEmailExistURL = "{% url 'google_login.views.doesEmailExist' %}";
+    </script>
+
+    
+    <script>
+      $('document').ready(function(){
+	      
+	$('#google-authorize').click(function(){
+	  //popup new window to log in to oauth
+	  var myWindow = window.open("{% url "google_login.views.auth" %}","_blank","toolbar=no, location=no, menubar=no, scrollbars=yes, resizable=yes, top=100, left=0, width=500, height=600");
+	 
+	});
+	
+      });
+      
+      
+	
+	function syncAccounts(newUserID) {
+	  location.reload();
+	}
+
+      
+    </script>
+
+  </body>
+</html>

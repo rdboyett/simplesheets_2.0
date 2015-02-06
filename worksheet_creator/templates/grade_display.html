@@ -1,0 +1,59 @@
+
+{% if not error %}
+    <div>You have completed this worksheet {{ myGrade.timesGraded }} time{{ myGrade.timesGraded|pluralize }}.</div>
+    <br>
+    <table class="table table-bordered table-striped table-condensed cf">
+        <thead class="cf">
+            <tr class="info">
+                <th class="numeric text-center">Page</th>
+                <th class="numeric text-center">Question</th>
+                <th class="text-center">Question Type</th>
+                <th class="numeric text-center">Points</th>
+                <th class="numeric text-center" colspan="2">Answer</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for answer in allMyAnswers %}
+            <tr>
+                <td class="numeric text-center">{{ answer.answer.pageNumber }}</td>
+                <td class="numeric text-center">{{ answer.answer.questionNumber }}</td>
+                
+                {% if answer.answer.inputType == "select" %}
+                <td class="text-center">Multiple Choice</td>
+                {% elif answer.answer.inputType == "textarea" %}
+                <td class="text-center">Paragraph</td>
+                {% else %}
+                <td class="text-center">{{ answer.answer.inputType|capfirst }}</td>
+                {% endif %}
+                
+                <td class="numeric text-center">{{ answer.answer.points }}</td>
+                <td class="text-center">{{ answer.myAnswer }}</td>
+                <td class="text-center">
+                    {% if answer.bCorrect %}
+                    <span class="fa fa-check fa-lg text-success"></span>
+                    {% else %}
+                    <span class="fa fa-times-circle fa-lg text-danger"></span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+            <tr>
+                <td class="success text-center text-primary" colspan="4">total points possible:</td>
+                <td class="success numeric text-center text-primary" colspan="2">{{ myGrade.pointsPossible }}</td>
+            </tr>
+            <tr>
+                <td class="success text-center text-primary" colspan="4">total points earned:</td>
+                <td class="success numeric text-center text-primary" colspan="2">{{ myGrade.pointsEarned }}</td>
+            </tr>
+            <tr>
+                <td class="warning text-center text-danger" colspan="4">average:</td>
+                <td class="warning numeric text-center text-danger" colspan="2">{{ myGrade.average }}%</td>
+            </tr>
+        </tbody>
+    </table>
+    <br>
+    <div id="attemptsLeft" data-options='{"attempts_left":{{ numberAttemptsLeft }}}'>
+        You have {% if numberAttemptsLeft < 1 %}no{% else %}{{ numberAttemptsLeft }}{% endif %} more attempt{{ numberAttemptsLeft|pluralize }} left for this worksheet.</div>
+{% else %}
+    {{ error }}
+{% endif %}
