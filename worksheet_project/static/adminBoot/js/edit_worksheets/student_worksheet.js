@@ -810,10 +810,12 @@ function showGradeColors() {
 		    resizeElements();
 			
 			$("#display-grade-modal .modal-body").html(html);
-			var attemptsLeft = $("#attemptsLeft").data('options').attempts_left;
-			if (attemptsLeft<1) {
-				$("#retry-btn").addClass('disabled');
-			}
+			if ($("#attemptsLeft").length) {
+				var attemptsLeft = $("#attemptsLeft").data('options').attempts_left;
+				if (attemptsLeft<1) {
+					$("#retry-btn").addClass('disabled');
+				}
+			}else{$("#retry-btn").hide();}
 			$("#display-grade-modal").modal('show');
                 }
             };
@@ -875,7 +877,10 @@ function showGradeColors() {
 	 
 	 
 	 
-	 
+	if (bGraded) {
+		showGradeColors();
+		resizeElements();
+	}
 	 
 
 

@@ -679,7 +679,9 @@ def submitGradeWorksheet(request):
             if Project.objects.filter(id=project_id):
                 project = Project.objects.get(id=project_id)
             else:
-                error = "There is no project with ID: "+str(project_id)
+                args = {
+                        'error':"There is no project with ID: "+str(project_id),
+                    }
                 
             #Get the Old grade file
             if MyGrade.objects.filter(userInfo=userInfo, project=project):
@@ -687,102 +689,112 @@ def submitGradeWorksheet(request):
             else:
                 oldTimesGraded = 0
             
-            
-            
-            #Create a grade file every time in order to show progress and average 
-            myGrade = MyGrade.objects.create(
-                project = project,
-                userInfo=userInfo,
-                pointsPossible = 0,
-                pointsEarned = 0,
-                average = 0,
-                timesGraded = oldTimesGraded,
-            )
-                
-            #Get the points possible by adding each input question
-            pointsPossible = 0
-            #get input grade for student for points earned on each question
-            pointsEarned = 0
-            
-            #get all the input questions for the project and loop through them
-            if project.formInputs.all():
-                
-                myAnswers = {}
-                counter = 1
-                
-                for question in project.formInputs.all().order_by('pageNumber'):  #question is a FormInput
-                    #get myAnswer for this question
-                    if MyAnswer.objects.filter(project=project, userInfo=userInfo, answer=question):
-                        myAnswer = MyAnswer.objects.get(project=project, userInfo=userInfo, answer=question)
-                        
-                        pointsPossible += float(question.points)
-                        if myAnswer.bCorrect:
-                            pointsEarned += float(question.points)
-                        
-                        #if the input type is textarea then we need to create a points earned
-                        if question.inputType == 'textarea':
-                            myAnswerList = myAnswer.myAnswer.split(" ")
-                            #count the number of keywords provided to calculate the points for each match
-                            keywordCounter = 0
-                            number_of_keyword_matches = 0
-                            if question.option1:
-                                keywordCounter += 1
-                                if question.option1 in myAnswerList:  #Count the number of keyword matches in answer and calculate the points earned
-                                    number_of_keyword_matches += 1
-                            
-                            if question.option2:
-                                keywordCounter += 1
-                                if question.option2 in myAnswerList:
-                                    number_of_keyword_matches += 1
-                                
-                            if question.option3:
-                                keywordCounter += 1
-                                if question.option3 in myAnswerList:
-                                    number_of_keyword_matches += 1
-                            
-                            if question.option4:
-                                keywordCounter += 1
-                                if question.option4 in myAnswerList:
-                                    number_of_keyword_matches += 1
-                            
-                                    
-                            #calculate the points per match and points earned
-                            pointsPossiblePerKeyword = float(float(question.points)/float(keywordCounter))
-                            pointsEarned += float(float(pointsPossiblePerKeyword)*number_of_keyword_matches)
-                        
-                        
-                    else:
-                        pointsPossible += float(question.points)
-                        
+            if oldTimesGraded >= project.numberOfRetry:
+                args = {
+                        'error':"Sorry, you have exceded the number of retries",
+                    }
             else:
-                error = "There are no questions for the project with ID: "+str(project_id)
-            
-            #calculate an average at the end and add to the timesGraded
-            average = float(float(pointsEarned)/float(pointsPossible)*float(100))
-            
-            #save myGrade information
-            myGrade.pointsPossible = pointsPossible
-            myGrade.pointsEarned = pointsEarned
-            myGrade.average = average
-            myGrade.timesGraded += 1
-            myGrade.save()
-            
-            numberAttemptsLeft = int(project.numberOfRetry) - int(myGrade.timesGraded)
-            
-            allMyAnswers = MyAnswer.objects.filter(project=project, userInfo=userInfo)
-            
-            args = {
-                'myGrade':myGrade,
-                'project': project,
-                "numberAttemptsLeft": numberAttemptsLeft,
-                'allMyAnswers':allMyAnswers,
-            }
+                #Create a grade file every time in order to show progress and average 
+                myGrade = MyGrade.objects.create(
+                    project = project,
+                    userInfo=userInfo,
+                    pointsPossible = 0,
+                    pointsEarned = 0,
+                    average = 0,
+                    timesGraded = oldTimesGraded,
+                )
+                    
+                #Get the points possible by adding each input question
+                pointsPossible = 0
+                #get input grade for student for points earned on each question
+                pointsEarned = 0
                 
+                #get all the input questions for the project and loop through them
+                if project.formInputs.all():
+                    
+                    myAnswers = {}
+                    counter = 1
+                    
+                    for question in project.formInputs.all().order_by('pageNumber'):  #question is a FormInput
+                        #get myAnswer for this question
+                        if MyAnswer.objects.filter(project=project, userInfo=userInfo, answer=question):
+                            myAnswer = MyAnswer.objects.get(project=project, userInfo=userInfo, answer=question)
+                            
+                            pointsPossible += float(question.points)
+                            if myAnswer.bCorrect:
+                                pointsEarned += float(question.points)
+                            
+                            #if the input type is textarea then we need to create a points earned
+                            if question.inputType == 'textarea':
+                                myAnswerList = myAnswer.myAnswer.split(" ")
+                                #count the number of keywords provided to calculate the points for each match
+                                keywordCounter = 0
+                                number_of_keyword_matches = 0
+                                if question.option1:
+                                    keywordCounter += 1
+                                    if question.option1 in myAnswerList:  #Count the number of keyword matches in answer and calculate the points earned
+                                        number_of_keyword_matches += 1
+                                
+                                if question.option2:
+                                    keywordCounter += 1
+                                    if question.option2 in myAnswerList:
+                                        number_of_keyword_matches += 1
+                                    
+                                if question.option3:
+                                    keywordCounter += 1
+                                    if question.option3 in myAnswerList:
+                                        number_of_keyword_matches += 1
+                                
+                                if question.option4:
+                                    keywordCounter += 1
+                                    if question.option4 in myAnswerList:
+                                        number_of_keyword_matches += 1
+                                
+                                        
+                                #calculate the points per match and points earned
+                                pointsPossiblePerKeyword = float(float(question.points)/float(keywordCounter))
+                                pointsEarned += float(float(pointsPossiblePerKeyword)*number_of_keyword_matches)
+                            
+                            
+                        else:
+                            pointsPossible += float(question.points)
+                            
+                else:
+                    args = {
+                        'error':"There are no questions for the project with ID: "+str(project_id),
+                    }
+                
+                #calculate an average at the end and add to the timesGraded
+                average = float(float(pointsEarned)/float(pointsPossible)*float(100))
+                
+                #save myGrade information
+                myGrade.pointsPossible = pointsPossible
+                myGrade.pointsEarned = pointsEarned
+                myGrade.average = average
+                myGrade.timesGraded += 1
+                myGrade.save()
+                
+                numberAttemptsLeft = int(project.numberOfRetry) - int(myGrade.timesGraded)
+                
+                allMyAnswers = MyAnswer.objects.filter(project=project, userInfo=userInfo)
+                
+                args = {
+                    'myGrade':myGrade,
+                    'project': project,
+                    "numberAttemptsLeft": numberAttemptsLeft,
+                    'allMyAnswers':allMyAnswers,
+                }
+                    
                 
         else:
-            error = "There is no user with ID: "+str(userInfo_id)
+            args = {
+                'error':"There is no user with ID: "+str(userInfo_id),
+            }
+            
     else:
-        error = "There was an error posting this request. Please try again."
+        args = {
+                'error':"There was an error posting this request. Please try again.",
+            }
         
     
     return render_to_response('grade_display.html', args)

@@ -47,19 +47,21 @@
               <div class="centered">
                 <a href="{% url "worksheet_project.views.showNextPage" worksheet.id 1 %}"><button type="button" class="col-xs-4 btn btn-default" data-container="body"
                   data-toggle="popover" data-placement="bottom" data-trigger="hover"
-                  data-content="Edit">
+                  data-content="{% if classUser.teacher %}Edit{%else%}Work{%endif%}">
                   <i class="fa fa-edit fa-2x"></i>
-                </button>
-                <a href="{% url "worksheet_project.views.monitor" worksheet.id %}"><button type="button" class="col-xs-4 btn btn-default" data-container="body"
+                </button></a>
+                <a href="{% if classUser.teacher %}{% url "worksheet_project.views.monitor" worksheet.id %}{%else%}{% url "worksheet_project.views.worksheet_display" worksheet.id %}{%endif%}"><button type="button" class="col-xs-4 btn btn-default" data-container="body"
                   data-toggle="popover" data-placement="bottom" data-trigger="hover"
-                  data-content="Monitor">
+                  data-content="{% if classUser.teacher %}Monitor{%else%}Score{%endif%}">
                   <i class="fa fa-bar-chart-o fa-2x"></i>
                 </button></a>
+                {% if classUser.teacher %}
                 <button type="button" class="col-xs-4 btn btn-default" data-container="body"
                   data-toggle="popover" data-placement="bottom" data-trigger="hover"
                   data-content="Delete" onclick="$('#worksheetID-hidden-input').val({{ worksheet.id }});$('#delete-worksheet').modal('show');">
                   <i class="fa fa-trash-o fa-2x"></i>
                 </button>
+                {% endif %}
               </div>
             </div>
           </div><! --/col-md-4 -->
@@ -79,7 +81,7 @@
 {% block modal %}
 
 
-{% if currentClass %}
+{% if currentClass and classUser.teacher %}
 <!---------------- modal ------------------------------------->
 <div id="class-code" class="modal fade" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
   <div class="modal-dialog">

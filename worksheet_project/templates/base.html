@@ -115,7 +115,7 @@
 
               {% if allClasses %}
                   <li class="sub-menu">
-                      <a class="{% if currentClass %}active{%endif%}" href="javascript:;">
+                      <a class="{% if currentClass %}active{%endif%} {% if not classUser.teacher %}active{% endif %}" href="javascript:;">
                         <i class="fa fa-users"></i>
                         <span>Classes</span>
                       </a>

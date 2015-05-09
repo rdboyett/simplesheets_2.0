@@ -1,0 +1,43 @@
+
+                          <section id="no-more-tables">
+                            <table class="table table-bordered table-striped table-condensed cf">
+                              <thead class="cf">
+                              <tr>
+                                  <th class="numeric text-center">Page No.</th>
+                                  <th class="numeric text-center">No.</th>
+                                  <th class="text-center">Answer</th>
+                                  <th class="numeric text-center">Points Earned</th>
+                              </tr>
+                              </thead>
+                              <tbody>
+                              {% if myAnswers %}
+                                {% for input in myAnswers %}
+                              <tr>
+                                  <td class="numeric text-center" data-title="Page No.">{{ input.answer.pageNumber }}</td>
+                                  <td class="numeric text-center" data-title="No.">{{ input.answer.questionNumber }}</td>
+                                  {% if input.bCorrect %}
+                                  <td class="numeric correct text-center" data-title="Answer"><i class="fa fa-check"></i></td>
+                                  <td class="numeric text-center" data-title="Points Earned">{{ input.answer.points }}</td>
+                                  {% else %}
+                                  <td class="numeric incorrect text-center" data-title="Answer"><i class="fa fa-close"></i></td>
+                                  <td class="numeric text-center" data-title="Points Earned">0</td>
+                                  {% endif %}
+                              </tr>
+                                {% endfor %}
+                              <tr>
+                                {% if myGrade.average > 69 %}
+                                  <td class="text-right correct" colspan="3" style="font-size: 20px;">Average</td>
+                                  <td class="text-center correct" style="font-size: 20px;">{{ myGrade.average }}%</td>
+                                {% else %}
+                                  <td class="text-right incorrect" colspan="3" style="font-size: 20px;">Average</td>
+                                  <td class="text-center incorrect" style="font-size: 20px;">{{ myGrade.average }}%</td>
+                                {% endif %}
+                              </tr>
+                              {% else %}
+                              <tr>
+                                  <td class="text-center" colspan="4">Sorry, please complete the questions.</td>
+                              </tr>
+                              {% endif %}
+                              </tbody>
+                          </table>
+                        </section>

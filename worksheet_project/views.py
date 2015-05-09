@@ -164,7 +164,13 @@ def showNextPage(request, projectID=False, pageNumber=False):
         else:
             webPage = 'student_worksheet.html'
             
-            
+        #Get my grade for this project (if there is one)
+        if MyGrade.objects.filter(project=newProject, userInfo=userInfo):
+            myGrade = MyGrade.objects.filter(project=newProject, userInfo=userInfo).order_by('-dateTime')[0]
+        else:
+            myGrade = False
+        
+        
         args = {
                 "worksheet":True,
                   'user':request.user,
@@ -174,6 +180,7 @@ def showNextPage(request, projectID=False, pageNumber=False):
                 "classUser":classUser,
                   'newProject':newProject,
                   'myAnswers':myAnswers,
+                  'myGrade':myGrade,
                   'pageNumber':int(pageNumber),
                   'totalPages':int(totalPages),
                   'pageRange':range(int(totalPages)),
@@ -459,6 +466,19 @@ def worksheet_display(request, projectID=False):
     else:
         allClasses = False
     
+    #Get Answers for Students
+    if MyAnswer.objects.filter(userInfo=userInfo, project=currentProject):
+        myAnswers = MyAnswer.objects.filter(userInfo=userInfo, project=currentProject).order_by('answer__pageNumber', 'answer__questionNumber')
+    else:
+        myAnswers = False
+    
+    #Get Student grade for this project (if there is one)
+    if MyGrade.objects.filter(project=currentProject, userInfo=userInfo):
+        myGrade = MyGrade.objects.filter(project=currentProject, userInfo=userInfo).order_by('-dateTime')[0]
+    else:
+        myGrade = False
+        
+    
     
     if GoogleUserInfo.objects.filter(user=request.user):
         googleUserInfo = GoogleUserInfo.objects.get(user=request.user)
@@ -470,6 +490,8 @@ def worksheet_display(request, projectID=False):
             "worksheet":True,
             "userInfo":userInfo,
             "classUser":classUser,
+            'myAnswers':myAnswers,
+            "myGrade":myGrade,
             "allClasses":allClasses,
             "googleUserInfo":googleUserInfo,
             "randomNumber":['1','2','3','4','5','6'],

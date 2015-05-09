@@ -25,11 +25,13 @@
               <div class="">
                 <input type="hidden" name="worksheetID" value="{{ currentProject.id }}">
                 <div class="">
-                  {% ifequal currentProject.status "locked" %}
+                {% if classUser.teacher%}
+                  {% if currentProject.status == "locked" %}
                   <button type="submit" class="btn btn-success btn-block pull-right"><i class="fa fa-unlock"></i>  activate</button>
                   {% else %}
                   <button type="submit" class="btn btn-danger btn-block pull-right"><i class="fa fa-lock"></i>  lock</button>
-                  {% endifequal %}
+                  {% endif %}
+                {% endif %}
                 </div>
               </div>
             </form>
@@ -50,19 +52,21 @@
               <div class="centered">
                 <a href="{% url "worksheet_project.views.showNextPage" currentProject.id 1 %}"><button type="button" class="col-xs-4 btn btn-default" data-container="body"
                   data-toggle="popover" data-placement="bottom" data-trigger="hover"
-                  data-content="Edit">
+                  data-content="{% if classUser.teacher %}Edit{%else%}Work{%endif%}">
                   <i class="fa fa-edit fa-2x"></i>
-                </button>
-                <a href="{% url "worksheet_project.views.monitor" currentProject.id %}"><button type="button" class="col-xs-4 btn btn-default" data-container="body"
-                  data-toggle="popover" data-placement="bottom" data-trigger="hover"
-                  data-content="Monitor">
+                </button></a>
+                <a href="{% if classUser.teacher %}{% url "worksheet_project.views.monitor" currentProject.id %}{%else%}{% url "worksheet_project.views.worksheet_display" currentProject.id %}{%endif%}">
+                  <button type="button" class="col-xs-4 btn btn-default" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover"
+                  data-content="{% if classUser.teacher %}Monitor{%else%}Score{%endif%}">
                   <i class="fa fa-bar-chart-o fa-2x"></i>
                 </button></a>
+                {% if classUser.teacher %}
                 <button type="button" class="col-xs-4 btn btn-default" data-container="body"
                   data-toggle="popover" data-placement="bottom" data-trigger="hover"
-                  data-content="Delete" onclick="$('#worksheetID-hidden-input').val({{ worksheet.id }});$('#delete-worksheet').modal('show');">
+                  data-content="Delete" onclick="$('#worksheetID-hidden-input').val({{ currentProject.id }});$('#delete-worksheet').modal('show');">
                   <i class="fa fa-trash-o fa-2x"></i>
                 </button>
+                {% endif %}
               </div>
             </div>
           </div><! --/col-md-4 -->
@@ -94,8 +98,13 @@
                   <span class="label label-primary label-as-badge">{{ currentProject.numberOfRetry }}</span>
                 </li></a>
                 <li class="list-group-item">
+                {% if classUser.teacher %}
                   total students complete:
                   <span class="label label-primary label-as-badge">14</span>
+                {%else%}
+                  my number of tries:
+                  <span class="label label-primary label-as-badge">{{ myGrade.timesGraded }}</span>
+                {% endif %}
                 </li>
               </ul>
             </div>
@@ -108,12 +117,22 @@
           <div class="showback col-xs-12 mb">
 	    <div id="profile-01" class="noBg">
               <h4><i class="fa fa-angle-right"></i>&nbsp;&nbsp;Questions
+              {% if classUser.teacher %}
               <a href="{% url "worksheet_project.views.showNextPage" currentProject.id 1 %}"
-                 class="btn btn-primary pull-right" style="margin-bottom: 5px;margin-top: -10px;">Add Questions</a></h4>
+                 class="btn btn-primary pull-right" style="margin-bottom: 5px;margin-top: -10px;">Add Questions</a>
+              {% else %}
+              <a href="{% url "worksheet_project.views.showNextPage" currentProject.id 1 %}"
+                 class="btn btn-primary pull-right
+                 {% if myGrade %}{% if myGrade.timesGraded >= currentProject.numberOfRetry %}
+                     disabled
+                 {%endif%}{%endif%}" style="margin-bottom: 5px;margin-top: -10px;">retry</a>
+              {% endif %}
+              </h4>
               
               <div class="row">
                 
                     <div class="col-xs-12">
+                      {% if classUser.teacher %}
                           <section id="no-more-tables">
                             <table class="table table-bordered table-striped table-condensed cf">
                               <thead class="cf">
@@ -172,7 +191,9 @@
                               </tbody>
                           </table>
                         </section>
-                            
+                      {% else %}
+                        {% include "student/student_grade_display_table.html" %}
+                      {% endif %}
                               
                   </div>
                     
@@ -192,7 +213,7 @@
 
 {% block modal %}
   
-{% if currentProject %}
+{% if currentProject and classUser.teacher %}
 <!---------------- modal ------------------------------------->
 <div id="worksheet-settings" class="modal fade" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
   <div class="modal-dialog">

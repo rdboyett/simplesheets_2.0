@@ -2742,8 +2742,14 @@ border-bottom: 3px solid #fff;
 
 .table tbody tr > td.correct {
   background-color: #9df09d !important; /*#5cb85c*/
-  color: #FFF;
+  color: #005C1F;
 }
+
+.table tbody tr > td.incorrect {
+  background-color: #FF8080 !important; /*#5cb85c*/
+  color: #7A0000;
+}
+
 
 .imgareaselect-handle {
 background-color: #428bca !important;

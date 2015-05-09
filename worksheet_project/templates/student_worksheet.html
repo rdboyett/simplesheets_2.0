@@ -1,5 +1,6 @@
 {% extends "base_student_worksheet.html" %}
 {% load staticfiles %}
+{% load my_tags %}
 
 
 {% block title %}{{ newProject.title|capfirst }}{% endblock %}
@@ -32,9 +33,25 @@
     
 
 {% block body %}
-	<button id="gradeWorksheet" class="btn btn-primary">grade worksheet</button>
-	<button id="zoom-out-btn" class="btn btn-primary"><span class="fa fa-search-minus"></span></button>
-	<button id="zoom-in-btn" class="btn btn-primary"><span class="fa fa-search-plus"></button>
+    <div class="row">
+	<div class="col-sm-4">
+	    <button id="gradeWorksheet" class="btn btn-primary
+	    {% if myGrade %}{% if myGrade.timesGraded >= newProject.numberOfRetry %} disabled{% endif %}{% endif %}
+	    ">grade worksheet</button>
+	    <button id="zoom-out-btn" class="btn btn-primary"><span class="fa fa-search-minus"></span></button>
+	    <button id="zoom-in-btn" class="btn btn-primary"><span class="fa fa-search-plus"></button>
+	</div>
+	{% if myGrade %}
+	<div class="col-sm-4">
+	    <div class="panel panel-default">
+		<div class="panel-body text-center">
+		  Your current grade is {{ myGrade.average }}%.
+		  You have {{ newProject.numberOfRetry|subtract:myGrade.timesGraded }} tries left.
+		</div>
+	    </div>
+	</div>
+	{% endif %}
+    </div>
 <section id="wrapper-holder">
     <section id="wrapper">
 	{% for backImage in newProject.backgroundImages.all %}
@@ -248,7 +265,7 @@
       </div>
       <div class="modal-footer bottom-rounded">
         <button type="button" class="btn btn-default rounded" data-dismiss="modal">close</button>
-        <button id="retry-btn" type="button" class="btn btn-primary rounded">retry</button>
+        <button id="retry-btn" type="button" class="btn btn-primary rounded" onclick="location.reload();">retry</button>
       </div>
     </div>
   </div>
@@ -311,6 +328,8 @@
 	    var sendStudentAnswerURL = "{% url "worksheet_creator.page_view_ajax.sendStudentAnswer" %}";
 	    var submitGradeWorksheetURL = "{% url "worksheet_creator.page_view_ajax.submitGradeWorksheet" %}";
 	    var uploadWorkboxImageURL = "{% url "worksheet_creator.page_view_ajax.uploadWorkboxImage" %}";
+	    var bGraded = false;
+	    {% if myGrade %}{% if myGrade.timesGraded >= newProject.numberOfRetry %}bGraded=true;{% endif %}{% endif %}
     </script>
     
     

@@ -32,3 +32,11 @@ def dayssince(value):
         # Date is in the future; return formatted date.
         return value.strftime("%B %d, %Y")
 
+
+
+@register.filter
+def subtract(startingValue, valueToSubtract):
+    if (int(startingValue)- int(valueToSubtract)) < 0:
+        return 0
+    else:
+        return int(startingValue)- int(valueToSubtract)
