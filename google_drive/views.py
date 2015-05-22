@@ -2,6 +2,7 @@ import os
 import logging
 import httplib2
 from datetime import date
+import base64
 
 
 from django.shortcuts import render_to_response
@@ -19,6 +20,10 @@ from google_login.models import CredentialsModel
 from userInfo_profile.models import UserInfo
 from classrooms.models import ClassUser
 
+
+
+import logging
+log = logging.getLogger(__name__)
 
 
 @login_required
@@ -111,11 +116,11 @@ def driveUpload(user, FILENAME):
         drive_service = build("drive", "v2", http=http)
     
         # Insert a file
-        media_body = MediaFileUpload(FILENAME, mimetype='application/sst', resumable=True)
+        media_body = MediaFileUpload(FILENAME, mimetype='application/vnd.google-apps.drive-sdk', resumable=True)
         body = {
           'title': fname,
           'description': 'Duck Soup Worksheet',
-          'mimeType': 'application/sst'
+          'mimeType': 'application/vnd.google-apps.drive-sdk'
         }
         
         file = drive_service.files().insert(body=body, media_body=media_body).execute()
@@ -123,7 +128,45 @@ def driveUpload(user, FILENAME):
         return file['id']
 
 
-
+def createGoogleShortcut(user, FILENAME, thumbPath):
+    storage = Storage(CredentialsModel, 'id', user, 'credential')
+    credential = storage.get()
+    
+    if credential is None or credential.invalid == True:
+        #return HttpResponseRedirect("/login/")
+        return render_to_response('google-login-wait.html', {})
+    
+    else:
+        # Path to the file to upload
+        #FILENAME = filePath
+        
+        #fdir, fname = os.path.split(FILENAME)
+    
+        http = httplib2.Http()
+        http = credential.authorize(http)
+        drive_service = build("drive", "v2", http=http)
+        
+        with open(thumbPath, "rb") as image_file:
+            imageData = base64.urlsafe_b64encode(image_file.read())
+        
+        
+        body = {
+            'title': FILENAME,
+            'description': 'Duck Soup Worksheet',
+            'mimeType': 'application/vnd.google-apps.drive-sdk',
+            "thumbnail": {
+                    "image": imageData,
+                    "mimeType": 'image/png'
+                },
+        }
+        
+        returnedFile = drive_service.files().insert(body=body).execute()
+        
+        log.info(returnedFile)
+        
+        return returnedFile['id']
+        
+        
 
 
 def delete_file(service, file_id):

@@ -9,6 +9,7 @@ SCOPES = [
     'https://www.googleapis.com/auth/userinfo.email',
     'https://www.googleapis.com/auth/userinfo.profile',
     'https://www.googleapis.com/auth/drive.install',
+    'https://www.googleapis.com/auth/drive.metadata',
     'https://www.googleapis.com/auth/drive',
     # Add other requested scopes.
 ]

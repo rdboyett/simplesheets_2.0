@@ -8,6 +8,7 @@ import logging
 import httplib2
 import datetime
 import shutil
+import re
 
 
 from django.shortcuts import render_to_response, redirect
@@ -44,7 +45,7 @@ except ImportError:
 from userInfo_profile.models import UserInfo
 from google_login.models import CredentialsModel
 from worksheet_creator.models import Project, BackImage
-from google_drive.views import driveUpload
+from google_drive.views import driveUpload, createGoogleShortcut
 
 
 
@@ -102,8 +103,11 @@ def create(request):
                   resp, content = drive_service._http.request(download_url)
                   if resp.status == 200:
                     rawTitle = file['title']
-                    title = rawTitle.replace(" ", "")
+                    title = re.sub(r'[^\w]', '', rawTitle)
+                    title = title.replace(" ", "")
                     baseFilePath = os.path.join(ROOT_PATH,'media', request.user.first_name+request.user.last_name+str(request.user.id), str(title[:5]+str(fileId[:5])))
+                    duckThumbPath = os.path.join(ROOT_PATH, 'duckThumb')
+                    make_sure_path_exists(duckThumbPath)
                     make_sure_path_exists(baseFilePath)
                     
                     pdfPath = os.path.join(baseFilePath,title + ".pdf")
@@ -195,9 +199,9 @@ def create(request):
                         #myZipFile = zipFile(jsonFilePath, title, baseFilePath) #don't need to zip...not storing pics
                         myZipFile = True #set this to continue the program
                         if myZipFile:
-                            uploadedFileID = driveUpload(request.user, os.path.join(baseFilePath,title + '.sst'))
+                            uploadedFileID = createGoogleShortcut(request.user, newProject.title.title(), os.path.join(duckThumbPath,'icon_600.png'))
                             if uploadedFileID:
-                                os.remove(os.path.join(baseFilePath,title + '.sst'))
+                                os.remove(os.path.join(baseFilePath,title))
                                 newProject.uploadedFileID = uploadedFileID
                                 newProject.save()
                         
@@ -256,8 +260,16 @@ def create(request):
         
         
         
+
+@login_required
+def openGoogleFile(request):
+    if request.method == 'GET':
+        idList = json.loads(request.GET["state"])['ids']
+        action = json.loads(request.GET["state"])['action']
+        googleUserID = json.loads(request.GET["state"])['userId']
         
         
+    return HttpResponse(googleUserID)
         
         
         
@@ -340,10 +352,10 @@ def makeJsonFile(user, data ,title, basePath):
     }
     '''
     #changed the .json to .sst to change it to a format that people would not recognize in their drive
-    with open(os.path.join(basePath,title + '.sst'), 'w') as json_file:
+    with open(os.path.join(basePath,title), 'w') as json_file:
         json.dump(data, json_file)
         
-    return os.path.join(basePath,title + '.sst')
+    return os.path.join(basePath,title)
 
 
 

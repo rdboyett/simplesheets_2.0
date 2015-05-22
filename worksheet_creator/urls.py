@@ -4,6 +4,7 @@ from django.conf.urls import patterns, include, url
 urlpatterns = patterns('worksheet_creator.views',
     (r'^startCreate/(?P<fileId>.+)/$', 'startCreate'),
     (r'^create/$', 'create'),
+    (r'^open/$', 'openGoogleFile'),
 )
 
 urlpatterns += patterns('worksheet_creator.ajax',
