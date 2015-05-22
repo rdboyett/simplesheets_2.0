@@ -17,5 +17,7 @@ urlpatterns += patterns('classrooms.ajax',
     (r'^editProfile/$', 'editProfile'),
     (r'^getOldMessages/$', 'getOldMessages'),
     (r'^getNewMessages/$', 'getNewMessages'),
+    (r'^removeFromClass/$', 'removeFromClass'),
+    (r'^newCode/$', 'newCode'),
     
 )

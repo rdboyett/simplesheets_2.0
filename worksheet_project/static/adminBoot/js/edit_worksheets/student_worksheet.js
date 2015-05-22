@@ -613,11 +613,13 @@ function showGradeColors() {
             
         }else if ($(this).data('options').input_type=='work') {
                     if ($(this).data('bCorrect') == 'correct') {
+			$(this).addClass('correctOutline').removeClass('incorrectOutline');
                         var correct = {
                             'backColor':"#9efe83",
                             'borderColor':"#1b7401",
                         }
                     }else{
+			$(this).addClass('incorrectOutline').removeClass('correctOutline');
                         var correct = {
                             'backColor':"#ffa8a8",
                             'borderColor':"#dd0000",
@@ -642,6 +644,7 @@ function showGradeColors() {
             
         }else{
             if ($(this).data('bCorrect') == 'correct') {
+		    $(this).addClass('correctOutline').removeClass('incorrectOutline');
                     $( "#default_form" ).append('<div id="checkboxNotify'+ counter +'" class="" title="Your answer is correct."><div>');
                     var pos = $(this).position();
                     $("#checkboxNotify"+ counter).css({
@@ -656,6 +659,7 @@ function showGradeColors() {
                         'opacity':'0.4',
                     });
             }else{
+		    $(this).addClass('incorrectOutline').removeClass('correctOutline');
                     $( "#default_form" ).append('<div id="checkboxNotify'+ counter +'" class="" title="Sorry, your answer is not correct."><div>');
                     var pos = $(this).position();
                     $("#checkboxNotify"+ counter).css({
@@ -743,91 +747,96 @@ function showGradeColors() {
     /************************** Submit Answer *************************************************************************8*****/
 	function sendStudentAnswer(element, answer, data){
 		console.log('In sendStudentAnswer');
-	    
-            var csrftoken = getCookie('csrftoken');
-	    var uri = sendStudentAnswerURL;
-            var xhr = new XMLHttpRequest();
-            var fd = new FormData();
-            
-            xhr.open("POST", uri, true);
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState == 4 && xhr.status == 200) {
-                    // Handle response.
-		    //console.log(xhr.responseText);
-		    var data = JSON.parse(xhr.responseText)
-		    console.log(data);
-		    if (data.error) {alert(data.error);}
-		    else{
-			element.data('bCorrect',data.answer);
-			/*
-			if (data.answer == 'correct') {
-			    element.css({
-				'background-color':'#9efe83',
-				'border-color':'#1b7401',
-			    });
-			}else{
-			    element.css({
-				'background-color':'#ffa8a8',
-				'border-color':'#dd0000',
-			    });
+	    if (!bGraded) {
+		var csrftoken = getCookie('csrftoken');
+		var uri = sendStudentAnswerURL;
+		var xhr = new XMLHttpRequest();
+		var fd = new FormData();
+		
+		xhr.open("POST", uri, true);
+		xhr.onreadystatechange = function() {
+		    if (xhr.readyState == 4 && xhr.status == 200) {
+			// Handle response.
+			//console.log(xhr.responseText);
+			var data = JSON.parse(xhr.responseText)
+			console.log(data);
+			if (data.error) {alert(data.error);}
+			else{
+			    element.data('bCorrect',data.answer);
+			    /*
+			    if (data.answer == 'correct') {
+				element.css({
+				    'background-color':'#9efe83',
+				    'border-color':'#1b7401',
+				});
+			    }else{
+				element.css({
+				    'background-color':'#ffa8a8',
+				    'border-color':'#dd0000',
+				});
+			    }
+			    */
 			}
-			*/
 		    }
-                }
-            };
-	    xhr.timeout = 4000;
-	    xhr.ontimeout = function () { location.reload(); }
-            fd.append('userInfo_id', userInfo_id_ajax);
-            fd.append('inputNumber', data.answer_id);
-            fd.append('answer', answer);
-	    
-            // Initiate a multipart/form-data upload
-            xhr.setRequestHeader("X-CSRFToken", csrftoken);
-	    xhr.send(fd);
-	    //console.log( xhr._object);
+		};
+		xhr.timeout = 4000;
+		xhr.ontimeout = function () { location.reload(); }
+		fd.append('userInfo_id', userInfo_id_ajax);
+		fd.append('inputNumber', data.answer_id);
+		fd.append('answer', answer);
+		fd.append('classID', classID_ajax);
+		
+		
+		// Initiate a multipart/form-data upload
+		xhr.setRequestHeader("X-CSRFToken", csrftoken);
+		xhr.send(fd);
+		//console.log( xhr._object);
+	    }
         }
 	
 	
 	
 	
-    /************************** grade Worksheet *************************************************************************8*****/
+    /************************** grade Worksheet ******************************************************************************/
 	function submitGradeWorksheet(){
 		console.log('In submitGradeWorksheet');
 	    
-            var csrftoken = getCookie('csrftoken');
-	    var uri = submitGradeWorksheetURL;
-            var xhr = new XMLHttpRequest();
-            var fd = new FormData();
-            
-            xhr.open("POST", uri, true);
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState == 4 && xhr.status == 200) {
-                    // Handle response.
-		    console.log(xhr.responseText);
-		    var html = xhr.responseText;
-			
-		    showGradeColors();
-		    resizeElements();
-			
-			$("#display-grade-modal .modal-body").html(html);
-			if ($("#attemptsLeft").length) {
-				var attemptsLeft = $("#attemptsLeft").data('options').attempts_left;
-				if (attemptsLeft<1) {
-					$("#retry-btn").addClass('disabled');
-				}
-			}else{$("#retry-btn").hide();}
-			$("#display-grade-modal").modal('show');
-                }
-            };
-	    xhr.timeout = 4000;
-	    xhr.ontimeout = function () { location.reload(); }
-            fd.append('userInfo_id', userInfo_id_ajax);
-            fd.append('project_id', project_id_ajax);
-	    
-            // Initiate a multipart/form-data upload
-            xhr.setRequestHeader("X-CSRFToken", csrftoken);
-	    xhr.send(fd);
-	    //console.log( xhr._object);
+	    if (!bGraded) {
+		var csrftoken = getCookie('csrftoken');
+		var uri = submitGradeWorksheetURL;
+		var xhr = new XMLHttpRequest();
+		var fd = new FormData();
+		
+		xhr.open("POST", uri, true);
+		xhr.onreadystatechange = function() {
+		    if (xhr.readyState == 4 && xhr.status == 200) {
+			// Handle response.
+			console.log(xhr.responseText);
+			var html = xhr.responseText;
+			    
+			showGradeColors();
+			resizeElements();
+			    
+			    $("#display-grade-modal .modal-body").html(html);
+			    if ($("#attemptsLeft").length) {
+				    var attemptsLeft = $("#attemptsLeft").data('options').attempts_left;
+				    if (attemptsLeft<1) {
+					    $("#retry-btn").addClass('disabled');
+				    }
+			    }else{$("#retry-btn").hide();}
+			    $("#display-grade-modal").modal('show');
+		    }
+		};
+		xhr.timeout = 4000;
+		xhr.ontimeout = function () { location.reload(); }
+		fd.append('userInfo_id', userInfo_id_ajax);
+		fd.append('project_id', project_id_ajax);
+		
+		// Initiate a multipart/form-data upload
+		xhr.setRequestHeader("X-CSRFToken", csrftoken);
+		xhr.send(fd);
+		//console.log( xhr._object);
+	    }
         }
 	
 	
@@ -835,39 +844,40 @@ function showGradeColors() {
 	function uploadWorkboxImage(file, inputID){
 		console.log('In uploadWorkboxImage');
 	    
-            var csrftoken = getCookie('csrftoken');
-	    var uri = uploadWorkboxImageURL;
-            var xhr = new XMLHttpRequest();
-            var fd = new FormData();
-            
-            xhr.open("POST", uri, true);
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState == 4 && xhr.status == 200) {
-                    // Handle response.
-		    //console.log(xhr.responseText);
-		    var data = JSON.parse(xhr.responseText)
-		    console.log(data);
-		    if (data.error) {alert(data.error);}
-		    else{
-		    
+	    if (!bGraded) {
+		var csrftoken = getCookie('csrftoken');
+		var uri = uploadWorkboxImageURL;
+		var xhr = new XMLHttpRequest();
+		var fd = new FormData();
+		
+		xhr.open("POST", uri, true);
+		xhr.onreadystatechange = function() {
+		    if (xhr.readyState == 4 && xhr.status == 200) {
+			// Handle response.
+			//console.log(xhr.responseText);
+			var data = JSON.parse(xhr.responseText)
+			console.log(data);
+			if (data.error) {alert(data.error);}
+			else{
+			
+			}
 		    }
-                }
-            };
-	    xhr.timeout = 4000;
-	    xhr.ontimeout = function () { location.reload(); }
-            fd.append('userInfo_id', userInfo_id_ajax);
-            fd.append('project_id', project_id_ajax);
-            fd.append('inputNumber', inputID);
-            fd.append('file', file);
-	    
-            // Initiate a multipart/form-data upload
-            xhr.setRequestHeader("X-CSRFToken", csrftoken);
-	    xhr.send(fd);
-	    //console.log( xhr._object);
+		};
+		xhr.timeout = 4000;
+		xhr.ontimeout = function () { location.reload(); }
+		fd.append('userInfo_id', userInfo_id_ajax);
+		fd.append('project_id', project_id_ajax);
+		fd.append('inputNumber', inputID);
+		fd.append('file', file);
+		
+		// Initiate a multipart/form-data upload
+		xhr.setRequestHeader("X-CSRFToken", csrftoken);
+		xhr.send(fd);
+		//console.log( xhr._object);
+	    }
         }
 	
 	
-
 
 
 
@@ -876,12 +886,12 @@ function showGradeColors() {
 	 /****************** End of Ajax calls ***************************/
 	 
 	 
-	 
+	 /*
 	if (bGraded) {
 		showGradeColors();
 		resizeElements();
 	}
-	 
+	 */
 
 
         

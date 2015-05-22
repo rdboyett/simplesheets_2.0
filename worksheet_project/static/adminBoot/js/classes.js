@@ -83,7 +83,119 @@ $('document').ready(function(){
         });
     
     
+$.validator.addMethod("noWhitespace",
+   function(value) {
+    var noWhitespaces = /^\w+$/;
+    if (noWhitespaces.test(value)){
+        return true
+    }else{return false}
+   },'no spaces');
     
+    
+    $("#reset-password-form").validate({
+            errorPlacement: function(error, element){
+		element.parent().parent().prepend(error);
+            },
+	    highlight: function(element, errorClass, validClass) {
+		$(element).addClass(errorClass).removeClass(validClass);
+		$(element.form).find("label[for=" + element.id + "]")
+		  .addClass(errorClass);
+		var check = $(element).next();
+		if (check.hasClass("register-check-good")) {
+		    check.removeClass("register-check-good").addClass("register-check-error");
+		}
+		check.fadeIn(300);
+	    },
+	    unhighlight: function(element, errorClass, validClass) {
+		$(element).removeClass(errorClass).addClass(validClass);
+		$(element.form).find("label[for=" + element.id + "]")
+		  .removeClass(errorClass);
+		var check = $(element).next();
+		if (check.hasClass("register-check-error")) {
+		    check.removeClass("register-check-error").addClass("register-check-good");
+		}
+		check.fadeIn(300);
+	    },
+	    rules: {
+		password1: {
+		    required: true,
+		    minlength: 6,
+		    maxlength: 30,
+		    noWhitespace: true,
+		},
+		password2: {
+		    required: true,
+		    equalTo: "#password1"
+		},
+	    },
+	    messages: {
+		password2: {
+		    required: "confirm",
+		    equalTo: "same password as above"
+		},
+	    }
+});
+    
+    
+    
+    $('#reset-password-form').ajaxForm({ 
+        success:       function(responseText){
+            if (responseText.error) {
+                alert(responseText.error);
+            }else if (responseText.success) {
+		$('#reset-password').modal('hide');
+            }
+        },
+	clearForm: true,
+	resetForm: true,
+        dataType:  'json',
+        timeout:   4000 
+    }); 
+    
+    
+    
+    $('#remove-from-class-form').ajaxForm({ 
+        success:       function(responseText){
+            console.log(responseText);
+            if (responseText.error) {
+                alert(responseText.error);
+            }else {
+		location.reload();
+            }
+        },
+        dataType:  'json',
+        timeout:   4000 
+    }); 
+    
+    
+    
+    $('#newCode-form').ajaxForm({ 
+        success:       function(responseText){
+            console.log(responseText);
+            if (responseText.error) {
+                alert(responseText.error);
+            }else {
+		$("#class-code .modal-body span").html(responseText.classCode);
+                $("#class-code-container .class-code").html(responseText.classCode);
+            }
+        },
+        dataType:  'json',
+        timeout:   4000 
+    }); 
+    
+    
+    $('#forceTurnIn').ajaxForm({ 
+        success:       function(responseText){
+            console.log(responseText);
+            if (responseText.error) {
+                alert(responseText.error);
+            }else {
+		location.reload();
+            }
+        },
+        dataType:  'json',
+        timeout:   4000 
+    });
     
     
     

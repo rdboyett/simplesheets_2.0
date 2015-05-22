@@ -32,8 +32,9 @@ from oauth2client.client import OAuth2WebServerFlow
 from apiclient import errors
 
 
-from userInfo_profile.models import UserInfo, MyAnswer, MyGrade
+from userInfo_profile.models import UserInfo, MyAnswer, MyGrade, LiveMonitorSession
 from worksheet_creator.models import Project, BackImage, FormInput
+from classrooms.models import Classroom, ClassUser
 from google_login.models import CredentialsModel
 from worksheet_creator import settings
 
@@ -58,6 +59,8 @@ except ImportError:
 
 
 
+import logging
+log = logging.getLogger(__name__)
 
 
 
@@ -140,7 +143,7 @@ def updateHelpLink(request):
     if request.method == 'POST':
         userInfo_id = request.POST["userInfo_id"]
         inputNumber = request.POST["inputNumber"]
-        newHelpLink = request.POST["newHelpLink"]
+        newHelpLink = request.POST["newHelpLink"].strip()
     
     
         if FormInput.objects.filter(id=int(inputNumber)):
@@ -611,7 +614,8 @@ def sendStudentAnswer(request):
     if request.method == 'POST':
         userInfo_id = request.POST["userInfo_id"]
         answerID = request.POST["inputNumber"]
-        myAnswer = request.POST["answer"]
+        myAnswer = request.POST["answer"].strip()
+        classID = request.POST["classID"].strip()
         
         myAnswer = myAnswer.strip()
         myAnswer = myAnswer.lower()
@@ -648,7 +652,12 @@ def sendStudentAnswer(request):
                     bCorrect = bCorrect,
                 )
                 
-                
+            #now check for live session and update live session answers
+            currentProject = Project.objects.get(formInputs__id=answerID)
+            if LiveMonitorSession.objects.filter(project=currentProject, classroom__id=classID):
+                liveSession = LiveMonitorSession.objects.get(project=currentProject, classroom__id=classID)
+                liveSession.answers.add(myAnswerObject)
+                liveSession.save()
                 
         else:
             data = {
@@ -674,6 +683,7 @@ def submitGradeWorksheet(request):
         
         
         
+        
         if UserInfo.objects.filter(id=userInfo_id):
             userInfo = UserInfo.objects.get(id=userInfo_id)
             if Project.objects.filter(id=project_id):
@@ -683,16 +693,14 @@ def submitGradeWorksheet(request):
                         'error':"There is no project with ID: "+str(project_id),
                     }
                 
-            #Get the Old grade file
-            if MyGrade.objects.filter(userInfo=userInfo, project=project):
-                oldTimesGraded = MyGrade.objects.filter(userInfo=userInfo, project=project).count()
-            else:
-                oldTimesGraded = 0
             
-            if oldTimesGraded >= project.numberOfRetry:
-                args = {
-                        'error':"Sorry, you have exceded the number of retries",
-                    }
+            if MyGrade.objects.filter(userInfo=userInfo, project=project):
+                myGrade = MyGrade.objects.get(userInfo=userInfo, project=project)
+                        
+                if myGrade.timesGraded >= project.numberOfRetry:
+                    args = {
+                            'error':"Sorry, you have exceded the number of retries",
+                        }
             else:
                 #Create a grade file every time in order to show progress and average 
                 myGrade = MyGrade.objects.create(
@@ -701,9 +709,11 @@ def submitGradeWorksheet(request):
                     pointsPossible = 0,
                     pointsEarned = 0,
                     average = 0,
-                    timesGraded = oldTimesGraded,
+                    timesGraded = 0,
                 )
                     
+            
+            if myGrade:
                 #Get the points possible by adding each input question
                 pointsPossible = 0
                 #get input grade for student for points earned on each question
@@ -721,8 +731,18 @@ def submitGradeWorksheet(request):
                             myAnswer = MyAnswer.objects.get(project=project, userInfo=userInfo, answer=question)
                             
                             pointsPossible += float(question.points)
-                            if myAnswer.bCorrect:
-                                pointsEarned += float(question.points)
+                            if not question.inputType == 'textarea':
+                                if question.correctAnswer == myAnswer.myAnswer:
+                                    pointsEarned += float(question.points)
+                                    myAnswer.bCorrect = True
+                                else:
+                                    myAnswer.bCorrect = False
+                                
+                                myAnswer.save()
+                                
+                                
+                                                
+
                             
                             #if the input type is textarea then we need to create a points earned
                             if question.inputType == 'textarea':
@@ -732,31 +752,48 @@ def submitGradeWorksheet(request):
                                 number_of_keyword_matches = 0
                                 if question.option1:
                                     keywordCounter += 1
-                                    if question.option1 in myAnswerList:  #Count the number of keyword matches in answer and calculate the points earned
+                                    if question.option1.lower() in [x.lower() for x in myAnswerList]:  #Count the number of keyword matches in answer and calculate the points earned
                                         number_of_keyword_matches += 1
                                 
                                 if question.option2:
                                     keywordCounter += 1
-                                    if question.option2 in myAnswerList:
+                                    if question.option2.lower() in [x.lower() for x in myAnswerList]:
                                         number_of_keyword_matches += 1
                                     
                                 if question.option3:
                                     keywordCounter += 1
-                                    if question.option3 in myAnswerList:
+                                    if question.option3.lower() in [x.lower() for x in myAnswerList]:
                                         number_of_keyword_matches += 1
                                 
                                 if question.option4:
                                     keywordCounter += 1
-                                    if question.option4 in myAnswerList:
+                                    if question.option4.lower() in [x.lower() for x in myAnswerList]:
                                         number_of_keyword_matches += 1
                                 
                                         
                                 #calculate the points per match and points earned
                                 pointsPossiblePerKeyword = float(float(question.points)/float(keywordCounter))
                                 pointsEarned += float(float(pointsPossiblePerKeyword)*number_of_keyword_matches)
+                                myAnswer.partialCredit = float(float(pointsPossiblePerKeyword)*number_of_keyword_matches)
+                                if myAnswer.partialCredit > 0:
+                                    myAnswer.bCorrect = True
+                                else:
+                                    myAnswer.bCorrect = False
+                                    
+                                myAnswer.save()
                             
                             
                         else:
+                            if question.inputType == 'checkbox' and not question.correctAnswer:  #this means that the user could have kept the checkbox unchecked and it is the correct answer but a corresponding answer was not created.
+                                myNewAnswerObject = MyAnswer.objects.create(
+                                    project = project,
+                                    userInfo=userInfo,
+                                    answer = question,
+                                    myAnswer = question.correctAnswer,
+                                    bCorrect = True,
+                                )
+                                pointsEarned += float(question.points)
+                                        
                             pointsPossible += float(question.points)
                             
                 else:
@@ -772,11 +809,13 @@ def submitGradeWorksheet(request):
                 myGrade.pointsEarned = pointsEarned
                 myGrade.average = average
                 myGrade.timesGraded += 1
+                myGrade.highestGrade = True
+                myGrade.extraCredit = 0
                 myGrade.save()
                 
                 numberAttemptsLeft = int(project.numberOfRetry) - int(myGrade.timesGraded)
                 
-                allMyAnswers = MyAnswer.objects.filter(project=project, userInfo=userInfo)
+                allMyAnswers = MyAnswer.objects.filter(project=project, userInfo=userInfo).order_by('answer__pageNumber','answer__questionNumber')
                 
                 args = {
                     'myGrade':myGrade,
@@ -798,6 +837,179 @@ def submitGradeWorksheet(request):
         
     
     return render_to_response('grade_display.html', args)
+
+
+
+
+
+@login_required
+def forceGradeWorksheet(request):
+    if request.method == 'POST':
+        try:
+            user_id = request.POST["user_id"].strip()  #django user
+        except:
+            user_id = False
+            
+        project_id = request.POST["project_id"].strip()
+        class_id = request.POST["class_id"].strip()
+            
+        
+        #get all the userInfo's for the class
+        if not user_id and ClassUser.objects.filter(user=request.user, classrooms__id=class_id, teacher=True):  #if class_id then force turn in for whole class
+            if ClassUser.objects.filter(classrooms__id=class_id, teacher=False):
+                allUsers = [x.user for x in ClassUser.objects.filter(classrooms__id=class_id, teacher=False)]
+                if UserInfo.objects.filter(user__in=allUsers):
+                    allUserInfos = UserInfo.objects.filter(user__in=allUsers)
+                else:
+                    return HttpResponse(json.dumps({'error':"Sorry, there are no students in this class."}))
+            else:
+                return HttpResponse(json.dumps({'error':"Sorry, there are no students in this class."}))
+        else:
+            if ClassUser.objects.filter(user=request.user, classrooms__id=class_id, teacher=True):  #ensure that this is a teacher trying to force turn in.
+                if UserInfo.objects.filter(user__id=user_id):
+                    allUserInfos = UserInfo.objects.filter(user__id=user_id)
+                else:
+                    return HttpResponse(json.dumps({'error':"Sorry, we can't find that student."}))
+            else:
+                return HttpResponse(json.dumps({'error':"Sorry, you must be a teacher of this class."}))
+            
+            
+            
+            
+            
+        
+        for userInfo in allUserInfos:
+            if Project.objects.filter(id=project_id):
+                project = Project.objects.get(id=project_id)
+            else:
+                return HttpResponse(json.dumps({'error':"We can't find the worksheet."}))
+                
+            if MyGrade.objects.filter(userInfo=userInfo, project=project):
+                myGrade = MyGrade.objects.get(userInfo=userInfo, project=project)
+            else:
+                #Create a grade file every time in order to show progress and average 
+                myGrade = MyGrade.objects.create(
+                    project = project,
+                    userInfo=userInfo,
+                    pointsPossible = 0,
+                    pointsEarned = 0,
+                    average = 0,
+                    timesGraded = 0,
+                )
+                    
+            
+            if myGrade:
+                #Get the points possible by adding each input question
+                pointsPossible = 0
+                #get input grade for student for points earned on each question
+                pointsEarned = 0
+                
+                #get all the input questions for the project and loop through them
+                if project.formInputs.all():
+                    
+                    myAnswers = {}
+                    counter = 1
+                    
+                    for question in project.formInputs.all().order_by('pageNumber'):  #question is a FormInput
+                        #get myAnswer for this question
+                        if MyAnswer.objects.filter(project=project, userInfo=userInfo, answer=question):
+                            myAnswer = MyAnswer.objects.get(project=project, userInfo=userInfo, answer=question)
+                            
+                            pointsPossible += float(question.points)
+                            if not question.inputType == 'textarea':
+                                if question.correctAnswer == myAnswer.myAnswer:
+                                    pointsEarned += float(question.points)
+                                    myAnswer.bCorrect = True
+                                else:
+                                    myAnswer.bCorrect = False
+                                
+                                myAnswer.save()
+                                
+                                
+                                                
+
+                            
+                            #if the input type is textarea then we need to create a points earned
+                            if question.inputType == 'textarea':
+                                myAnswerList = myAnswer.myAnswer.split(" ")
+                                #count the number of keywords provided to calculate the points for each match
+                                keywordCounter = 0
+                                number_of_keyword_matches = 0
+                                if question.option1:
+                                    keywordCounter += 1
+                                    if question.option1.lower() in [x.lower() for x in myAnswerList]:  #Count the number of keyword matches in answer and calculate the points earned
+                                        number_of_keyword_matches += 1
+                                
+                                if question.option2:
+                                    keywordCounter += 1
+                                    if question.option2.lower() in [x.lower() for x in myAnswerList]:
+                                        number_of_keyword_matches += 1
+                                    
+                                if question.option3:
+                                    keywordCounter += 1
+                                    if question.option3.lower() in [x.lower() for x in myAnswerList]:
+                                        number_of_keyword_matches += 1
+                                
+                                if question.option4:
+                                    keywordCounter += 1
+                                    if question.option4.lower() in [x.lower() for x in myAnswerList]:
+                                        number_of_keyword_matches += 1
+                                
+                                        
+                                #calculate the points per match and points earned
+                                pointsPossiblePerKeyword = float(float(question.points)/float(keywordCounter))
+                                pointsEarned += float(float(pointsPossiblePerKeyword)*number_of_keyword_matches)
+                                myAnswer.partialCredit = float(float(pointsPossiblePerKeyword)*number_of_keyword_matches)
+                                if myAnswer.partialCredit > 0:
+                                    myAnswer.bCorrect = True
+                                else:
+                                    myAnswer.bCorrect = False
+                                    
+                                myAnswer.save()
+                            
+                            
+                        else:
+                            if question.inputType == 'checkbox' and not question.correctAnswer:  #this means that the user could have kept the checkbox unchecked and it is the correct answer but a corresponding answer was not created.
+                                myNewAnswerObject = MyAnswer.objects.create(
+                                    project = project,
+                                    userInfo=userInfo,
+                                    answer = question,
+                                    myAnswer = question.correctAnswer,
+                                    bCorrect = True,
+                                )
+                                pointsEarned += float(question.points)
+                                        
+                            pointsPossible += float(question.points)
+                            
+                else:
+                    return HttpResponse(json.dumps({'error':"Sorry, there are no questions for this worksheet."}))
+                
+                #calculate an average at the end and add to the timesGraded
+                average = float(float(pointsEarned)/float(pointsPossible)*float(100))
+                
+                #save myGrade information
+                myGrade.pointsPossible = pointsPossible
+                myGrade.pointsEarned = pointsEarned
+                myGrade.average = average
+                myGrade.timesGraded = project.numberOfRetry
+                myGrade.highestGrade = True
+                myGrade.extraCredit = 0
+                myGrade.save()
+                
+            
+                
+        data = {'success':'success'}
+                
+            
+    else:
+        data = {
+                'error':"There was an error posting this request. Please try again.",
+            }
+        
+    
+    return HttpResponse(json.dumps(data))
+
+
 
 
 
@@ -1212,6 +1424,137 @@ def toggleLockWorksheet(request):
         }
             
     return HttpResponse(json.dumps(data))
+
+
+
+
+
+@login_required
+def liveMonitorAnswers(request):
+    if request.method == 'POST':
+        project_id = request.POST["projectID"].strip()
+        class_id = request.POST["classID"].strip()
+        
+        allNewAnswers = []
+        if LiveMonitorSession.objects.filter(project__id=project_id, classroom__id=class_id):
+            liveSession = LiveMonitorSession.objects.get(project__id=project_id, classroom__id=class_id)
+            if liveSession.answers.all():
+                allAnswers = liveSession.answers.all()
+                for answer in allAnswers:
+                    if UserInfo.objects.filter(id=answer.userInfo.id):
+                        user = UserInfo.objects.get(id=answer.userInfo.id).user
+                        newId = user.last_name + str(user.id) + str(answer.answer.questionNumber)
+                        #newAnswers = {'id':'last_name-question#', 'bCorrect':'true'}
+                        allNewAnswers.append({'id':newId, 'bCorrect':answer.bCorrect})
+                #Now clear all the answers from the liveSession
+                liveSession.answers.clear()
+                return HttpResponse(json.dumps({'answers':allNewAnswers}))
+            else:
+                return HttpResponse(json.dumps({'noAnswers':'noAnswers'}))
+            
+                
+            
+        else:
+            return HttpResponse(json.dumps({'noAnswers':'noAnswers'}))
+        
+        
+    else:
+        data = {
+            'error': "There was an error posting this request. Please try again.",
+        }
+            
+    return HttpResponse(json.dumps(data))
+
+
+
+
+
+
+
+
+@login_required
+def teacherGradeChange(request):
+    if request.method == 'POST':
+        myGradeID = request.POST["myGradeID"].strip()
+        pointsEarned = request.POST["pointsEarned"].strip()
+        extraCredit = request.POST["extraCredit"].strip()
+        newAverage = request.POST["newAverage"].strip()
+        
+        if ClassUser.objects.filter(user=request.user, teacher=True):
+            post = request.POST
+            del post['myGradeID']
+            del post['pointsEarned']
+            del post['extraCredit']
+            del post['newAverage']
+            del post['csrfmiddlewaretoken']
+            
+            
+            log.info(post)
+            
+            for key, value in post.iteritems():  #now only answers are left 
+                answerID = key.split('_')[1]
+                if MyAnswer.objects.filter(id=answerID):
+                    myAnswer = MyAnswer.objects.get(id=answerID)
+                    if value == 'correct':
+                        myAnswer.bCorrect = True
+                        if myAnswer.partialCredit:
+                            myAnswer.partialCredit = 0
+                    elif value == 'incorrect':
+                        myAnswer.bCorrect = False
+                        if myAnswer.partialCredit:
+                            myAnswer.partialCredit = 0
+                    
+                    myAnswer.save()
+                        
+            if MyGrade.objects.filter(id=myGradeID):
+                myGrade = MyGrade.objects.get(id=myGradeID)
+                myGrade.pointsEarned = pointsEarned
+                myGrade.average = newAverage
+                myGrade.extraCredit = extraCredit
+                myGrade.save()
+                data = {'success':'success'}
+            else:
+                data = {'error':"Sorry, we can't find that grade"}
+                
+        else:
+            data = {'error':'Sorry, you must be a teacher to changed a grade.'}
+        
+        
+        
+    else:
+        data = {
+            'error': "There was an error posting this request. Please try again.",
+        }
+            
+    return HttpResponse(json.dumps(data))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

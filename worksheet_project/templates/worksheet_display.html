@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load staticfiles %}
+{% load userInfo_tags %}
 
 
 {% block title %}{{ currentProject.title|capfirst }}{% endblock %}
@@ -50,7 +51,7 @@
                 <p  data-toggle="modal" data-target="#worksheet-settings">{{ currentProject.title|capfirst }}</p>
               </div>
               <div class="centered">
-                <a href="{% url "worksheet_project.views.showNextPage" currentProject.id 1 %}"><button type="button" class="col-xs-4 btn btn-default" data-container="body"
+                <a href="{% if classUser.teacher %}{% url "worksheet_project.views.showNextPage" currentProject.id 1 %}{%else%}{% url "worksheet_project.views.showNextPage" currentProject.id 1 currentProject|getStudentsClass:classUser %}{%endif%}"><button type="button" class="col-xs-4 btn btn-default" data-container="body"
                   data-toggle="popover" data-placement="bottom" data-trigger="hover"
                   data-content="{% if classUser.teacher %}Edit{%else%}Work{%endif%}">
                   <i class="fa fa-edit fa-2x"></i>
@@ -61,7 +62,7 @@
                   <i class="fa fa-bar-chart-o fa-2x"></i>
                 </button></a>
                 {% if classUser.teacher %}
-                <button type="button" class="col-xs-4 btn btn-default" data-container="body"
+                <button type="button" class="col-xs-4 btn btn-danger" data-container="body"
                   data-toggle="popover" data-placement="bottom" data-trigger="hover"
                   data-content="Delete" onclick="$('#worksheetID-hidden-input').val({{ currentProject.id }});$('#delete-worksheet').modal('show');">
                   <i class="fa fa-trash-o fa-2x"></i>
@@ -100,7 +101,7 @@
                 <li class="list-group-item">
                 {% if classUser.teacher %}
                   total students complete:
-                  <span class="label label-primary label-as-badge">14</span>
+                  <span class="label label-primary label-as-badge">{{ currentProject|totalStudentsComplete }}</span>
                 {%else%}
                   my number of tries:
                   <span class="label label-primary label-as-badge">{{ myGrade.timesGraded }}</span>
@@ -179,7 +180,9 @@
                                 {% endif %}
                                   
                                   <td class="numeric" data-title="Value">{{ input.points }}</td>
-                                  <td class="numeric" data-title="Avg Correct">{{ input.pageNumber }}%</td>
+                                  <td class="numeric" data-title="Avg Correct">
+                                    {{ input|questionAverage|safe }}
+                                  </td>
                               </tr>
                                 {% endfor %}
                               {% else %}

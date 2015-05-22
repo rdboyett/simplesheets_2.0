@@ -779,6 +779,11 @@ function synchronizeCheckbox() {
 	    $('#input'+inputNumber_id).prop("checked", true);
 	}
 	else{$('#input'+inputNumber_id).prop("checked", false);}
+	
+	var newCorrectAnswer = document.getElementById('showCheckbox').checked;
+	updateCorrectAnswer(parseInt(inputNumber_id), (newCorrectAnswer).toString());
+	
+	
 }
 
 function updateHelpInput(helpID) {
@@ -798,6 +803,10 @@ function changeHelpLink(helpID) {
 	var inputNumber_id = $('#questionNumber').data("options").answer_id;
 	var data = $('#input'+inputNumber_id).data("options");
 	var newHelpLink = $("#"+helpID).val();
+	
+	if(!/^(https?|ftp):\/\//i.test(newHelpLink)) {
+		newHelpLink = 'http://'+newHelpLink; // set both the value
+	}
 	if (!$("#textHelpLink").hasClass('error') && !newHelpLink == '') {
 		updateHelpLink(parseInt(inputNumber_id), newHelpLink);
 		$('#input'+inputNumber_id).data("options").help_link = newHelpLink;

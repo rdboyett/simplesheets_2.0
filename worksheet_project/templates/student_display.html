@@ -1,0 +1,308 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load userInfo_tags %}
+
+
+{% block title %}{% if student %}{{ student.user.first_name|capfirst }} {{ student.user.last_name|capfirst }}{%endif%}{% endblock %}
+
+
+    {% block extraBottomHead %}
+    <link href="{% static "adminBoot/css/table-responsive.css" %}" rel="stylesheet">
+    {% endblock %}
+
+{% block body %}
+
+
+    {% if classUser.teacher and student %}
+
+  <div class="row">
+    <div class="col-sm-9 col-md-10">
+        {% if currentClass %}<a href="{% url "worksheet_project.views.classes" currentClass.id %}"><h3>{{ currentClass.name }}</h3></a>{% endif %}
+        <h1><i class="fa fa-angle-double-right"></i>  {{ student.user.first_name|capfirst }} {{ student.user.last_name|capfirst }}</h1>
+    </div>
+    <div class="col-xs-6 col-xs-offset-3 col-sm-offset-0 col-sm-3 col-md-2 mt">
+        <button type="submit" class="btn btn-success btn-block pull-right mb" onclick="$('#reset-password-form .userID').val({{ student.id }});$('#reset-password').modal('show');">
+	  <i class="fa fa-lock"></i>  reset password
+	</button>
+              {% if students %}
+              <button class="btn btn-block btn-lg btn-warning rounded space mt" data-toggle="modal" data-target="#manage-students">
+                manage students</button>
+              </button>
+              {% endif %}
+    </div>
+  </div> <!-- end of row -->
+  
+  <div class="row">
+        <div class="worksheet-info col-lg-5 col-md-6 col-sm-6 mb">
+          <div class="showback col-xs-12 mb">
+	    <div id="profile-01" class="noBg">
+              <ul class="list-group" style="margin-bottom: 0;">
+                <li class="list-group-item">
+                  username:
+                  <span class="label label-primary label-as-badge">{{ student.user.username }}</span>
+                </li>
+                <a href="#"><li class="list-group-item" onclick="$('#remove-from-class-form .userID').val({{ student.id }});$('#remove-from-class').modal('show');">
+                  remove this student from class:
+                  <span class="label label-primary label-as-badge"><i class="fa fa-sign-out fa-lg"></i></span>
+                </li></a>
+              </ul>
+            </div>
+          </div>
+        </div>
+  </div>  <!-- end of row -->
+  
+  
+  
+  <div class="row">
+    <div class="col-xs-12">
+        <h3 class="text-default">Assignments</h3>
+{% if currentClass and currentClass.worksheets.all %}
+        <ul class="row list-unstyled">
+          
+          {% for worksheet in currentClass.worksheets.all reversed %}
+          <!------------------------------ Worksheet Display ------------------------------------->
+          <div class="col-lg-4 col-md-4 col-sm-4 mb">
+            <div class="content-panel pn">
+              <div id="profile-01" class="bg{{ randomNumber|random }}">
+                <img src="{{ worksheet.thumb }}" alt="worksheet">
+              </div>
+              <div class="profile-01 centered">
+                <a href="{% url "worksheet_project.views.worksheet_display" worksheet.id %}"><p>{{ worksheet.title|capfirst }}</p></a>
+              </div>
+	      {% with grade=student.user|myGrade:worksheet %}
+              <div class="profile-03 {% if grade == 'no grade' %}warning{% elif grade >= 70 %}success{% elif grade < 70 %}danger{% endif %} centered">
+                <p>{% if grade == 'no grade' %}not finished{% else %}{{ grade|floatformat:2 }}%{% endif %}</p>
+              </div>
+	    {% endwith %}
+              <div class="centered">
+                <a href="{% url "worksheet_project.views.handGrade" worksheet.id 1 currentClass.id student.id %}"><button type="button" class="col-xs-4 btn btn-default" data-container="body"
+                  data-toggle="popover" data-placement="bottom" data-trigger="hover"
+                  data-content="hand grade">
+                  <i class="fa fa-check-circle-o fa-2x"></i>
+                </button></a>
+		
+		<form id="forceTurnIn" action="{% url "worksheet_creator.page_view_ajax.forceGradeWorksheet" %}" enctype='multipart/form-data' method="post" autocomplete="off">{% csrf_token %}
+		  <input type="hidden" name="project_id" value="{{ worksheet.id }}">
+		  <input type="hidden" name="user_id" value="{{ student.user.id }}">
+		  <input type="hidden" name="class_id" value="{{ currentClass.id }}">
+		  <button type="submit" class="col-xs-4 btn btn-default" data-container="body"
+		    data-toggle="popover" data-placement="bottom" data-trigger="hover"
+		    data-content="force turn-in">
+		    <i class="fa fa-inbox fa-2x"></i>
+		  </button>
+		</form>
+                <button type="button" class="col-xs-4 btn btn-default" data-container="body"
+                  data-toggle="popover" data-placement="bottom" data-trigger="hover"
+                  data-content="{% if worksheet|attempts_left:student == 'no grade' %}student has not finished yet{% elif worksheet|attempts_left:student == 0 %}retries: 0 (change){% else %}retries: {{ worksheet|attempts_left:student }} (change){% endif %}"
+		   onclick="$('#resetRetry-form .userID').val({{ student.id }});$('#resetRetry-form .projectID').val({{ worksheet.id }});$('#resetRetry').modal('show');">
+                  <i class="fa fa-refresh fa-2x"></i>
+                </button>
+              </div>
+            </div>
+          </div><! --/col-md-4 -->
+          <!------------------------------ End of Worksheet Display ------------------------------------->
+          {% endfor %}
+          
+        </ul>
+{% else %}
+  <h5>Sorry, there are no assignments yet.</h5>
+{% endif %}
+    </div>
+  </div>
+
+  
+
+  {% endif %}
+
+{% endblock %}  <!-- end of body block -->
+
+
+{% block modal %}
+  
+{% if student and classUser.teacher %}
+  
+  
+{% if students %}
+<!---------------- modal ------------------------------------->
+<div id="manage-students" class="modal fade" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content rounded">
+      <div class="modal-header top-rounded">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">Manage Students</h4>
+      </div>
+      <div class="modal-body text-center bottom-rounded">
+        <div class="row">
+                 
+                    <table class="table table-bordered table-hover table-striped table-responsive">
+                      <thead>
+                        <!-------------------- Start of table headers -------------------------------------------->
+                        <tr class="row" id="students-table-headers">
+                          <td class="col-xs-2 table-sort">
+                            <div id="sort-student">
+                              <span>Student</span>
+                            </div>
+                          </td>
+                          <td class="text-center">
+                            <div>
+                              <span>Username</span>
+                            </div>
+                          </td>
+                          <td class="text-center">
+                            <div>
+                              <span>Actions</span>
+                            </div>
+                          </td>
+                        </tr>
+                      </thead>
+                        <!-- ------------------------ End of table headers -------------------------------------------->
+                        
+                        <!------------------------ Start of Student --------------------------------------------------->
+                      <tbody class="student-table">
+                 {% for currentStudent in students %}
+                          <tr class="row">
+                            <td class="col-xs-3">
+                              <a href="{% url "worksheet_project.views.student_display" currentClass.id currentStudent.id %}"><strong class="text-primary">{{ currentStudent.user.last_name }}, {{ currentStudent.user.first_name }}</strong></a>
+                            </td>
+                            <td class="col-xs-3">
+                              <strong>{{ currentStudent.user.username }}</strong>
+                            </td>
+                            <td class="col-xs-3">
+                                <span class="fa-stack fa-1x" style="cursor: pointer; margin-right: 10px;" data-toggle="popover" data-placement="bottom"
+                                      data-trigger="hover" data-content="change password">
+                                  <i class="fa fa-rotate-left fa-stack-2x text-danger"></i>
+                                  <i class="fa fa-lock fa-stack-1x text-danger" onclick="$('#reset-password-form .userID').val({{ currentStudent.id }});$('#reset-password').modal('show');"></i>
+                                </span>
+                                <span style="cursor: pointer;" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover"
+                                  data-content="remove from class">
+				  <i class="fa fa-sign-out fa-lg text-danger" onclick="$('#remove-from-class-form .userID').val({{ currentStudent.id }});$('#remove-from-class').modal('show');"></i>
+				</span>
+                            </td>
+                          </tr>
+                 {% endfor %}
+                      </tbody>
+                    </table>
+                 
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!---------------- modal ----------------------------------->
+<div id="reset-password" class="modal fade" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content rounded">
+      <div class="modal-header top-rounded">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">reset password</h4>
+      </div>
+      <div class="modal-body centered">
+            <form id="reset-password-form" class="form-horizontal style-form" action="{% url "google_login.views.ajaxResetPassword" %}" enctype='multipart/form-data' method="post" autocomplete="off">{% csrf_token %}
+              <input class="userID" type="hidden" name="userID" value="">
+              <input type="hidden" name="classID" value="{{ currentClass.id }}">
+              <div class="form-group">
+                
+                      <div class="col-xs-12 col-sm-8 col-md-offset-2 text-center">
+                          <input class="form-control" id="password1" type="password" name="password1" minlength="6" maxlength="40" required noSpace="true" value="" placeholder="password..." autofocus>
+                          <span class="register-check register-check-error"></span>
+                      </div>
+              </div>
+              <div class="form-group">
+                      <div class="col-xs-12 col-sm-8 col-md-offset-2 text-center">
+                          <input class="form-control" type="password" name="password2" minlength="6" maxlength="40" required noSpace="true" value="" placeholder="confirm...">
+                          <span class="register-check register-check-error"></span>
+                      </div>
+              </div>
+            </form>
+      </div>
+      <div class="modal-footer bottom-rounded">
+        <div class="col-xs-12 col-sm-8 col-md-offset-2">
+          <button type="submit" form="reset-password-form" class="btn btn-block btn-lg btn-success rounded">reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+  
+<!---------------- modal ------------------------------------->
+<div id="remove-from-class" class="modal fade" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content rounded">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">Remove this student from this class?</h4>
+      </div>
+      <div class="modal-body text-center">
+        
+            <form id="remove-from-class-form" class="form-horizontal style-form" action="{% url "classrooms.ajax.removeFromClass" %}" enctype='multipart/form-data' method="post" autocomplete="off">{% csrf_token %}
+              <input class="userID" type="hidden" name="userID" value="">
+	      <input type="hidden" name="classID" value="{{ currentClass.id }}">
+	      <button type="button" class="btn btn-success rounded" data-dismiss="modal">no</button>
+	      <button type="submit" class="btn btn-danger rounded">remove</button>
+            </form>
+                  
+                  
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!---------------- modal ------------------------------------->
+<div id="resetRetry" class="modal fade" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content rounded">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">Set the number of retries on this worksheet for {{ student.user.first_name|capfirst }}.</h4>
+      </div>
+      <div class="modal-body text-center">
+        
+            <form id="resetRetry-form" class="form-horizontal style-form" action="{% url "worksheet_creator.ajax.resetNumberRetry" %}" enctype='multipart/form-data' method="post" autocomplete="off">{% csrf_token %}
+              <input class="projectID" type="hidden" name="projectID" value="" required>
+	      <input class="userID" type="hidden" name="userID" value="" required>
+	      <input type="hidden" name="classID" value="{{ currentClass.id }}">
+              <div class="form-group">
+                      <div class="col-xs-12 col-sm-8 col-md-offset-2 text-center">
+                          <input class="form-control" type="number" name="numberRetry" required min="0"  placeholder="number of retries...">
+                      </div>
+              </div>
+            </form>
+                  
+                  
+        
+      </div>
+      <div class="modal-footer">
+	
+	      <button type="button" class="btn btn-default rounded" data-dismiss="modal">cancel</button>
+	      <button type="submit" form="resetRetry-form" class="btn btn-success rounded">change</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{% endif %}
+
+
+{%endif%}
+
+
+
+
+{% endblock %}  <!-- end of modal block -->
+
+
+
+
+{% block extraScript %}
+  <script src="{% static "adminBoot/js/student_display.js" %}"></script>
+{% endblock %}

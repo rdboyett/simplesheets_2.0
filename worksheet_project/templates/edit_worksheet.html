@@ -33,7 +33,7 @@
 	    {% for input in formInputs %}
 		{% ifequal input.pageNumber pageNumber %}
 		    {% if input.inputType == 'textarea' %}
-			<textarea id="input{{ input.id }}" class="answers highlight img-rounded" readonly="readonly" data-options='{"answer_id":"{{ input.id }}", "question_number":"{{ input.questionNumber }}", "input_type":"{{ input.inputType }}", "points":"{{ input.points }}", "help_text":{% if input.helpText %}"{{ input.helpText }}"{% else %}""{% endif %}, "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}' style="position: absolute;z-index: 1;left: {{ input.left }}%;top: {{ input.top }}%;width: {{ input.width }}%; height: {{ input.height }}%">Place keywords to search in order to help with grading later.</textarea>
+			<textarea id="input{{ input.id }}" class="answers highlight img-rounded" readonly="readonly" data-options='{"answer_id":"{{ input.id }}", "question_number":"{{ input.questionNumber }}", "input_type":"{{ input.inputType }}", "points":"{{ input.points }}", "help_text":{% if input.helpText %}"{{ input.helpText }}"{% else %}""{% endif %}, "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}' style="resize: none;position: absolute;z-index: 1;left: {{ input.left }}%;top: {{ input.top }}%;width: {{ input.width }}%; height: {{ input.height }}%">Place keywords to search in order to help with grading later.</textarea>
 			<script>
 			    {% if input.option1 %}
 			    $('#input{{ input.id }}').data('keyword1', '{{ input.option1 }}');
@@ -136,13 +136,15 @@
 			$("#input{{ input.id }}").data('bCorrect','correct');
 			{% endif %}
 		    {% if input.inputType == 'work' %}
+			{% if myAnswer.workImagePath %}
 			$('#workinput{{ input.id }} img').attr('src', '{{ MEDIA_URL }}{{ myAnswer.workImagePath }}')
+			{% endif %}
 			{% if myAnswer.myAnswer %}
 			$('#input{{ input.id }}').val('{{ myAnswer.myAnswer }}');
 			{% endif %}
 			
 		    {% elif input.inputType == 'checkbox' %}
-			$('#input{{ input.id }}').prop("checked", {{ myAnswer.myAnswer }});
+			$('#input{{ input.id }}').prop("checked", {% if myAnswer.myAnswer == "true" %}{{ myAnswer.myAnswer }}{%else%}false{%endif%});
 				
 		    {% else %}
 			$('#input{{ input.id }}').val('{{ myAnswer.myAnswer }}');

@@ -444,7 +444,51 @@ def getNewMessages(request):
 
 
 
+@login_required
+def removeFromClass(request):
+    if request.method == 'POST':
+        classUser_id = request.POST["userID"].strip()
+        class_id = request.POST["classID"].strip()
+        
+        if Classroom.objects.filter(id=class_id):
+            classroom = Classroom.objects.get(id=class_id)
+        if ClassUser.objects.filter(id=classUser_id, classrooms=classroom, teacher=False):
+            classUser = ClassUser.objects.get(id=classUser_id, classrooms=classroom, teacher=False)
+            classUser.classrooms.remove(classroom)
+            data = {'remove':'student'+str(classUser.id)}
+        else:
+            data = {'error':'Sorry, that student in not in this class.'}
+        
+    else:
+        data = {
+            'error': "There was an error posting this request. Please try again.",
+        }
+            
+    return HttpResponse(json.dumps(data))
 
+
+
+
+
+@login_required
+def newCode(request):
+    if request.method == 'POST':
+        userInfo = ClassUser.objects.get(user=request.user)
+        classID = request.POST['classID'].strip()
+        groupCode = generateCode()
+                
+        if Classroom.objects.filter(id=classID, classOwnerID=userInfo.id):
+            classroom = Classroom.objects.get(id=classID, classOwnerID=userInfo.id)
+            classroom.code = groupCode
+            classroom.save()
+            data = {'classCode':groupCode}
+        else:
+            data = {'error':'Sorry, you are not the owner of this class.'}
+        
+    else:
+        data = {'error':"didn't work"}
+                
+    return HttpResponse(json.dumps(data))
 
 
 

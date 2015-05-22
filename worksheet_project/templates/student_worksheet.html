@@ -1,6 +1,7 @@
 {% extends "base_student_worksheet.html" %}
 {% load staticfiles %}
 {% load my_tags %}
+{% load userInfo_tags %}
 
 
 {% block title %}{{ newProject.title|capfirst }}{% endblock %}
@@ -45,7 +46,7 @@
 	<div class="col-sm-4">
 	    <div class="panel panel-default">
 		<div class="panel-body text-center">
-		  Your current grade is {{ myGrade.average }}%.
+		  Your current grade is {{ myGrade.average|floatformat:2 }}%.
 		  You have {{ newProject.numberOfRetry|subtract:myGrade.timesGraded }} tries left.
 		</div>
 	    </div>
@@ -62,10 +63,10 @@
 	
 	
 	{% if pageNumber > 1 %}
-	<a href="/nextPage/{{ newProject.id }}/{{ pageNumber|add:"-1" }}/" title="Previous"><div id="leftNav" class="nav_button_holder"></div></a>
+	<a href="/nextPage/{{ newProject.id }}/{{ pageNumber|add:"-1" }}/{% if classID %}{{ classID }}/{% endif %}" title="Previous"><div id="leftNav" class="nav_button_holder"></div></a>
 	{% endif %}
 	{% ifnotequal pageNumber totalPages %}
-	<a href="/nextPage/{{ newProject.id }}/{{ pageNumber|add:"1" }}/" title="Next"><div id="rightNav" class="nav_button_holder"></div></a>
+	<a href="/nextPage/{{ newProject.id }}/{{ pageNumber|add:"1" }}/{% if classID %}{{ classID }}/{% endif %}" title="Next"><div id="rightNav" class="nav_button_holder"></div></a>
 	{% endifnotequal %}
 	
 	<form id="default_form">
@@ -81,13 +82,15 @@
 				    "points":"{{ input.points }}",
 				    "help_text":{% if input.helpText %}"{{ input.helpText }}"{% else %}""{% endif %},
 				    "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}'
-				  style="
+				  style="resize: none;
 				    position: absolute;
 				    z-index: 1;
 				    left: {{ input.left }}%;
 				    top: {{ input.top }}%;
 				    width: {{ input.width }}%;
 				    height: {{ input.height }}%"></textarea>
+			    <div id="textareaOverlay{{ input.id }}" class="show_work btn btn-primary"
+				 style="display: none;position: absolute; z-index: 1; left: {{ input.left }}%; top: {{ input.top|add:input.height }}%;"></div>
 			
 		    {% elif input.inputType == 'work' %}
 			<div id="workinput{{ input.id }}" class="highlight" readonly="readonly"
@@ -292,25 +295,61 @@
 	{% if formInputs %}
 	    {% for input in formInputs %}
 		{% ifequal input.pageNumber pageNumber %}
-		{% for myAnswer in myAnswers %}
-		    {% ifequal myAnswer.answer.id input.id %}
-			{% if myAnswer.bCorrect %}
-			$("#input{{ input.id }}").data('bCorrect','correct');
-			{% endif %}
-		    {% if input.inputType == 'work' %}
-			$('#workinput{{ input.id }} img').attr('src', '{{ MEDIA_URL }}{{ myAnswer.workImagePath }}')
-			{% if myAnswer.myAnswer %}
-			$('#input{{ input.id }}').val('{{ myAnswer.myAnswer }}');
-			{% endif %}
-			
-		    {% elif input.inputType == 'checkbox' %}
-			$('#input{{ input.id }}').prop("checked", {{ myAnswer.myAnswer }});
+		    {% for myAnswer in myAnswers %}
+			{% ifequal myAnswer.answer.id input.id %}
+			    {% if input.inputType == 'textarea' %}
+				$('#input{{ input.id }}').val('{{ myAnswer.myAnswer }}');
+				{% if myAnswer.bCorrect %}
+				$("#input{{ input.id }}").data('bCorrect','correct').addClass('correctOutline');
+				{% elif myAnswer.partialCredit > 0 %}
+				$("#input{{ input.id }}").data('bCorrect','correct').addClass('correctOutline');
+				$("#textareaOverlay{{ input.id }}").html("Partial Credit: {{ myAnswer.partialCredit|floatformat:2 }} pts.").fadeIn(600);
+				{% else %}
+				$("#input{{ input.id }}").addClass('incorrectOutline');
+				{% endif %}
 				
-		    {% else %}
-			$('#input{{ input.id }}').val('{{ myAnswer.myAnswer }}');
+					
+			    {% elif myAnswer.bCorrect %}
+			    $("#input{{ input.id }}").data('bCorrect','correct').addClass('correctOutline');
+			    {% else %}
+			    $("#input{{ input.id }}").addClass('incorrectOutline');
+			    {% endif %}
+			{% if input.inputType == 'work' %}
+			    {% if myAnswer.workImagePath %}
+			    $('#workinput{{ input.id }} img').attr('src', '{{ MEDIA_URL }}{{ myAnswer.workImagePath }}')
+			    {% endif %}
+			    {% if myAnswer.myAnswer %}
+			    $('#input{{ input.id }}').val('{{ myAnswer.myAnswer }}');
+			    {% endif %}
+			    
+			{% elif input.inputType == 'checkbox' %}
+			    $('#input{{ input.id }}').prop("checked", {% if myAnswer.myAnswer == "true" %}{{ myAnswer.myAnswer }}{%else%}false{%endif%});
+			    {% if myAnswer.bCorrect %}
+			    $("#input{{ input.id }}").data('bCorrect','correct').addClass('correctOutline');
+			    {% else %}
+			    $("#input{{ input.id }}").addClass('incorrectOutline');
+			    {% endif %}
+				    
+			{% elif input.inputType == 'textarea' %}
+			    $('#input{{ input.id }}').val('{{ myAnswer.myAnswer }}');
+			    {% if myAnswer.bCorrect %}
+			    $("#input{{ input.id }}").data('bCorrect','correct').addClass('correctOutline');
+			    {% elif myAnswer.partialCredit %}
+			    $("#input{{ input.id }}").data('bCorrect','correct').addClass('correctOutline');
+			    {% else %}
+			    $("#input{{ input.id }}").addClass('incorrectOutline');
+			    {% endif %}
+			    
+			{% else %}
+			    $('#input{{ input.id }}').val('{{ myAnswer.myAnswer }}');
+			{% endif %}
+			{% endifequal %}
+		    {% endfor %}
+		    //means that there is no answer for this question
+		    //check to see if it is a checkbox and that the correct answer is null
+		    {% if input.inputType == 'checkbox' and not input.correctAnswer == "true" and not input|checkAnswerExists:myAnswers %}
+			$("#input{{ input.id }}").data('bCorrect','correct');
 		    {% endif %}
-		    {% endifequal %}
-		{% endfor %}
 		{% endifequal %}
 	    {% endfor %}
 	{% endif %}
@@ -325,11 +364,16 @@
             var userInfo_id_ajax = {{ userInfo.id }};
             var project_id_ajax = {{ newProject.id }};
             var pageNumber_ajax = {{ pageNumber }};
-	    var sendStudentAnswerURL = "{% url "worksheet_creator.page_view_ajax.sendStudentAnswer" %}";
-	    var submitGradeWorksheetURL = "{% url "worksheet_creator.page_view_ajax.submitGradeWorksheet" %}";
-	    var uploadWorkboxImageURL = "{% url "worksheet_creator.page_view_ajax.uploadWorkboxImage" %}";
+            var classID_ajax = {{ classID }};
+	    //Check to see if the worksheet is active or not
+	    var sendStudentAnswerURL = "{% if newProject.status == 'active' %}{% url "worksheet_creator.page_view_ajax.sendStudentAnswer" %}{% endif %}";
+	    var submitGradeWorksheetURL = "{% if newProject.status == 'active' %}{% url "worksheet_creator.page_view_ajax.submitGradeWorksheet" %}{% endif %}";
+	    var uploadWorkboxImageURL = "{% if newProject.status == 'active' %}{% url "worksheet_creator.page_view_ajax.uploadWorkboxImage" %}{% endif %}";
 	    var bGraded = false;
 	    {% if myGrade %}{% if myGrade.timesGraded >= newProject.numberOfRetry %}bGraded=true;{% endif %}{% endif %}
+	    {% if not newProject.status == 'active' %}
+		alert('Sorry, this worksheet has been locked by the teacher.  You cannot make any changes.');
+	    {% endif %}
     </script>
     
     

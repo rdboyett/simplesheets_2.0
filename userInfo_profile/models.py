@@ -6,6 +6,7 @@ from django.db import models
 
 
 from worksheet_creator.models import Project, FormInput
+from classrooms.models import Classroom
 
 class UserInfo(models.Model):
     user = models.ForeignKey(User)
@@ -23,10 +24,12 @@ class MyGrade(models.Model):
   project = models.ForeignKey(Project)
   userInfo = models.ForeignKey(UserInfo)
   pointsPossible = models.IntegerField()
-  pointsEarned = models.IntegerField()
-  average = models.IntegerField()
+  pointsEarned = models.FloatField()
+  average = models.FloatField()
   timesGraded = models.IntegerField()
   dateTime = models.DateTimeField(auto_now_add=True, blank=True)
+  extraCredit = models.IntegerField(blank=True, null=True)
+  highestGrade = models.BooleanField(default=False)
 
   def __unicode__(self):
         return u'%s %s' % (self.project, self.userInfo)
@@ -45,6 +48,7 @@ class MyAnswer(models.Model):
   myAnswer = models.TextField(blank=True, null=True)
   bCorrect = models.BooleanField(default=True)
   workImagePath = models.FilePathField(blank=True, null=True)
+  partialCredit = models.FloatField(blank=True, null=True)
 
   def __unicode__(self):
         return u'%s %s' % (self.project, self.userInfo)
@@ -53,6 +57,16 @@ class MyAnswer(models.Model):
       ordering = ['project','userInfo']
       
         
+
+class LiveMonitorSession(models.Model):
+  project = models.ForeignKey(Project)
+  classroom = models.ForeignKey(Classroom)
+  answers = models.ManyToManyField(MyAnswer, blank=True, null=True)
+
+
+
+
+
 
 admin.site.register(UserInfo)
 admin.site.register(MyGrade)

@@ -1573,6 +1573,30 @@ PANELS CONFIGURATIONS
 }
 
 
+.profile-03.success {
+	background: #5cb85c;
+	height: 50px;
+}
+
+
+.profile-03.danger {
+	background: #d9534f;
+	height: 50px;
+}
+
+
+.profile-03.warning {
+	background: #f0ad4e;
+	height: 50px;
+}
+
+.profile-03 p {
+	color: #ffffff;
+	padding-top: 10px;
+	font-weight: 400;
+	font-size: 25px;
+}
+
 /*spark line*/
 .chart {
     display: inline-block;
@@ -2817,3 +2841,51 @@ fieldset[disabled] .btn-schoology.active {
   color: #4babca;
   background-color: #fff;
 }
+
+.correctOutline {
+    border: 3px solid green;
+    /* default fallback */
+    background: rgb(26, 117, 12) transparent;
+    /* nice browsers */
+    background: rgba(26, 117, 12, 0.1);
+    /* IE 6/7 */
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#1A750C, endColorstr=#1A750C);
+    /* IE8 */    
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#1A750C, endColorstr=#1A750C)";
+}
+
+
+.incorrectOutline {
+    border: 3px solid red;
+    /* default fallback */
+    background: rgb(255, 0, 0) transparent;
+    /* nice browsers */
+    background: rgba(255, 0, 0, 0.1);
+    /* IE 6/7 */
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#FF0000, endColorstr=#FF0000);
+    /* IE8 */    
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#FF0000, endColorstr=#FF0000)";
+}
+
+
+.google-drive{
+	margin: 0px 5px 0 0px;
+	max-width: 40px !important;
+	max-height: 34px !important;
+	background: url("../img/google_icons.png") center no-repeat;
+	background-size: 50px;
+	background-position: 5px -172px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

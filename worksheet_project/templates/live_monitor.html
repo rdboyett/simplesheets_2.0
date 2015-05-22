@@ -1,0 +1,270 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load userInfo_tags %}
+
+
+{% block title %}Live Monitor{% endblock %}
+
+{% block body %}
+
+
+  <div id="main-region" class="">
+    <div>
+      <div class="panel rounded">
+        <div class="panel-heading col-xs-12">
+          <span class="panel-title col-xs-12 col-sm-4">
+              <a href="{% url "worksheet_project.views.worksheet_display" currentProject.id %}">
+              <h1 class="text-primary"><i class="fa fa-angle-double-right"></i>  {% if currentProject %}{{ currentProject.title|capfirst }}{%endif%}  <i class="fa fa-gears"></i></h1>
+              </a>
+          </span>
+          <span class="col-xs-12 col-sm-4">
+              <h1 class="text-danger">Live Monitoring</h1>
+          </span>
+        </div>
+        
+        
+        <div class="panel-body table-responsive">
+          
+          
+          <!------------------------------------  Start of list holder -------------------------------------------->
+            <div id="list-students">
+              <div class="col-xs-12">
+                <div class="row">
+                  <div class="col-xs-12">
+                    {% if currentProject %}
+                    {% if classesAndStudents %}
+                    {% if classesAndStudents == 'no students' %}
+                    <p>Sorry, no students have joined this class yet.</p>
+                    {% else %}
+<div class="accordion" id="accordionHolder">
+                      {% for class in classesAndStudents %}
+  <div class="accordion-group">
+    <div class="accordion-heading">
+                      
+                      
+        <div class="row">
+          <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordionHolder" href="#collapse{{ class.class.id }}">
+            <h3>{{class.class|title}}</h3>
+          </a>
+          {% if class.students %}
+          <a href="{% url "worksheet_project.views.monitor" currentProject.id %}" class="btn btn-primary pull-right" style="margin-top: -45px;">View All Classes</a>
+          {% endif %}
+        </div>
+
+    </div>
+                
+    <div id="collapse{{ class.class.id }}" class="accordion-body collapse {% if forloop.counter == 1 %}in{% endif %}">
+      <div class="accordion-inner">
+                    <table class="table table-bordered table-hover table-striped table-responsive">
+                      <thead>
+                        <!-------------------- Start of table headers -------------------------------------------->
+                        <tr class="row" id="students-table-headers">
+                          <td class="col-xs-2 table-sort">
+                            <div id="sort-student">
+                              <span>Student</span>
+                              <i class="pull-right glyphicon glyphicon-sort"></i>
+                            </div>
+                          </td>
+                          {% for question in currentProject.formInputs.all %}
+                          <td class="text-center">
+                            <div>
+                              <span>{{ question.questionNumber }}</span>
+                            </div>
+                          </td>
+                          {% endfor%}
+                          <td class="text-center">
+                            <div>
+                              <span>Avg.</span>
+                            </div>
+                          </td>
+                        </tr>
+                      </thead>
+                        <!-- ------------------------ End of table headers -------------------------------------------->
+                        
+                        <!------------------------ Start of Student --------------------------------------------------->
+                      <tbody class="student-table">
+                        {% if class.students %}
+                          {% for student in class.students %}
+                          <tr class="row">
+                            <td class="col-xs-3">
+                              <strong>{{ student.user.last_name }}, {{ student.user.first_name }}</strong>
+                            </td>
+                            {% for myAnswer in student.user|myAnswers:currentProject %}
+                              
+                              {% if myAnswer == 'no answers'%}
+                                {% for  blankAnswer in currentProject.formInputs.all %}
+                                <td id="{{ student.user.last_name }}{{ student.user.id }}{{ blankAnswer.questionNumber }}" class="text-center">
+                                  <i class="fa fa-minus fa-lg"></i>
+                                </td>
+                                {% endfor %}
+                              {% elif myAnswer.empty %}
+                                <td id="{{ student.user.last_name }}{{ student.user.id }}{{ myAnswer.empty.questionNumber }}" class="text-center">
+                                  <i class="fa fa-minus fa-lg"></i>
+                                </td>
+                              {% elif myAnswer.bCorrect %}
+                                <td id="{{ student.user.last_name }}{{ student.user.id }}{{ myAnswer.answer.questionNumber }}" class="text-center">
+                                  <i class="fa fa-check fa-lg text-success"></i>
+                                </td>
+                              {% else %}
+                                <td id="{{ student.user.last_name }}{{ student.user.id }}{{ myAnswer.answer.questionNumber }}" class="text-center">
+                                  <i class="fa fa-close fa-lg text-danger"></i>
+                                </td>
+                              {% endif %}
+                              
+                            {% endfor %}
+                                  {% if student.user|myGrade:currentProject == 'no grade' %}
+                                    <td class="text-center">
+                                      <i class="fa fa-minus fa-lg"></i>
+                                    </td>
+                                  {% else %}
+                                      {% if student.user|myGrade:currentProject >= 70 %}
+                                        <td class="text-center success">
+                                          <span>{{ student.user|myGrade:currentProject|floatformat:2 }}%</span>
+                                        </td>
+                                      {% else %}
+                                        <td class="text-center danger">
+                                          <span>{{ student.user|myGrade:currentProject|floatformat:2 }}%</span>
+                                        </td>
+                                      {% endif %}
+                                  {% endif %}
+                          </tr>
+                          {% endfor %}
+                        {% else %}
+                          <tr class="row">
+                                {% with total=currentProject.formInputs.all.count|add:"2" %}
+                                <td class="text-center" colspan="{{ total }}">
+                                  Sorry, no students have joined this class yet.
+                                </td>
+                                {% endwith %}
+                          </tr>
+                        {% endif %}
+                      </tbody>
+                    </table>
+      </div>
+    </div>
+    
+  </div>
+                      {% endfor %}
+</div>
+                    {% endif %}
+                    {% else %}
+                    <p>Sorry, there are no classes assigned this worksheet.</p>
+                    {% endif %}
+                    {% else %}
+                    <p>Sorry, there is no worksheet with that name.</p>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            
+            
+            
+        <!-----------------------------  End of holder -----------------------------------------
+        
+        
+        
+        
+        
+        
+        
+        
+        
+            
+            <div id="grid-students">
+                <div id="studentBox1" class="studentBox col-xs-6 rounded" data-options='{"right":"7", "wrong":"2"}'>
+                    <div class="cont" student-name="Robert">
+                        <svg class="svg" width="130" height="130" viewPort="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                          <path class="background" d="M 27 100 A 50 50 0 1 1 97 100"/>
+                          <path class="right-green" d="M 25 100"/>
+                          <path class="wrong-red" d="M 25 100"/>
+                        </svg>
+                    </div>
+                </div>
+                <div id="studentBox2" class="studentBox col-xs-6 rounded" data-options='{"right":"7", "wrong":"2"}'>
+                    <div class="cont" student-name="Robert">
+                        <svg class="svg" width="130" height="130" viewPort="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                          <path class="background" d="M 27 100 A 50 50 0 1 1 97 100"/>
+                          <path class="right-green" d="M 25 100"/>
+                          <path class="wrong-red" d="M 25 100"/>
+                        </svg>
+                    </div>
+                </div>
+                <div id="studentBox3" class="studentBox col-xs-6 rounded" data-options='{"right":"7", "wrong":"2"}'>
+                    <div class="cont" student-name="Robert">
+                        <svg class="svg" width="130" height="130" viewPort="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                          <path class="background" d="M 27 100 A 50 50 0 1 1 97 100"/>
+                          <path class="right-green" d="M 25 100"/>
+                          <path class="wrong-red" d="M 25 100"/>
+                        </svg>
+                    </div>
+                </div>
+                <div id="studentBox4" class="studentBox col-xs-6 rounded" data-options='{"right":"7", "wrong":"2"}'>
+                    <div class="cont" student-name="Robert">
+                        <svg class="svg" width="130" height="130" viewPort="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                          <path class="background" d="M 27 100 A 50 50 0 1 1 97 100"/>
+                          <path class="right-green" d="M 25 100"/>
+                          <path class="wrong-red" d="M 25 100"/>
+                        </svg>
+                    </div>
+                </div>
+                <div id="studentBox5" class="studentBox col-xs-6 rounded" data-options='{"right":"7", "wrong":"2"}'>
+                    <div class="cont" student-name="Robert">
+                        <svg class="svg" width="130" height="130" viewPort="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                          <path class="background" d="M 27 100 A 50 50 0 1 1 97 100"/>
+                          <path class="right-green" d="M 25 100"/>
+                          <path class="wrong-red" d="M 25 100"/>
+                        </svg>
+                    </div>
+                </div>
+                <div id="studentBox6" class="studentBox col-xs-6 rounded" data-options='{"right":"7", "wrong":"2"}'>
+                    <div class="cont" student-name="Robert">
+                        <svg class="svg" width="130" height="130" viewPort="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                          <path class="background" d="M 27 100 A 50 50 0 1 1 97 100"/>
+                          <path class="right-green" d="M 25 100"/>
+                          <path class="wrong-red" d="M 25 100"/>
+                        </svg>
+                    </div>
+                </div>
+                <div id="studentBox7" class="studentBox col-xs-6 rounded" data-options='{"right":"7", "wrong":"2"}'>
+                    <div class="cont" student-name="Robert">
+                        <svg class="svg" width="130" height="130" viewPort="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                          <path class="background" d="M 27 100 A 50 50 0 1 1 97 100"/>
+                          <path class="right-green" d="M 25 100"/>
+                          <path class="wrong-red" d="M 25 100"/>
+                        </svg>
+                    </div>
+                </div>
+                <div id="studentBox8" class="studentBox col-xs-6 rounded" data-options='{"right":"7", "wrong":"2"}'>
+                    <div class="cont" student-name="Robert">
+                        <svg class="svg" width="130" height="130" viewPort="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                          <path class="background" d="M 27 100 A 50 50 0 1 1 97 100"/>
+                          <path class="right-green" d="M 25 100"/>
+                          <path class="wrong-red" d="M 25 100"/>
+                        </svg>
+                    </div>
+                </div>
+                
+            </div>
+            -->   <!------End of Grid students-------->
+            
+            
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+{% endblock %}
+
+
+
+
+{% block extraScript %}
+  <script>
+    var liveMonitorAnswersURL = "{% url "worksheet_creator.page_view_ajax.liveMonitorAnswers" %}"
+    var liveMonitorData = { projectID: {{ currentProject.id }}, classID: {% for class in classesAndStudents %}{{ class.class.id }}{%endfor%} }
+  </script>
+  <script type="text/javascript" src="{% static "adminBoot/js/monitor/live_monitor.js" %}"></script>
+{% endblock %}

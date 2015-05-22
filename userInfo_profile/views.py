@@ -2,6 +2,9 @@ import os
 ROOT_PATH = os.path.dirname(__file__)
 
 import json
+import errno
+import httplib2
+import shutil
 
 from django.shortcuts import render_to_response, redirect, get_object_or_404
 from django.http import Http404, HttpResponse, HttpResponseRedirect
@@ -9,9 +12,28 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 
-from userInfo_profile.models import UserInfo
+from userInfo_profile.models import UserInfo, MyGrade
 from userInfo_profile import settings
-from classrooms.models import ClassUser
+from classrooms.models import ClassUser, Classroom
+from worksheet_creator.models import Project
+
+
+
+from apiclient.discovery import build
+from oauth2client.django_orm import Storage
+from apiclient.http import MediaFileUpload
+from apiclient import errors
+
+
+from google_login.models import CredentialsModel
+
+
+import logging
+log = logging.getLogger(__name__)
+
+
+
+
 
 
 @login_required
@@ -132,6 +154,99 @@ def profileUpdate(request):
 
 
 
+@login_required
+def googleDriveGradeUpload(request):
+    if request.method == 'POST':
+        projectID =request.POST["projectID"].strip()
+        
+        if ClassUser.objects.filter(user=request.user, teacher=True):
+            if Project.objects.filter(id=projectID):
+                project = Project.objects.get(id=projectID)
+            
+                if Classroom.objects.filter(worksheets=project):
+                    classrooms = Classroom.objects.filter(worksheets=project).order_by('id')
+                    
+                    row = []
+                    for classroom in classrooms:
+                        row.append('"'+classroom.name.title()+'"')
+                        if ClassUser.objects.filter(classrooms=classroom, teacher=False):
+                            students = ClassUser.objects.filter(classrooms=classroom, teacher=False).order_by('user__last_name')
+                            row.append('"Students","Average"')
+                            for student in students:
+                                if MyGrade.objects.filter(project=project, userInfo__user=student.user):
+                                    myGrade = MyGrade.objects.get(project=project, userInfo__user=student.user)
+                                    row.append('"'+ student.user.last_name +', '+ student.user.first_name +'","{0:.2f}%'.format(round(myGrade.average),2) +'"')
+                                else:
+                                    row.append('"'+ student.user.last_name +', '+ student.user.first_name +'","no grade"')
+                    
+                    FILENAME = makeCSV(request.user, row ,project.title.title()+' grades')
+                    
+                    #Now upload to google drive
+                    storage = Storage(CredentialsModel, 'id', request.user, 'credential')
+                    credential = storage.get()
+                    
+                    if credential is None or credential.invalid == True:
+                        #return HttpResponseRedirect("/login/")
+                        return render_to_response('google-login-wait.html', {})
+                    
+                    else:
+                        # Path to the file to upload
+                        #FILENAME = filePath
+                        
+                        fdir, fname = os.path.split(FILENAME)
+                    
+                        http = httplib2.Http()
+                        http = credential.authorize(http)
+                        drive_service = build("drive", "v2", http=http)
+                    
+                        # Insert a file
+                        media_body = MediaFileUpload(FILENAME, mimetype='text/csv', resumable=True)
+                        body = {
+                          'title': fname+'(Duck Soup Worksheet)',
+                          'description': 'A grade report for '+project.title.title()+' worksheet. Created by Duck Soup Worksheets.',
+                          'mimeType': 'text/csv'
+                        }
+                        
+                        file = drive_service.files().insert(body=body, media_body=media_body, convert=True).execute()
+                        
+                        #log.info(file)
+                        os.remove(FILENAME)
+                    
+                    data = {'link':file['alternateLink']}
+                else:
+                    data = {'error':"Sorry, we can't find any classes that are assigned this worksheet."}
+            else:
+                data = {'error':"Sorry, we can't find that worksheet."}
+        else:
+            data = {'error':'Sorry, you must be a teacher.'}
+        
+    else:
+        data = {
+            'error': "There was an error posting this request. Please try again.",
+        }
+        
+    
+    return HttpResponse(json.dumps(data))
+
+
+
+
+
+def makeCSV(user, data ,title):
+    baseFilePath = os.path.join(ROOT_PATH,'media', user.first_name+user.last_name+str(user.id), 'temp')
+    make_sure_path_exists(baseFilePath)
+    
+    '''
+    #This is how you create new data
+    data = ['"cell","cell","cell","cell"','"cell","cell","cell","cell"',....]
+    
+    '\n'.join(data)
+    '''
+    #changed the .json to .sst to change it to a format that people would not recognize in their drive
+    with open(os.path.join(baseFilePath,title), 'w') as text_file:
+        text_file.write('\n'.join(data))
+        
+    return os.path.join(baseFilePath,title)
 
 
 
@@ -173,8 +288,12 @@ def profileUpdate(request):
 
 
 
-
-
+def make_sure_path_exists(path):
+    try:
+        os.makedirs(path)
+    except OSError as exception:
+        if exception.errno != errno.EEXIST:
+            raise
 
 
 

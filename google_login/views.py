@@ -18,6 +18,7 @@ from django.utils import timezone
 
 from google_login.models import CredentialsModel, GoogleUserInfo, ForgottenPassword
 from userInfo_profile.models import UserInfo
+from classrooms.models import Classroom, ClassUser
 from google_login import settings
 from forms import ContactForm
 
@@ -517,11 +518,29 @@ def syncGoogleAccount(request):
 @login_required
 def ajaxResetPassword(request):
     if request.method == 'POST':
+	try:
+	    userID = request.POST['userID'].strip()
+	except:
+	    userID = False
+	    
+	try:
+	    classID = request.POST['classID'].strip()
+	except:
+	    classID = False
+	    
         password1 = request.POST['password1'].strip()
         password2 = request.POST['password2'].strip()
 	
-	if password1 == password2:
+	if not userID and not classID:
 	    user = request.user
+	else:
+	    if ClassUser.objects.filter(id=userID, classrooms__id=classID, teacher=False):
+		classUser = ClassUser.objects.get(id=userID, classrooms__id=classID, teacher=False)
+		user = classUser.user
+	    else:
+		return HttpResponse(json.dumps({'error':"Sorry, we can't find that student."}))
+	    
+	if password1 == password2:
 	    user.set_password(password1)
 	    user.save()
 	    data = {'success':'success'}

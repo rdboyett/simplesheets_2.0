@@ -4,9 +4,9 @@ import json
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 
-from userInfo_profile.models import UserInfo
+from userInfo_profile.models import UserInfo, MyGrade
 from worksheet_creator.models import Project
-from classrooms.models import Classroom
+from classrooms.models import Classroom, ClassUser
 
 
 @login_required
@@ -139,6 +139,46 @@ def assignWorksheets(request):
 
 
 
+@login_required
+def resetNumberRetry(request):
+    if request.method == 'POST':
+        classUser = ClassUser.objects.get(user=request.user)
+        projectID = request.POST["projectID"].strip()
+        classID = request.POST["classID"].strip()
+        numberRetry = request.POST["numberRetry"].strip()
+        studentClassUser_id = request.POST["userID"].strip()
+        
+        if Classroom.objects.filter(id=classID, classOwnerID=classUser.id) and classUser.teacher:
+            #This person has the right to reset the number of tries (they own the class and are a teacher)
+            if Project.objects.filter(id=projectID) and ClassUser.objects.filter(id=studentClassUser_id):
+                userInfo = UserInfo.objects.get(user=ClassUser.objects.get(id=studentClassUser_id).user)
+                currentProject = Project.objects.get(id=projectID)
+                if MyGrade.objects.filter(project=currentProject, userInfo=userInfo):
+                    myGrades = MyGrade.objects.filter(project=currentProject, userInfo=userInfo)
+                    newTimesGraded = int(currentProject.numberOfRetry) - int(numberRetry)
+                    for grade in myGrades:
+                        grade.timesGraded = newTimesGraded
+                        grade.save()
+                    
+                    data = {'success':'success'}
+                    
+                else:
+                    data = {'error':"Sorry, the student hasn't started on the worksheet yet."}
+                    
+            
+            else:
+                data = {'error':"Sorry, we can't find that worksheet or student."}
+                
+        else:
+            data = {'error':"Sorry, you must be the teacher who created this class."}
+        
+    else:
+        data = {
+            'error': "There was an error posting this request. Please try again.",
+        }
+        
+    
+    return HttpResponse(json.dumps(data))
 
 
 

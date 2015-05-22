@@ -40,3 +40,31 @@ def subtract(startingValue, valueToSubtract):
         return 0
     else:
         return int(startingValue)- int(valueToSubtract)
+    
+
+    
+@register.filter
+def possessivePronoun(name):
+    if name[-1] == 's':
+        return name+"'"
+    else:
+        return name+"'s"
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

@@ -27,9 +27,24 @@
                 {% endif %}
                 
                 <td class="numeric text-center">{{ answer.answer.points }}</td>
-                <td class="text-center">{{ answer.myAnswer }}</td>
+                <td class="text-center">
+                    {% if answer.answer.inputType == "textarea" %}
+                        written response
+                    {% elif answer.answer.inputType == "select" %}
+                        {% if answer.myAnswer == 'option1' %}{{ answer.answer.option1 }}{% endif %}
+                        {% if answer.myAnswer == 'option2' %}{{ answer.answer.option2 }}{% endif %}
+                        {% if answer.myAnswer == 'option3' %}{{ answer.answer.option3 }}{% endif %}
+                        {% if answer.myAnswer == 'option4' %}{{ answer.answer.option4 }}{% endif %}
+                    {% elif answer.answer.inputType == "checkbox" %}
+                        {% if answer.myAnswer == 'true' %}Checked{% else %}Not Checked{% endif %}
+                    {% else %}
+                        {{ answer.myAnswer }}
+                    {% endif %}
+                </td>
                 <td class="text-center">
                     {% if answer.bCorrect %}
+                    <span class="fa fa-check fa-lg text-success"></span>
+		    {% elif answer.partialCredit %}
                     <span class="fa fa-check fa-lg text-success"></span>
                     {% else %}
                     <span class="fa fa-times-circle fa-lg text-danger"></span>
@@ -43,11 +58,11 @@
             </tr>
             <tr>
                 <td class="success text-center text-primary" colspan="4">total points earned:</td>
-                <td class="success numeric text-center text-primary" colspan="2">{{ myGrade.pointsEarned }}</td>
+                <td class="success numeric text-center text-primary" colspan="2">{{ myGrade.pointsEarned|floatformat:2 }}</td>
             </tr>
             <tr>
                 <td class="warning text-center text-danger" colspan="4">average:</td>
-                <td class="warning numeric text-center text-danger" colspan="2">{{ myGrade.average }}%</td>
+                <td class="warning numeric text-center text-danger" colspan="2">{{ myGrade.average|floatformat:2 }}%</td>
             </tr>
         </tbody>
     </table>

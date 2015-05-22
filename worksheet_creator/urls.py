@@ -10,6 +10,8 @@ urlpatterns += patterns('worksheet_creator.ajax',
     (r'^checkProjectExists/$', 'checkProjectExists'),
     (r'^deleteOldProject/$', 'deleteOldProject'),
     (r'^assignWorksheets/$', 'assignWorksheets'),
+    (r'^resetNumberRetry/$', 'resetNumberRetry'),
+    
 )
 
 
@@ -35,5 +37,8 @@ urlpatterns += patterns('worksheet_creator.page_view_ajax',
     (r'^deleteProject/$', 'deleteProject'),
     (r'^changeWorksheetName/$', 'changeWorksheetName'),
     (r'^toggleLockWorksheet/$', 'toggleLockWorksheet'),
+    (r'^liveMonitorAnswers/$', 'liveMonitorAnswers'),
+    (r'^forceGradeWorksheet/$', 'forceGradeWorksheet'),
+    (r'^teacherGradeChange/$', 'teacherGradeChange'),
     
 )

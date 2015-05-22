@@ -6,4 +6,5 @@ urlpatterns = patterns('userInfo_profile.views',
     (r'^teacherStudent/$', 'teacherStudent'),
     (r'^profileUpdate/$', 'profileUpdate'),
     
+    (r'^googleDriveGradeUpload/$', 'googleDriveGradeUpload'),
 )

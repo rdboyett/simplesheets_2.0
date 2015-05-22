@@ -114,7 +114,7 @@ def driveUpload(user, FILENAME):
         media_body = MediaFileUpload(FILENAME, mimetype='application/sst', resumable=True)
         body = {
           'title': fname,
-          'description': 'Simple Sheets Worksheet',
+          'description': 'Duck Soup Worksheet',
           'mimeType': 'application/sst'
         }
         
