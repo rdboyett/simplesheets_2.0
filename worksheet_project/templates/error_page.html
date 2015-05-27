@@ -1,0 +1,95 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Dashboard">
+    <meta name="keyword" content="Dashboard, Bootstrap, Admin, Template, Theme, Responsive, Fluid, Retina">
+
+    <title>Duck Soup | sign in</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{% static "adminBoot/css/bootstrap.css" %}" rel="stylesheet">
+    <!--external css-->
+    <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" />
+        
+    <!-- Custom styles for this template -->
+    <link href="{% static "adminBoot/css/style.css" %}" rel="stylesheet">
+    <link href="{% static "adminBoot/css/style-responsive.css" %}" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="//ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"></script>
+    
+  </head>
+  
+  
+
+  <body>
+
+      <!-- **********************************************************************************************************************************************************
+      MAIN CONTENT
+      *********************************************************************************************************************************************************** -->
+
+	  	<div class="container">
+	  	
+		          <!-- Modal -->
+		          <div id="error-modal" aria-hidden="true" aria-labelledby="myModalLabel" role="dialog" tabindex="-1" id="myModal" class="modal fade">
+		              <div class="modal-dialog">
+		                  <div class="modal-content">
+		                      <div class="modal-header">
+		                          <h4 class="modal-title">There was a problem!...I think?...</h4>
+		                      </div>
+		                      <div class="modal-body">
+					<div class="row">
+					  <div class="col-xs-12 text-center">
+					    <h4>{{ error|capfirst }}</h4>
+					  </div>
+					</div>
+		                      </div>
+		                      <div class="modal-footer">
+		                          <a href="{% url "worksheet_project.views.classes" %}"><button class="btn btn-default">Go to Classes</button></a>
+		                          <a href="{% url "worksheet_project.views.dashboard" %}"><button class="btn btn-theme">Dashboard</button></a>
+		                      </div>
+		                  </div>
+		              </div>
+		          </div>
+		          <!-- modal -->
+		
+	  	
+	  	</div>
+
+    <!-- js placed at the end of the document so the pages load faster -->
+    <script src="{% static "adminBoot/js/bootstrap.min.js" %}"></script>
+    <script src="{% static "adminBoot/js/jquery.form.js" %}"></script>
+    
+
+    <!--BACKSTRETCH-->
+    <!-- You can use an image of whatever size. This script will stretch to fit in any screen size.-->
+    <script type="text/javascript" src="{% static "adminBoot/js/jquery.backstretch.min.js" %}"></script>
+    <script>
+        $.backstretch("{% static "adminBoot/img/login-bg2.jpg" %}", {speed: 500});
+    </script>
+    
+    <script>
+      $(document).ready(function(){
+	
+	$("#error-modal").modal({
+	  "backdrop" : "static",
+	  "keyboard" : "false",
+	});
+	
+      });
+    </script>
+
+  </body>
+</html>

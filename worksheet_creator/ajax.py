@@ -113,6 +113,7 @@ def assignWorksheets(request):
     if request.method == 'POST':
         projectIDList = request.POST.getlist("projectIDList[]")
         classIDList = request.POST.getlist("classIDList[]")
+        bAssign = request.POST["bAssign"]
         
         for classID in classIDList:
             if Classroom.objects.filter(id=classID):
@@ -120,7 +121,10 @@ def assignWorksheets(request):
                 for worksheetID in projectIDList:
                     if Project.objects.filter(id=worksheetID):
                         worksheet = Project.objects.get(id=worksheetID)
-                        classroom.worksheets.add(worksheet)
+                        if bAssign == 'assign':
+                            classroom.worksheets.add(worksheet)
+                        else:
+                            classroom.worksheets.remove(worksheet)
                         classroom.save()
 
         data = {

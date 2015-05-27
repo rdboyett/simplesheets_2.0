@@ -22,6 +22,7 @@
     <!-- Custom styles for this template -->
     <link href="{% static "adminBoot/css/style.css" %}" rel="stylesheet">
     <link href="{% static "adminBoot/css/style-responsive.css" %}" rel="stylesheet">
+    <link href="{% static "adminBoot/css/font-awesome-animation.min.css" %}" rel="stylesheet">
     
     <!--
     <link rel="stylesheet" type="text/css" href="{% static "adminBoot/css/zabuto_calendar.css" %}">
@@ -40,6 +41,7 @@
     
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <script src="//ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"></script>
+    <script src="http://jqueryvalidation.org/files/dist/additional-methods.min.js"></script>
     
     {% block extraBottomHead %}{% endblock %}
     
@@ -109,7 +111,7 @@
                       </a>
                       <ul class="sub">
                           <li class="{% if create %}active{%endif%}"><a  href="{% url "google_drive.views.google_picker" %}">Create</a></li>
-                          <li class="{% if assign %}active{%endif%}"><a  href="{% url "worksheet_project.views.assign" %}">Assign</a></li>
+                          <li class="{% if assign %}active{%endif%}"><a  href="{% url "worksheet_project.views.assign" %}">Assign/Unassign</a></li>
                       </ul>
                   </li>
 		{% endif %}

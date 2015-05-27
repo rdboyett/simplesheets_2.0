@@ -116,6 +116,10 @@ $.validator.addMethod("wordCount",
                 alert(responseText.error);
             }else if (responseText.fullName) {
                 $("#sidebar .userName").html(responseText.fullName);
+		$("#fullName-input").css({'backgroundColor':'#F3F781'})
+		$("#fullName-input").animate({
+		    backgroundColor: "#FFF",
+		}, 500);
             }
         },
         dataType:  'json',

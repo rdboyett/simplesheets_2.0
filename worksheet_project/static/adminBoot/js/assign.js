@@ -68,39 +68,44 @@ $.ajaxSetup({
     
     function checkActive() {
 	if($(".content-panel.active").length<1){
-	    if (!$("#new-worksheet").hasClass('disabled')) {
+	    if (!$(".assign_btn").hasClass('disabled')) {
 		console.log('disabling');
 		$("#new-worksheet").addClass('disabled').toggleClass('btn-primary').toggleClass('btn-success');
+		$("#unassign-worksheet-btn").addClass('disabled').toggleClass('btn-primary').toggleClass('btn-danger');
 	    }
 	}else{
-	    if ($("#new-worksheet").hasClass('disabled')) {
+	    if ($(".assign_btn").hasClass('disabled')) {
 		console.log('enabling');
 		$("#new-worksheet").removeClass('disabled').toggleClass('btn-primary').toggleClass('btn-success');
+		$("#unassign-worksheet-btn").removeClass('disabled').toggleClass('btn-primary').toggleClass('btn-danger');
 	    }
 	}
     }
     
     $(".class-button").click(function(){
+	var modalID = $(this).closest('.modal.fade').attr('id');
+	var actionBtnID = $(this).closest('.modal.fade').find('.action-btn').attr('id');
+	
 	$(this).toggleClass('btn-primary').toggleClass('btn-success');
 	$(this).find( ".classCheckButton" ).toggleClass('fa-check-square-o').toggleClass('fa-square-o');
-	checkClassSelected();
+	checkClassSelected(modalID, actionBtnID);
     });
     
-    function checkClassSelected() {
-	if($(".class-button.btn-success").length<1){
-	    if (!$("#assignThis-button").hasClass('disabled')) {
-		$("#assignThis-button").addClass('disabled').toggleClass('btn-primary').toggleClass('btn-success');
+    function checkClassSelected(modalID, buttonID) {
+	if($("#"+modalID+" .class-button.btn-success").length<1){
+	    if (!$("#"+buttonID).hasClass('disabled')) {
+		$("#"+buttonID).addClass('disabled').toggleClass('btn-primary').toggleClass('btn-success');
 	    }
 	}else{
-	    if ($("#assignThis-button").hasClass('disabled')) {
-		$("#assignThis-button").removeClass('disabled').toggleClass('btn-primary').toggleClass('btn-success');
+	    if ($("#"+buttonID).hasClass('disabled')) {
+		$("#"+buttonID).removeClass('disabled').toggleClass('btn-primary').toggleClass('btn-success');
 	    }
 	}
     }
     
     
     $("#assignThis-button").click(function(){
-	if($(".class-button.btn-success").length>0){
+	if($("#assign-worksheets .class-button.btn-success").length>0){
 	    //get the project id's
 	    var projectIDList = [];
 	    var count = 0;
@@ -113,19 +118,42 @@ $.ajaxSetup({
 	    //get the class id's
 	    var classIDList = [];
 	    count = 0;
-	    $(".class-button.btn-success").each(function(){
+	    $("#assign-worksheets .class-button.btn-success").each(function(){
 		classIDList[count]=$(this).data("options").class_id;
 		count++;
 	    });
 	    console.log(classIDList);
-	    sendAssignments(projectIDList, classIDList)
+	    sendAssignments("assign-worksheets", projectIDList, classIDList, "assign")
+	}
+    });
+    
+    $("#unassignThis-button").click(function(){
+	if($("#unassign-worksheets .class-button.btn-success").length>0){
+	    //get the project id's
+	    var projectIDList = [];
+	    var count = 0;
+	    $(".content-panel.active").each(function(){
+		projectIDList[count]=$(this).data("options").worksheet_id;
+		count++;
+	    });
+	    console.log(projectIDList);
+	    
+	    //get the class id's
+	    var classIDList = [];
+	    count = 0;
+	    $("#unassign-worksheets .class-button.btn-success").each(function(){
+		classIDList[count]=$(this).data("options").class_id;
+		count++;
+	    });
+	    console.log(classIDList);
+	    sendAssignments("unassign-worksheets", projectIDList, classIDList, "unassign")
 	}
     });
     
     
     
-    function sendAssignments(projectIDList, classIDList) {
-	var formData = {"projectIDList":projectIDList, "classIDList":classIDList};
+    function sendAssignments(modalID, projectIDList, classIDList, bAssign) {
+	var formData = {"projectIDList":projectIDList, "classIDList":classIDList, "bAssign": bAssign};
 	$.ajax({
 	    type: "POST",
 	    data: formData,
@@ -133,7 +161,7 @@ $.ajaxSetup({
 	    success:  function(data, textStatus, jqXHR)
 	    {
 		console.log(data);
-		$('#assign-worksheets').modal('hide');
+		$('#'+modalID).modal('hide');
 	    },
 	    error: function (jqXHR, textStatus, errorThrown)
 	    {

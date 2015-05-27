@@ -51,6 +51,7 @@ INSTALLED_APPS = (
     'contact_me',
     'userInfo_profile',
     'worksheet_creator',
+    'beta_test',
 )
 
 MIDDLEWARE_CLASSES = (

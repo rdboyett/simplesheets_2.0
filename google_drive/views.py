@@ -5,9 +5,10 @@ from datetime import date
 import base64
 
 
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.core.context_processors import csrf
 
 
 from apiclient.discovery import build
@@ -16,7 +17,7 @@ from apiclient.http import MediaFileUpload
 from apiclient import errors
 
 
-from google_login.models import CredentialsModel
+from google_login.models import CredentialsModel, GoogleUserInfo
 from userInfo_profile.models import UserInfo
 from classrooms.models import ClassUser
 
@@ -53,9 +54,14 @@ def google_picker(request):
     else:
         allClasses = False
     
+    if GoogleUserInfo.objects.filter(user=request.user):
+        googleUser = GoogleUserInfo.objects.get(user=request.user)
+    else:
+        googleUser = False
     
     
-    return render_to_response('google_drive/list_files.html', {
+    
+    args = {
               'worksheet':True,
               'userInfo': userInfo,
               'developerKey': developerKey,
@@ -63,7 +69,12 @@ def google_picker(request):
               "allClasses":allClasses,
               "classUser":classUser,
               "create":True,
-        })
+              "googleUser":googleUser,
+        }
+    args.update(csrf(request))
+        
+    
+    return render_to_response('google_drive/list_files.html', args)
 
 
 
@@ -97,7 +108,7 @@ def retrieve_all_files(service):
 
 
 
-def driveUpload(user, FILENAME):
+def driveUpload(user, FILENAME, thumbPath, projectData, googleTitle, parentFolderID):
     storage = Storage(CredentialsModel, 'id', user, 'credential')
     credential = storage.get()
     
@@ -114,21 +125,43 @@ def driveUpload(user, FILENAME):
         http = httplib2.Http()
         http = credential.authorize(http)
         drive_service = build("drive", "v2", http=http)
+        
+        with open(thumbPath, "rb") as image_file:
+            imageData = base64.urlsafe_b64encode(image_file.read())
+        
     
         # Insert a file
-        media_body = MediaFileUpload(FILENAME, mimetype='application/vnd.google-apps.drive-sdk', resumable=True)
+        media_body = MediaFileUpload(FILENAME, mimetype='application/sst', resumable=True)
         body = {
-          'title': fname,
+          'title': googleTitle,
           'description': 'Duck Soup Worksheet',
-          'mimeType': 'application/vnd.google-apps.drive-sdk'
+          'mimeType': 'application/sst',
+            "thumbnail": {
+                    "image": imageData,
+                    "mimeType": 'image/png'
+            },
+            "copyable":True,
+            "defaultOpenWithLink": "worksheet_creator.views.openGoogleFile",
         }
         
-        file = drive_service.files().insert(body=body, media_body=media_body).execute()
+        if parentFolderID:
+            body["parents"] = [{"id":str(parentFolderID)}]
         
-        return file['id']
+        returnedFile = drive_service.files().insert(body=body, media_body=media_body).execute()
+        
+        log.info(returnedFile)
+        
+        duckSoupParameters = {
+                'key':        'duckSoupVariables',
+                'value':      projectData,
+                'visibility': 'PRIVATE'
+            }
+        drive_service.properties().insert(fileId=returnedFile['id'], body=duckSoupParameters).execute()
+        
+        return returnedFile['id']
 
 
-def createGoogleShortcut(user, FILENAME, thumbPath):
+def createGoogleShortcut(user, FILENAME, thumbPath, projectData):
     storage = Storage(CredentialsModel, 'id', user, 'credential')
     credential = storage.get()
     
@@ -157,12 +190,21 @@ def createGoogleShortcut(user, FILENAME, thumbPath):
             "thumbnail": {
                     "image": imageData,
                     "mimeType": 'image/png'
-                },
+            },
+            "copyable":True,
+            "defaultOpenWithLink": "worksheet_creator.views.openGoogleFile",
         }
         
         returnedFile = drive_service.files().insert(body=body).execute()
         
         log.info(returnedFile)
+        
+        duckSoupParameters = {
+                'key':        'duckSoupVariables',
+                'value':      projectData,
+                'visibility': 'PRIVATE'
+            }
+        drive_service.properties().insert(fileId=returnedFile['id'], body=duckSoupParameters).execute()
         
         return returnedFile['id']
         
@@ -307,13 +349,12 @@ def update_file(service, file_id, file_with_update, new_revision):
     
     
 def get_service(user):
-    isItOn()
     storage = Storage(CredentialsModel, 'id', user, 'credential')
     credential = storage.get()
     
     if credential is None or credential.invalid == True:
         #return HttpResponseRedirect("/login/")
-        return render_to_response('google-login-wait.html', {})
+        return redirect('google_login.views.index')
     
     else:
         http = httplib2.Http()
@@ -349,7 +390,46 @@ def driveList(request):
     
     
     
+def createGoogleFolder(user, parentFolderID, folderName):
+    drive_service = get_service(user)
     
+    if drive_service:
+        body = {
+            'title': "Duck Soup Worksheets",
+            'description': 'Duck Soup Folder',
+            'mimeType': 'application/vnd.google-apps.folder',
+        }
+        
+        if parentFolderID:
+            body["parents"] = [{"id":str(parentFolderID)}]
+            
+        if folderName:
+            body["title"] = folderName
+            
+        
+        returnedFile = drive_service.files().insert(body=body).execute()
+        
+        log.info(returnedFile)
+        
+        return returnedFile['id']
+    else:
+        return False
+    
+
+
+def checkOrCreateGoogleFolder(user, folderID, parentFolderID, folderName):
+    if folderID:
+        drive_service = get_service(user)
+        file = get_file(drive_service, folderID)
+        if file:
+            if file['labels']['trashed']:
+                restore_file_from_trash(drive_service, folderID)
+                
+            return file['id']
+        else:
+            return createGoogleFolder(user, parentFolderID, folderName)
+    else:
+        return createGoogleFolder(user, parentFolderID, folderName)
     
 def djangoLogin(request, user):
     user.backend = 'django.contrib.auth.backends.ModelBackend'

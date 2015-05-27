@@ -38,6 +38,7 @@ class Classroom(models.Model):
     allowJoin = models.BooleanField(default=True)
     classOwnerID = models.IntegerField()
     worksheets = models.ManyToManyField(Project, blank=True, null=True)
+    googleClassFolderID = models.CharField(max_length=45, blank=True, null=True)
 
 
     def __unicode__(self):
@@ -51,6 +52,7 @@ class ClassUser(models.Model):
     classrooms = models.ManyToManyField(Classroom, blank=True, null=True)
     avatarBackColor = models.CharField(max_length=45, blank=True, null=True)
     avatarTextColor = models.CharField(max_length=45, blank=True, null=True)
+    googleFolderID = models.CharField(max_length=45, blank=True, null=True)
 
 
     def __unicode__(self):

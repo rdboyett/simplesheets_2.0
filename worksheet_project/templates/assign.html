@@ -11,8 +11,13 @@
         {% if classUser.teacher %}
         <div class="row mt">
           <div class="col-xs-12 col-sm-6">
-		<button id="new-worksheet" class="btn btn-block btn-lg btn-primary rounded space disabled" data-toggle="modal" data-target="#assign-worksheets">
+		<button id="new-worksheet" class="assign_btn btn btn-block btn-lg btn-primary rounded space disabled" data-toggle="modal" data-target="#assign-worksheets">
                 <span class="glyphicon glyphicon-asterisk"></span>  assign worksheets
+		</button>
+          </div>
+          <div class="col-xs-12 col-sm-6">
+		<button id="unassign-worksheet-btn" class="assign_btn btn btn-block btn-lg btn-primary rounded space disabled" data-toggle="modal" data-target="#unassign-worksheets">
+                <span class="glyphicon glyphicon-asterisk"></span>  un-assign worksheets
 		</button>
           </div>
         </div>
@@ -79,7 +84,7 @@
     <div class="modal-content rounded">
       <div class="modal-header top-rounded">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h4 class="modal-title">pick a class...</h4>
+        <h4 class="modal-title">assign to class...</h4>
       </div>
       <div class="modal-body">
         <div id="class-spinner" style="display: none;margin: 80px 0;"></div>
@@ -104,7 +109,47 @@
       </div>
       <div class="modal-footer bottom-rounded">
         <button type="button" class="btn btn-default rounded" data-dismiss="modal">close</button>
-        <button id="assignThis-button" type="button" class="btn btn-primary rounded disabled">assign</button>
+        <button id="assignThis-button" type="button" class="action-btn btn btn-primary rounded disabled">assign</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<!---------------- modal ------------------------------------->
+<div id="unassign-worksheets" class="modal fade" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content rounded">
+      <div class="modal-header top-rounded">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">remove from class...</h4>
+      </div>
+      <div class="modal-body">
+        <div id="class-spinner" style="display: none;margin: 80px 0;"></div>
+	
+{% if allClasses %}
+  {% for class in allClasses %}
+  <div class="row" style="margin-top: 5px;">
+    <div class="col-xs-8 col-sm-6 text-center col-centered">
+      <button type="button" class="class-button btn btn-block btn-primary text-center rounded" data-toggle="button"  data-options='{"class_id":{{ class.id }}}'>
+	  <i class="classCheckButton fa fa-square-o fa-1x pull-left" style="line-height: 20px;vertical-align: middle;"></i>
+	  <span style="line-height: 20px;vertical-align: middle;">&nbsp;&nbsp;{{ class.name|capfirst }}</span>
+      </button>
+    </div><!-- /.col-lg-6 -->
+  </div>
+  {% endfor %}
+  {%else%}
+    <h5>Sorry, you don't have any classes yet.</h5>
+  {% endif %}
+  
+  
+  
+      </div>
+      <div class="modal-footer bottom-rounded">
+        <button type="button" class="btn btn-default rounded" data-dismiss="modal">close</button>
+        <button id="unassignThis-button" type="button" class="action-btn btn btn-primary rounded disabled">un-assign</button>
       </div>
     </div>
   </div>

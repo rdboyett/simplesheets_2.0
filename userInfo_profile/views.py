@@ -114,7 +114,11 @@ def teacherStudent(request):
 @login_required
 def profileUpdate(request):
     if request.method == 'POST':
-        title = request.POST["title"]
+        try:
+            title = request.POST["title"]
+        except:
+            title = 'False'
+            
         fullName = request.POST["fullName"]
         
         fullName = fullName.strip(' \t\n\r')

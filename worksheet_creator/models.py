@@ -50,6 +50,7 @@ class Project(models.Model):
   thumb = models.FilePathField(blank=True, null=True)
   status = models.CharField(max_length=10, default="active")
   numberOfRetry = models.IntegerField(default=2)
+  ownerID = models.IntegerField(blank=True, null=True)  #this is the django request.user.id
   
   def __unicode__(self):
         return u'%s %s' % (self.title, self.dateTime)

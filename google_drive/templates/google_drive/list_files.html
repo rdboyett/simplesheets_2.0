@@ -17,7 +17,7 @@
       <!-- Main jumbotron for a primary marketing message or call to action -->
       <div class="jumbotron">
         <h1>Pick a File!</h1>
-        <p>Convert any pdf or document from your computer or google drive.</p>
+        <p>Convert any pdf{% if googleUser %} or document from your computer or google drive.{%else%} to a worksheet.{%endif%}</p>
         <p><button id="openPicker" type="button" class="btn btn-primary btn-lg rounded">pick a file &raquo;</button></p>
       </div>
     </div>
@@ -44,211 +44,50 @@
 </div>
 
 
+{% if not googleUser %}
+<!---------------- modal ------------------------------------->
+<div id="upload-pdf-modal" class="modal fade" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content rounded">
+      <div class="modal-header top-rounded">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">upload pdf file</h4>
+      </div>
+      <div class="modal-body">
+	<form id="upload-pdf-form" class="form-horizontal style-form" action="{% url "worksheet_creator.views.createFromPDF" %}" enctype='multipart/form-data' method="post" autocomplete="off">{% csrf_token %}
+		      <div class="form-group">
+			<div class="col-sm-9">
+			  <input class="form-control" type="file" name="uploadFile" checkExtension="true" required>
+			</div>
+		      </div>
+	</form>
+      </div>
+      <div class="modal-footer bottom-rounded">
+        <button type="button" class="btn btn-default rounded" data-dismiss="modal">cancel</button>
+        <button type="submit" form="upload-pdf-form" class="btn btn-primary rounded">upload</button>
+      </div>
+    </div>
+  </div>
+</div>
+-->
+
+	  <div id="login-page" style="z-index: 10000000;position: fixed;left: 0;right: 0;bottom: 0;top: 0;display: none;">
+	  	<div class="container">
+		  <div class="row">
+		    <div class="col-xs-12 col-sm-6 col-sm-offset-3 col-md-4 col-md-offset-4 text-center" style="margin-top: 10%;color: #fff;">
+		      <div><img class="" src="{% static "index/img/duck-banner.png" %}" alt="logo"/></div>
+		      <div><i class="fa fa-circle-o faa-burst animated" style="color: #fff;font-size: 50px; margin-top: 20px;"></i></div>
+		      <div id="message" style="margin-top: 20px;font-size: 20px;" class="faa-passing animated">creating your worksheet...</div>
+		    </div>
+		  </div>
+	  	</div>
+	  </div>
+{% endif %}
+
 <div id="shade"></div>
 <div id="wait"></div>
 <div id="wait-spinner"></div>
 
-    <!--
-<script>
-    $( document ).ready(function() {
-	$("#shade").fadeOut(600);
-	
-    
-var opts = {
-  lines: 17, // The number of lines to draw
-  length: 40, // The length of each line
-  width: 21, // The line thickness
-  radius: 60, // The radius of the inner circle
-  corners: 1, // Corner roundness (0..1)
-  rotate: 0, // The rotation offset
-  direction: 1, // 1: clockwise, -1: counterclockwise
-  color: '#000', // #rgb or #rrggbb or array of colors
-  speed: 1.2, // Rounds per second
-  trail: 100, // Afterglow percentage
-  shadow: true, // Whether to render a shadow
-  hwaccel: false, // Whether to use hardware acceleration
-  className: 'spinner', // The CSS class to assign to the spinner
-  zIndex: 2e9, // The z-index (defaults to 2000000000)
-  top: 'auto', // Top position relative to parent in px
-  left: 'auto' // Left position relative to parent in px
-};
-var target = document.getElementById('wait-spinner');
-var spinner = new Spinner(opts).spin(target);
-
-        resizeElements();
-    });
-    
-    $( window ).resize(function() {
-        resizeElements();
-      });
-    
-    function resizeElements() {
-	var windowWidth = $(window).width(); //retrieve current window width
-	var windowHeight = $(window).height();
-	// Popup Center
-	$(".popup").each(function(){
-	    //console.log($(this).attr('id'));
-	    var popupLeft = (windowWidth/2)-($(this).width()/2);
-	    var popupTop = (windowHeight/2)-($(this).height()/2);
-	    $(this).css({
-		'left':popupLeft+'px',
-		'top':popupTop+'px',
-	    });
-	    //console.log(popupLeft);
-	    //console.log(popupTop);
-	});
-	
-	
-	// Spinner Center
-	var waitLeft = (windowWidth/2)-30;
-	var waitTop = (windowHeight/2)-10;
-	//console.log("Window Height: "+windowHeight+" Window Width: "+windowWidth+" wait width: "+$("#wait-spinner").width()+" wait height: "+$("#wait-spinner").height())
-	//console.log(waitLeft+" and "+waitTop);
-	$(".spinner").css({
-	    'left':waitLeft,
-	    'top':waitTop,
-	});
-        
-    }
-    
-    
-    //--------------- pick-up events--------------------------------------------------------
-    /*
-    $(document).on('click','#shade, #X-Sure',function(){
-        closePopups();
-    });
-    */
-    
-    
-    
-    
-    
-    
-    //---------------------- Misc Functions ---------------------------------------------------
-    
-function toggleSpinner() {
-    if ($('#wait').is(":visible")) {
-        $("#wait").fadeOut(600);
-        $("#wait-spinner").fadeOut(600);
-    }else{
-        $("#wait").show();
-        $("#wait-spinner").show();
-    }
-}
-
-function redirectProject(data, fileId) {
-  if (data.projectExist == 'true') {
-    toggleSpinner();
-    checkWithUser(fileId);
-    
-  }else{document.location.href = '/showFile/'+fileId;}
-}
-    
-    
-    /***************************** File Exists Check what user wants to do ************************************************************************/
-    function checkWithUser(fileId) {
-	$("#shade").fadeIn(600);
-	$("#filAlreadyExistsPopup").fadeIn(600);
-	$("#CreateNew").unbind('click').click(function(){
-          deleteOldProject(fileId);
-          document.location.href = '/createWorksheet/'+fileId;
-	  closePopups();
-          setTimeout(toggleSpinner(), 1);
-	});
-	$("#UpdateOld").unbind('click').click(function(){
-          document.location.href = '/openMyFile/'+fileId;
-	  closePopups();
-          setTimeout(toggleSpinner(), 1);
-	});
-	$("#PickNew").unbind('click').click(function(){
-	  closePopups();
-          createPicker();
-	});
-    }
-    
-    
-function closePopups() {
-    $("#shade").fadeOut(600);
-    $(".popup").fadeOut(600);
-}
-    
-    
-    
-    
-    
-    //---------------- Ajax Calls -----------------------------------------------------------
-    
-    /************************** Check If project already exits ****************/
-	function checkProjectExists(fileID){
-		console.log('In checkProjectExists');
-	    
-            toggleSpinner();
-            var uri = "{% url "worksheet_creator.ajax.checkProjectExists" %}";
-            var xhr = new XMLHttpRequest();
-            var fd = new FormData();
-            
-            xhr.open("POST", uri, true);
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState == 4 && xhr.status == 200) {
-                    // Handle response.
-		    //console.log(xhr.responseText);
-		    var data = JSON.parse(xhr.responseText)
-		    console.log(data);
-		    if (data.error) {alert(data.error);}
-		    else{
-                      redirectProject(data, fileID);
-                      
-		    }
-                }
-            };
-	    xhr.timeout = 4000;
-	    xhr.ontimeout = function () { location.reload(); }
-            fd.append('userInfo_id', {{ userInfo.id }});
-            fd.append('fileID', fileID);
-            
-            // Initiate a multipart/form-data upload
-            xhr.send(fd);
-	    console.log( xhr._object);
-        }
-	
-        
-    /************************** Delete Old Project ****************/
-	function deleteOldProject(fileID){
-		console.log('In deleteOldProject');
-	    
-            toggleSpinner();
-            var uri = "{% url "worksheet_creator.ajax.deleteOldProject" %}";
-            var xhr = new XMLHttpRequest();
-            var fd = new FormData();
-            
-            xhr.open("POST", uri, true);
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState == 4 && xhr.status == 200) {
-                    // Handle response.
-		    //console.log(xhr.responseText);
-		    var data = JSON.parse(xhr.responseText)
-		    console.log(data);
-		    if (data.error) {alert(data.error);}
-		    else{}
-                }
-            };
-	    xhr.timeout = 30000;
-	    xhr.ontimeout = function () { location.reload(); }
-            fd.append('userInfo_id', {{ userInfo.id }});
-            fd.append('fileID', fileID);
-            
-            // Initiate a multipart/form-data upload
-            xhr.send(fd);
-	    console.log( xhr._object);
-        }
-	
-	
-    
-    
-    
-    
-</script>
--->
 
 <script>
     var checkProjectExistsURI = "{% url "worksheet_creator.ajax.checkProjectExists" %}";
@@ -261,9 +100,13 @@ function closePopups() {
 
 {% block extraScript %}
     <script src="{% static "google_drive/js/spin.js" %}"></script>
-    <script src="{% static "google_drive/js/pick-script.js" %}"></script>
     <!-- The Google API Loader script. -->
+    {% if googleUser %}
+    <script src="{% static "google_drive/js/pick-script.js" %}"></script>
     <script type="text/javascript" src="https://apis.google.com/js/api.js?onload=onApiLoad"></script>
+    {% else %}
+    <script src="{% static "google_drive/js/noGoogle-script.js" %}"></script>
+    {% endif %}
 {% endblock %}
 
 

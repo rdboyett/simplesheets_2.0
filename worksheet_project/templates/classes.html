@@ -361,6 +361,28 @@
 {%endif%}
 
 
+{% if error %}
+		          <!-- Modal -->
+		          <div id="error-modal" aria-hidden="true" aria-labelledby="myModalLabel" role="dialog" tabindex="-1" id="myModal" class="modal fade">
+		              <div class="modal-dialog">
+		                  <div class="modal-content">
+		                      <div class="modal-header">
+					  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		                          <h4 class="modal-title">There was a problem!...I think?...</h4>
+		                      </div>
+		                      <div class="modal-body">
+					<div class="row">
+					  <div class="col-xs-12 text-center">
+							<h4>{{ error|capfirst }}</h4>
+					  </div>
+					</div>
+		                      </div>
+		                  </div>
+		              </div>
+		          </div>
+		          <!-- modal -->
+{% endif %}
+
 {% endblock %}  <!-- end of modal block -->
 
 
@@ -368,4 +390,15 @@
 
 {% block extraScript %}
   <script src="{% static "adminBoot/js/classes.js" %}"></script>
+  
+  
+    {% if error %}
+    <script>
+      $(document).ready(function(){
+	
+	$("#error-modal").modal("show");
+	
+      });
+    </script>
+    {% endif %}
 {% endblock %}

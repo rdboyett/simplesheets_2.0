@@ -1,0 +1,159 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Dashboard">
+    <meta name="keyword" content="Dashboard, Bootstrap, Admin, Template, Theme, Responsive, Fluid, Retina">
+
+    <title>Building Worksheet</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{% static "adminBoot/css/bootstrap.css" %}" rel="stylesheet">
+    <!--external css-->
+    <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" />
+        
+    <!-- Custom styles for this template -->
+    <link href="{% static "adminBoot/css/style.css" %}" rel="stylesheet">
+    <link href="{% static "adminBoot/css/style-responsive.css" %}" rel="stylesheet">
+    <link href="{% static "adminBoot/css/font-awesome-animation.min.css" %}" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    
+  </head>
+  
+  
+
+  <body>
+
+      <!-- **********************************************************************************************************************************************************
+      MAIN CONTENT
+      *********************************************************************************************************************************************************** -->
+
+	  <div id="login-page">
+	  	<div class="container">
+		  <div class="row">
+		    <div class="col-xs-12 col-sm-6 col-sm-offset-3 col-md-4 col-md-offset-4 text-center" style="margin-top: 10%;color: #fff;">
+		      <div><img class="" src="{% static "index/img/duck-banner.png" %}" alt="logo"/></div>
+		      <div><i class="fa fa-circle-o faa-burst animated" style="color: #fff;font-size: 50px; margin-top: 20px;"></i></div>
+		      <div id="message" style="margin-top: 20px;font-size: 20px;" class="faa-passing animated">creating your worksheet...</div>
+		    </div>
+		  </div>
+	  	</div>
+	  </div>
+
+    <!-- js placed at the end of the document so the pages load faster -->
+    <script src="{% static "adminBoot/js/bootstrap.min.js" %}"></script>
+    
+
+    <!--BACKSTRETCH-->
+    <!-- You can use an image of whatever size. This script will stretch to fit in any screen size.-->
+    <script type="text/javascript" src="{% static "adminBoot/js/jquery.backstretch.min.js" %}"></script>
+    <script>
+        $.backstretch("{% static "adminBoot/img/login-bg2.jpg" %}", {speed: 500});
+    </script>
+
+<script>
+  
+  $(document).ready(function(){
+    //---------------- Ajax Calls -----------------------------------------------------------
+    
+    /************************** Check If project already exits ****************/
+	function createWorksheet(fileId){
+		console.log('In createWorksheet');
+	    
+            var csrftoken = getCookie('csrftoken');
+            var uri = "{% url "worksheet_creator.views.create" %}";
+            var xhr = new XMLHttpRequest();
+            var fd = new FormData();
+            
+            xhr.open("POST", uri, true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    // Handle response.
+		    //console.log(xhr.responseText);
+		    var data = JSON.parse(xhr.responseText)
+		    console.log(data);
+		    if (data.error) {
+                      alert(data.error);
+                      document.location.href = '/drive/pickFile/';
+                    }
+		    else{
+                      document.location.href = '/nextPage/'+ data.projectID +'/1/';
+		    }
+                }
+            };
+	    xhr.timeout = 30000;
+	    xhr.ontimeout = function () { 
+              alert("Something went wrong, That's all we know.");
+              document.location.href = '/drive/pickFile/';
+            }
+            fd.append('fileID', fileId);
+            
+            // Initiate a multipart/form-data upload
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            xhr.send(fd);
+        }
+    /************************** Check If project already exits ***************/
+	
+        {% if fileId %}
+	  var count = 0;
+	  setInterval(function(){
+	    if (count == 1) {
+	      $("#message").html("this could take a minute...");
+	    }
+	    if (count == 2 ) {
+	      $("#message").html("we're still working...");
+	    }
+	    if (count == 3 ) {
+	      $("#message").html("please be patient...");
+	    }
+	    if (count == 4 ) {
+	      $("#message").html("this is so embarrassing...");
+	    }
+	    if (count == 5 ) {
+	      $("#message").html("sorry, there's alot to do...");
+	    }
+	    count++;
+	  }, 3000);
+          createWorksheet("{{ fileId }}");
+        {% else %}
+          alert("Something went wrong, That's all we know.");
+          document.location.href = '/drive/pickFile/';
+        {% endif %}
+        
+        
+        
+// using jQuery
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+        
+  });
+        
+</script>
+  </body>
+</html>

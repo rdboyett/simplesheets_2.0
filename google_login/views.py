@@ -21,6 +21,7 @@ from userInfo_profile.models import UserInfo
 from classrooms.models import Classroom, ClassUser
 from google_login import settings
 from forms import ContactForm
+from beta_test.models import BetaTestAllowedUsers
 
 from apiclient.discovery import build
 from oauth2client import xsrfutil
@@ -31,6 +32,7 @@ from oauth2client.client import OAuth2WebServerFlow
 
 from apiclient import errors
 
+bBETA_TEST_ON = settings.BETA_TEST_ON
 
 # CLIENT_SECRETS, name of a file containing the OAuth 2.0 information for this
 # application, including client_id and client_secret, which are found
@@ -54,6 +56,7 @@ def index(request):
             user = User.objects.get(id=user_id)
             user.backend = 'django.contrib.auth.backends.ModelBackend'
             login(request, user)
+	    request.session.set_expiry(604800)  #Time is in Seconds, this equals 7 days
             return HttpResponseRedirect(settings.LOGIN_SUCCESS)
         
         else:
@@ -99,6 +102,10 @@ def auth_return(request):
     emailEnding = google_email.split("@")[1]
     userName = "@"+google_email.split("@")[0]
     
+    if bBETA_TEST_ON:
+	if not BetaTestAllowedUsers.objects.filter(email=google_email):
+	    return redirect("worksheet_project.views.index")
+    
     if User.objects.filter(username=userName):
         # Make sure that the e-mail is unique.
         user = User.objects.get(username=userName)
@@ -142,7 +149,7 @@ def auth_return(request):
         login(request, user)
         
     request.session['user_id'] = user.id
-    request.session.set_expiry(604800)
+    request.session.set_expiry(604800) #Time is in Seconds, this equals 7 days
     storage = Storage(CredentialsModel, 'id', user, 'credential')
     storage.put(credential)
     #return HttpResponseRedirect(settings.LOGIN_SUCCESS)
@@ -224,6 +231,11 @@ def passwordReset(request):
         password1 = request.POST['password1'].strip()
         password2 = request.POST['password2'].strip()
 	
+	
+	if bBETA_TEST_ON:
+	    if not BetaTestAllowedUsers.objects.filter(email=email):
+		return HttpResponse(json.dumps({'error':"Sorry, we are currently beta testing this application."}))
+    
 	
 	if ForgottenPassword.objects.filter(id=forgotID):
 	    forgot = ForgottenPassword.objects.get(id=forgotID)
@@ -338,6 +350,10 @@ def ajaxAuth(request):
         user = authenticate(username=username, password=password)
 
         if user is None and User.objects.filter(email=username):
+	    if bBETA_TEST_ON:
+		if not BetaTestAllowedUsers.objects.filter(email=username):
+		    return HttpResponse(json.dumps({'error':"Sorry, we are beta testing this application."}))
+					
             userEmail = User.objects.get(email=username)
             user = authenticate(username=userEmail.username, password=password)
 
@@ -379,6 +395,11 @@ def submitRegistration(request):
         email = request.POST['email'].strip()
         password = request.POST['password'].strip()
 	
+	
+	if bBETA_TEST_ON:
+	    if not BetaTestAllowedUsers.objects.filter(email=email):
+		return HttpResponse(json.dumps({'error':"Sorry, we are beta testing this application."}))
+	
         if User.objects.filter(username=username):
             data = {'error':'This username is already taken.'}
         elif email:
@@ -414,6 +435,10 @@ def submitRegistration(request):
 def doesEmailExist(request):
     if request.method == 'POST':
         email = request.POST['email']
+	if bBETA_TEST_ON:
+	    if not BetaTestAllowedUsers.objects.filter(email=email):
+		return HttpResponse(json.dumps({'error':"Sorry, we are beta testing this application."}))
+	    
         if User.objects.filter(email=email):
             data = 'false'
         else:
@@ -428,6 +453,10 @@ def doesEmailExist(request):
 def submitPasswordForgot(request):
     if request.method == 'POST':
         email = request.POST['email']
+	if bBETA_TEST_ON:
+	    if not BetaTestAllowedUsers.objects.filter(email=email):
+		return HttpResponse(json.dumps({'error':"Sorry, we are beta testing this application."}))
+	    
         if User.objects.filter(email=email):
             user = User.objects.get(email=email)
             forgotLink = ForgottenPassword.objects.create(

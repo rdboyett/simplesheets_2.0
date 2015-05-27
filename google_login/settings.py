@@ -29,3 +29,6 @@ WEBMASTER_EMAIL = 'rdboyett@gmail.com'
 WEBSITENAME = 'SimpleSheets.com'
 
 ROOT_WEBSITE_LINK = 'http://127.0.0.1:8000'
+
+
+BETA_TEST_ON = False

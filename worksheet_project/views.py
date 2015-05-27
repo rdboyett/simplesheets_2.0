@@ -27,6 +27,7 @@ def index(request):
             user = User.objects.get(id=user_id)
             user.backend = 'django.contrib.auth.backends.ModelBackend'
             login(request, user)
+	    request.session.set_expiry(604800)  #Time is in Seconds, this equals 7 days
             return HttpResponseRedirect("/dashboard/")
         
         else:
@@ -40,7 +41,7 @@ def index(request):
     
 
 @login_required
-def dashboard(request):
+def dashboard(request, *args, **kwargs):
     if UserInfo.objects.filter(user=request.user):
         userInfo = UserInfo.objects.get(user=request.user)
     else:
@@ -84,9 +85,16 @@ def dashboard(request):
         allClasses = False
     
     
+    if 'error' in request.session:
+        error = request.session['error']
+        if classUser.teacher:
+            del request.session['error']
+    else:
+        error = False
     
     
     args = {
+            "error":error,
             "dashboard":True,
             "userInfo":userInfo,
             "googleUserInfo":googleUserInfo,
@@ -178,15 +186,15 @@ def showNextPage(request, projectID=False, pageNumber=False, classID=False):
                 "googleUserInfo":googleUserInfo,
                 "allClasses":allClasses,
                 "classUser":classUser,
-                  'newProject':newProject,
-                  'myAnswers':myAnswers,
-                  'myGrade':myGrade,
-                  'pageNumber':int(pageNumber),
-                  'totalPages':int(totalPages),
-                  'pageRange':range(int(totalPages)),
-                  'formInputs':formInputs,
-                  'bTeacher':bTeacher,
-                  'classID':classID,
+                'newProject':newProject,
+                'myAnswers':myAnswers,
+                'myGrade':myGrade,
+                'pageNumber':int(pageNumber),
+                'totalPages':int(totalPages),
+                'pageRange':range(int(totalPages)),
+                'formInputs':formInputs,
+                'bTeacher':bTeacher,
+                'classID':classID,
             }
         args.update(csrf(request))
     
@@ -353,7 +361,14 @@ def classes(request, classID=False):
     else:
         students = False
 
+    if 'error' in request.session:
+        error = request.session['error']
+        del request.session['error']
+    else:
+        error = False
+    
     args = {
+            "error":error,
             "classes":True,
             "userInfo":userInfo,
             "classUser":classUser,
@@ -391,7 +406,7 @@ def monitor(request, projectID=False, classID=False):
             teacher = teacher,
         )
         
-        
+    htmlPage = 'monitor.html'
     #Check if teacher
     if not classUser.teacher:
         return redirect('/classes/')
@@ -571,7 +586,7 @@ def assign(request, projectID=False):
     else:
         currentProject = False
         if userInfo.projects.all():
-            allProjects = userInfo.projects.all()
+            allProjects = userInfo.projects.all().order_by('-id')
         else:
             allProjects = False
         

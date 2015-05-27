@@ -119,6 +119,14 @@ jQuery.validator.addMethod("noSpace", function(value, element) {
      return value.indexOf(" ") < 0 && value != ""; 
   }, "Space are not allowed");
     
+jQuery.validator.addMethod("checkExtension", function(value, element) { 
+    if (value.split('.')[1] != "pdf") {
+	return false
+    }else{
+	return true
+    }
+  }, "must be a pdf");
+
 jQuery.validator.addMethod("complete_url", function(val, elem) {
     // if no url, don't do anything
     if (val.length == 0) { return true; }
