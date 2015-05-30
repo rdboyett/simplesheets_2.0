@@ -107,7 +107,7 @@
                   <li class="sub-menu">
                       <a class="{% if worksheet %}active{% endif %}" href="javascript:;" >
                           <i class="fa fa-file-word-o"></i>
-                          <span>Worksheets</span>
+                          <span>E-sheets</span>
                       </a>
                       <ul class="sub">
                           <li class="{% if create %}active{%endif%}"><a  href="{% url "google_drive.views.google_picker" %}">Create</a></li>
@@ -152,7 +152,7 @@
                 <li class="sub-menu">
                   <a class="btn btn-warning" href="{% url "google_drive.views.google_picker" %}">
                         <i class="fa fa-file-word-o" style="color: #424a5d;"></i>
-                        <span style="color: #424a5d;">  new worksheet</span>
+                        <span style="color: #424a5d;">  new e-sheet</span>
                   </a>
                 </li>
                 {%endif%}
@@ -274,7 +274,7 @@
       <div class="modal-body centered">
             <form id="delete-worksheet-form" class="form-horizontal style-form" action="{% url "worksheet_creator.page_view_ajax.deleteProject" %}" enctype='multipart/form-data' method="post" autocomplete="off">{% csrf_token %}
               <input id="worksheetID-hidden-input" type="hidden" name="worksheetID" value="">
-	      <div>Are you sure you want to <span class="text-danger">delete</span> this worksheet?</div>
+	      <div>Are you sure you want to <span class="text-danger">delete</span> this e-sheet?</div>
             </form>
 	    
       </div>

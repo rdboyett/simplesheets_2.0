@@ -64,7 +64,7 @@
           <div class="col-lg-4 col-md-4 col-sm-4 mb">
             <div class="content-panel pn">
               <div id="profile-01" class="bg{{ randomNumber|random }}">
-                <img src="{{ worksheet.thumb }}" alt="worksheet">
+                <img src="{{ worksheet.thumb }}" alt="e-sheet">
               </div>
               <div class="profile-01 centered">
                 <a href="{% url "worksheet_project.views.worksheet_display" worksheet.id %}"><p>{{ worksheet.title|capfirst }}</p></a>
@@ -262,7 +262,7 @@
     <div class="modal-content rounded">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h4 class="modal-title">Set the number of retries on this worksheet for {{ student.user.first_name|capfirst }}.</h4>
+        <h4 class="modal-title">Set the number of retries on this e-sheet for {{ student.user.first_name|capfirst }}.</h4>
       </div>
       <div class="modal-body text-center">
         

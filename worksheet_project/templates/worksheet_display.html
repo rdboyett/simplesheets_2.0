@@ -46,7 +46,7 @@
             <div class="content-panel pn">
               <div id="profile-01" class="bg{{ randomNumber|random }}">
                 {% if currentProject.thumb %}
-                <img src="{{ currentProject.thumb }}" alt="worksheet">
+                <img src="{{ currentProject.thumb }}" alt="e-sheet">
                 {% endif %}
               </div>
               <div class="profile-01 centered">
@@ -225,16 +225,16 @@
     <div class="modal-content rounded">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h4 class="modal-title">worksheet settings</h4>
+        <h4 class="modal-title">e-sheet settings</h4>
       </div>
       <div class="modal-body text-center">
         
             <form id="change-worksheetName-form" class="form-horizontal style-form" action="{% url "worksheet_creator.page_view_ajax.changeWorksheetName" %}" enctype='multipart/form-data' method="post" autocomplete="off">{% csrf_token %}
               <div class="form-group">
                 <input type="hidden" name="worksheetID" value="{{ currentProject.id }}">
-		<label class="col-sm-3 control-label">Worksheet Name</label>
+		<label class="col-sm-3 control-label">E-sheet Name</label>
 		  <div class="col-sm-9">
-		    <input class="form-control" type="text" name="worksheet_name" minlength="3" maxlength="95" required placeholder="Worksheet Name..." value="{{ currentProject.title|capfirst }}" autofocus>
+		    <input class="form-control" type="text" name="worksheet_name" minlength="3" maxlength="95" required placeholder="E-sheet Name..." value="{{ currentProject.title|capfirst }}" autofocus>
 		    <span class="register-check register-check-error"></span>
 		  </div>
 	      </div>
@@ -251,7 +251,7 @@
         
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-danger pull-left" aria-hidden="true" data-toggle="modal" data-target="#delete-yes-no">Delete this worksheet</button>
+        <button type="button" class="btn btn-danger pull-left" aria-hidden="true" data-toggle="modal" data-target="#delete-yes-no">Delete this e-sheet</button>
         <button type="button" class="btn btn-default rounded" data-dismiss="modal">close</button>
         <button type="submit" form="change-worksheetName-form" class="btn btn-primary rounded">update</button>
       </div>
@@ -266,7 +266,7 @@
     <div class="modal-content rounded">
       <div class="modal-header top-rounded">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h4 class="modal-title">delete this worksheet?</h4>
+        <h4 class="modal-title">delete this e-sheet?</h4>
       </div>
       <div class="modal-body text-center bottom-rounded">
         <div class="row">

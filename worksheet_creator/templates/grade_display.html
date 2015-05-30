@@ -1,6 +1,6 @@
 
 {% if not error %}
-    <div>You have completed this worksheet {{ myGrade.timesGraded }} time{{ myGrade.timesGraded|pluralize }}.</div>
+    <div>You have completed this e-sheet {{ myGrade.timesGraded }} time{{ myGrade.timesGraded|pluralize }}.</div>
     <br>
     <table class="table table-bordered table-striped table-condensed cf">
         <thead class="cf">
@@ -68,7 +68,7 @@
     </table>
     <br>
     <div id="attemptsLeft" data-options='{"attempts_left":{{ numberAttemptsLeft }}}'>
-        You have {% if numberAttemptsLeft < 1 %}no{% else %}{{ numberAttemptsLeft }}{% endif %} more attempt{{ numberAttemptsLeft|pluralize }} left for this worksheet.</div>
+        You have {% if numberAttemptsLeft < 1 %}no{% else %}{{ numberAttemptsLeft }}{% endif %} more attempt{{ numberAttemptsLeft|pluralize }} left for this e-sheet.</div>
 {% else %}
     {{ error }}
 {% endif %}

@@ -38,7 +38,7 @@
 	<div class="col-sm-4">
 	    <button id="gradeWorksheet" class="btn btn-primary
 	    {% if myGrade %}{% if myGrade.timesGraded >= newProject.numberOfRetry %} disabled{% endif %}{% endif %}
-	    ">grade worksheet</button>
+	    ">grade e-sheet</button>
 	    <button id="zoom-out-btn" class="btn btn-primary"><span class="fa fa-search-minus"></span></button>
 	    <button id="zoom-in-btn" class="btn btn-primary"><span class="fa fa-search-plus"></button>
 	</div>
@@ -372,7 +372,7 @@
 	    var bGraded = false;
 	    {% if myGrade %}{% if myGrade.timesGraded >= newProject.numberOfRetry %}bGraded=true;{% endif %}{% endif %}
 	    {% if not newProject.status == 'active' %}
-		alert('Sorry, this worksheet has been locked by the teacher.  You cannot make any changes.');
+		alert('Sorry, this e-sheet has been locked by the teacher.  You cannot make any changes.');
 	    {% endif %}
     </script>
     

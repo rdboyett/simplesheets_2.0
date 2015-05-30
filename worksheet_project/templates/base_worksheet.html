@@ -108,7 +108,7 @@
                   <li class="sub-menu">
                       <a class="{% if worksheet %}active{% endif %}" href="javascript:;" >
                           <i class="fa fa-file-word-o"></i>
-                          <span>Worksheets</span>
+                          <span>E-sheets</span>
                       </a>
                       <ul class="sub">
                           <li class="{% if create %}active{%endif%}"><a  href="{% url "google_drive.views.google_picker" %}">Create</a></li>
@@ -153,7 +153,7 @@
                 <li class="sub-menu">
                   <a class="btn btn-warning" href="{% url "google_drive.views.google_picker" %}">
                         <i class="fa fa-file-word-o" style="color: #424a5d;"></i>
-                        <span style="color: #424a5d;">  new worksheet</span>
+                        <span style="color: #424a5d;">  new e-sheet</span>
                   </a>
                 </li>
                 {%endif%}

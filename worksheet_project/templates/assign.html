@@ -2,7 +2,7 @@
 {% load staticfiles %}
 
 
-{% block title %}Assign Worksheets{% endblock %}
+{% block title %}Assign E-sheets{% endblock %}
 
 {% block body %}
 
@@ -12,12 +12,12 @@
         <div class="row mt">
           <div class="col-xs-12 col-sm-6">
 		<button id="new-worksheet" class="assign_btn btn btn-block btn-lg btn-primary rounded space disabled" data-toggle="modal" data-target="#assign-worksheets">
-                <span class="glyphicon glyphicon-asterisk"></span>  assign worksheets
+                <span class="glyphicon glyphicon-asterisk"></span>  assign e-sheets
 		</button>
           </div>
           <div class="col-xs-12 col-sm-6">
 		<button id="unassign-worksheet-btn" class="assign_btn btn btn-block btn-lg btn-primary rounded space disabled" data-toggle="modal" data-target="#unassign-worksheets">
-                <span class="glyphicon glyphicon-asterisk"></span>  un-assign worksheets
+                <span class="glyphicon glyphicon-asterisk"></span>  un-assign e-sheets
 		</button>
           </div>
         </div>
@@ -32,7 +32,7 @@
             <div class="content-panel pn" data-options='{"worksheet_id":{{ worksheet.id }}}'>
               <div id="profile-01" class="bg{{ randomNumber|random }}">
                 {% if worksheet.thumb %}
-                <img src="{{ worksheet.thumb }}" alt="worksheet">
+                <img src="{{ worksheet.thumb }}" alt="e-sheet">
                 {% endif %}
               </div>
 	      <div class="checkBox text-center">
