@@ -8,7 +8,6 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 
 from classrooms.models import *
-from classrooms import settings
 
 from userInfo_profile.views import test_function
 
