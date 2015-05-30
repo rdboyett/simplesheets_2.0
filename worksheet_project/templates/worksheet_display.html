@@ -28,9 +28,9 @@
                 <div class="">
                 {% if classUser.teacher%}
                   {% if currentProject.status == "locked" %}
-                  <button type="submit" class="btn btn-success btn-block pull-right"><i class="fa fa-lock"></i>  locked</button>
+                  <button type="submit" class="btn btn-danger btn-block pull-right"><i class="fa fa-lock"></i>  locked</button>
                   {% else %}
-                  <button type="submit" class="btn btn-danger btn-block pull-right"><i class="fa fa-unlock"></i>  unlocked</button>
+                  <button type="submit" class="btn btn-success btn-block pull-right"><i class="fa fa-unlock"></i>  unlocked</button>
                   {% endif %}
                 {% endif %}
                 </div>
