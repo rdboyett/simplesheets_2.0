@@ -20,6 +20,7 @@ from apiclient import errors
 from google_login.models import CredentialsModel, GoogleUserInfo
 from userInfo_profile.models import UserInfo
 from classrooms.models import ClassUser
+from google_drive import settings
 
 
 
@@ -31,8 +32,8 @@ log = logging.getLogger(__name__)
 def google_picker(request):
     userInfo = UserInfo.objects.get(user=request.user)
     
-    developerKey = 'AIzaSyCYJX4cSPn1U2-ZPZCCKe7NGG6QBM8teJ0'
-    clientId = '1060273265897-v1inhpkb97uasl3goq82j9hiuhc9nhnn.apps.googleusercontent.com'
+    developerKey = settings.DEVELOPER_KEY
+    clientId = settings.CLIENT_ID
     
     
     #Get all users Classes
