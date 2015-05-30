@@ -902,3 +902,8 @@ function showGradeColors() {
 function resetImagePath(inputNumber, imagePath) {
     $("#workinput"+inputNumber+" img").attr('src',imagePath);
 }
+
+
+function resetDrawingImagePath(inputNumber, imagePath) {
+    $("#drawinginput"+inputNumber+" img").attr('src',imagePath);
+}

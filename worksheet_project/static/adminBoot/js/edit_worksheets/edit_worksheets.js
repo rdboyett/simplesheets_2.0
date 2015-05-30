@@ -566,7 +566,10 @@ function changeQuestionType() {
 	else if (inputType == 'work') {
 	    createWork(oldInputType, 'input'+inputNumber_id);
 	}
-	else if ((inputType == 'text' || inputType == 'number' || inputType == 'checkbox') && (oldInputType == 'textarea' || oldInputType == 'select' || oldInputType == 'work')) {
+	else if (inputType == 'drawing') {
+	    createDrawing(oldInputType, 'input'+inputNumber_id);
+	}
+	else if ((inputType == 'text' || inputType == 'number' || inputType == 'checkbox') && (oldInputType == 'textarea' || oldInputType == 'select' || oldInputType == 'work' || oldInputType == 'drawing')) {
 	    //Re-create the default input type
 	    createDefaultInput(oldInputType, 'input'+inputNumber_id, inputType);
 	    /*
@@ -589,7 +592,7 @@ function changeQuestionType() {
     /****************************Create Inputs Area*********************************/
     function createTextarea(oldInputType, elementID) {
 	//get the important parts of element
-        if (oldInputType=="work") {
+	if (oldInputType=="work") {
             var testStyle = $('#work'+elementID).attr('style');
         }else{var testStyle = $('#'+elementID).attr('style');}
 	
@@ -606,6 +609,7 @@ function changeQuestionType() {
 	//make the old input disappear
 	$('#'+elementID).remove();
 	$('#work'+elementID).remove();
+	$('#drawing'+elementID).remove();
 	//$('#'+elementID).css("display","none");
 	//$('#'+elementID).attr('id','noShow');
 	
@@ -634,7 +638,7 @@ function changeQuestionType() {
     
     function createSelect(oldInputType, elementID) {
 	//get the important parts of element
-        if (oldInputType=="work") {
+	if (oldInputType=="work") {
             var testStyle = $('#work'+elementID).attr('style');
         }else{var testStyle = $('#'+elementID).attr('style');}
         
@@ -650,6 +654,7 @@ function changeQuestionType() {
 	//make the old input disappear
 	$('#'+elementID).remove();
 	$('#work'+elementID).remove();
+	$('#drawing'+elementID).remove();
 	
 	//Now, create the textarea
 	$( "#default_form" ).append( "<select id='"+ elementID +"' class='answers highlight img-rounded' data-options=''><option id='option0' value='none'>Select One...</option></select>" );
@@ -685,6 +690,7 @@ function changeQuestionType() {
 	}
 	//make the old input disappear
 	$('#'+elementID).remove();
+	$('#drawing'+elementID).remove();
 	
 	//Now, create the textarea
         var html = '<div id="work'+ elementID +'" class="highlight img-rounded" data-options="">'+
@@ -717,6 +723,56 @@ function changeQuestionType() {
         
     }
     
+    
+    
+    function createDrawing(oldInputType, elementID) {
+	//get the important parts of element
+	if (oldInputType=="work") {
+            var testStyle = $('#work'+elementID).attr('style');
+        }else{var testStyle = $('#'+elementID).attr('style');}
+	
+	var data = $('#'+elementID).data("options");
+	var choice = [];
+	for (var i=0;i<5;i++) {
+	    choice[i] = $('#'+elementID).data("choice"+(i+1));
+	    if (!choice[i]) {
+		choice[i] = $('#'+elementID).data("keyword"+(i+1));
+	    }
+	    //console.log("Create Textarea Choice "+(i+1)+" = "+choice[i]);
+	}
+	//make the old input disappear
+	$('#'+elementID).remove();
+	$('#work'+elementID).remove();
+	$('#drawing'+elementID).remove();
+	//$('#'+elementID).css("display","none");
+	//$('#'+elementID).attr('id','noShow');
+	
+	//Now, create the textarea
+	html = "<textarea id='"+ elementID +"' class='answers highlight img-rounded' readonly='readonly' data-options=''></textarea><div id='drawing"+ elementID +"' class='work-button img-rounded'>Drawing Area will be activated for student use...</div>"
+	
+	$( "#default_form" ).append( html );
+        $('#'+elementID).attr('style',testStyle+"resize: none;");
+        $('#drawing'+elementID).attr('style',testStyle.split('height')[0]+'text-align: center;');
+        //$('#'+elementID).attr('data-options', '{"answer_id":"'+ options.answer_id + '", "question_number":"'+ options.question_number + '"}');
+	
+	$('#'+elementID).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"drawing", "points":"'+data.points+'", "help_text":"'+data.help_text+'", "help_link":"'+data.help_link+'"}');
+	
+		for (var j=1; j<6; j++) {
+		    if (choice[j-1]) {
+			$('#'+elementID).data("choice"+j, choice[j-1]);
+			//console.log("Choice"+j+" saved as: "+choice[j-1]);
+			$('#'+elementID).data("keyword"+j, choice[j-1]);
+		    }
+		}
+	$('#'+elementID).focus();
+        resizeElements();
+        
+        
+    }
+    
+    
+    
+    
     function createDefaultInput(oldInputType, elementID, inputType) {
 	//get the important parts of element
         if (oldInputType=="work") {
@@ -735,6 +791,7 @@ function changeQuestionType() {
 	//make the old input disappear
 	$('#'+elementID).remove();
 	$('#work'+elementID).remove();
+	$('#drawing'+elementID).remove();
 	//$('#'+elementID).css("display","none");
 	//$('#'+elementID).attr('id','noShow');
 	

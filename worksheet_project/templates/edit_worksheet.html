@@ -56,6 +56,47 @@
 		    </div>
 		    
 		    
+		    {% elif input.inputType == 'drawing' %}
+		    
+			<textarea id="input{{ input.id }}" class="answers highlight img-rounded" readonly="readonly" data-options='{"answer_id":"{{ input.id }}",
+			    "question_number":"{{ input.questionNumber }}", "input_type":"{{ input.inputType }}", "points":"{{ input.points }}",
+			    "help_text":{% if input.helpText %}"{{ input.helpText }}"{% else %}""{% endif %},
+			    "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}'
+			    style="resize: none;position: absolute;z-index: 1;left: {{ input.left }}%;top: {{ input.top }}%;width: {{ input.width }}%;
+			    height: {{ input.height }}%"></textarea><div id="drawinginput{{ input.id }}" class="work-button img-rounded"
+			    style="position: absolute;z-index: 1;left: {{ input.left }}%;top: {{ input.top }}%;width: {{ input.width }}%; text-align: center;">Drawing Area will be activated for student use...</div>
+			<script>
+			    {% if input.option1 %}
+			    $('#input{{ input.id }}').data('keyword1', '{{ input.option1 }}');
+			    {% endif %}
+			    {% if input.option2 %}
+			    $('#input{{ input.id }}').data('keyword2', '{{ input.option2 }}');
+			    {% endif %}
+			    {% if input.option3 %}
+			    $('#input{{ input.id }}').data('keyword3', '{{ input.option3 }}');
+			    {% endif %}
+			    {% if input.option4 %}
+			    $('#input{{ input.id }}').data('keyword4', '{{ input.option4 }}');
+			    {% endif %}
+			</script>
+		    
+		    
+		    <!--
+		    <div id="drawinginput{{ input.id }}" class="highlight img-rounded" style="position: absolute;z-index: 1;left: {{ input.left }}%;top: {{ input.top }}%;width: {{ input.width }}%; height: {{ input.height }}%" data-options='{"answer_id":"{{ input.id }}", "question_number":"{{ input.questionNumber }}", "input_type":"{{ input.inputType }}", "points":"{{ input.points }}", "help_text":{% if input.helpText %}"{{ input.helpText }}"{% else %}""{% endif %}, "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}'>
+                        <div class="work-button img-rounded" style="position:relative;top:40%;left:0;font-size: 20px;text-align: center;">Drawing Area will be activated for student use...
+			    <input id="input{{ input.id }}" class="answers highlight" value="{% if input.correctAnswer %}{{ input.correctAnswer }}{% endif %}" name="" data-options='{"answer_id":"{{ input.id }}", "question_number":"{{ input.questionNumber }}", "input_type":"{{ input.inputType }}", "points":"{{ input.points }}", "help_text":{% if input.helpText %}"{{ input.helpText }}"{% else %}""{% endif %}, "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}' type="text" style="width:100px;" title="answer..." name="">
+			</div>
+		    </div>
+		    <!--
+		    <input id="input{{ input.id }}" placeholder="Drawing Area will be activated for student use..." class="answers highlight" data-options='{"answer_id":"{{ input.id }}",
+			"question_number":"{{ input.questionNumber }}", "input_type":"{{ input.inputType }}", "points":"{{ input.points }}",
+			"help_text":{% if input.helpText %}"{{ input.helpText }}"{% else %}""{% endif %},
+			"help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}'
+			type="{{ input.inputType }}" title='drawing area...'
+			value="{% if input.correctAnswer %}{{ input.correctAnswer }}{% endif %}"
+			name="" style="position: absolute;z-index: 1;left: {{ input.left }}%;top: {{ input.top }}%;width: {{ input.width }}%;
+			height: {{ input.height }}%">-->
+		    
 		    
 		    
 			

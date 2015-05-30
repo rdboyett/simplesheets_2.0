@@ -799,7 +799,25 @@ def submitGradeWorksheet(request):
                                     bCorrect = True,
                                 )
                                 pointsEarned += float(question.points)
-                                        
+                                
+                            elif question.inputType == 'drawing':
+                                myNewAnswerObject = MyAnswer.objects.create(
+                                    project = project,
+                                    userInfo=userInfo,
+                                    answer = question,
+                                    bCorrect = True,
+                                )
+                                pointsEarned += float(question.points)
+                                
+                            else:
+                                myNewAnswerObject = MyAnswer.objects.create(
+                                    project = project,
+                                    userInfo=userInfo,
+                                    answer = question,
+                                    bCorrect = False,
+                                )
+                                
+                                
                             pointsPossible += float(question.points)
                             
                 else:
@@ -1129,7 +1147,7 @@ def updateInputType(request):
             if FormInput.objects.filter(id=inputNumber):
                 workInput = FormInput.objects.get(id=inputNumber)
                 
-                if newInputType == 'work':
+                if newInputType == 'work' or newInputType == 'drawing':
                     workInput.inputType = str(newInputType)
                     try:
                         if BackImage.objects.filter(project__id=project_id, pageNumber=pageNumber):
@@ -1175,7 +1193,6 @@ def updateInputType(request):
                             
                             workInput.workImagePath = newPath
                             workInput.save()
-                            
                             
                             data = {
                                 'success':'success',
