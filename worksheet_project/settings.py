@@ -32,7 +32,7 @@ ADMINS = (
     ('Robert Boyett', 'rdboyett@gmail.com'),
 )
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['rdboyett.webfactional.com', 'ducksoup.us', 'www.ducksoup.us']
 
 
 # Application definition
@@ -73,8 +73,12 @@ WSGI_APPLICATION = 'worksheet_project.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'ducksoupdb',
+        'USER': 'rdboyett',
+        'PASSWORD': 'dallas20',
+        'HOST': '',
+        'PORT': '',
     }
 }
 
@@ -95,9 +99,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = 'http://rdboyett.webfactional.com/static/'
 TEMPLATE_DIRS = (os.path.join(ROOT_PATH,'templates'),)
 STATICFILES_DIRS = (os.path.join(ROOT_PATH,'static'),)
+STATIC_ROOT = '/home/rdboyett/webapps/static/'
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/var/www/example.com/media/"
@@ -122,7 +127,7 @@ with open(os.path.join(BASE_DIR, 'secrets', 'gmail_password.txt')) as f:
 
 
 
-
+'''
 
 LOGGING = {
     'version': 1,
@@ -171,7 +176,7 @@ LOGGING = {
     }
 }
 
-
+'''
 
 
 

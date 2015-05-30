@@ -99,15 +99,23 @@ def create(request):
                 try:
                     download_url = file['exportLinks']['application/pdf']
                 except Exception:
-                    download_url = file.get('downloadUrl')
+                    if file['mimeType'] == "application/pdf":
+                        download_url = file.get('downloadUrl')
+                    else:
+                        return HttpResponse(json.dumps({'error':"Sorry, we can't convert that file into a pdf.  Try converting it to a google doc or printing it as a pdf first."}))
+            
                 
                 if download_url:
                     #Download the file's content and store as a PDF file-------------------------------------------------
                   resp, content = drive_service._http.request(download_url)
                   if resp.status == 200:
                     rawTitle = file['title']
+                    if len(rawTitle)>90:
+                        rawTitle = rawTitle[:90]
                     title = re.sub(r'[^\w]', '', rawTitle)
                     title = title.replace(" ", "")
+                    if len(title) > 10:
+                        title = title[:10]
                     baseFilePath = os.path.join(ROOT_PATH,'media', request.user.first_name+request.user.last_name+str(request.user.id), str(title[:5]+str(fileId[:5])))
                     duckThumbPath = os.path.join(ROOT_PATH, 'duckThumb')
                     make_sure_path_exists(duckThumbPath)
@@ -118,122 +126,127 @@ def create(request):
                     f.write(content)
                     f.close()
                     
-                    #count the number of pages and delete if too many:---------------------------------------------------
-                    pdfFile = open(pdfPath, "rb")
-                    reader = PdfFileReader(pdfFile)
-                    counter = 0
-                    number_of_pages = reader.getNumPages()
-                    for page_num in xrange(number_of_pages):
-                        counter += 1
-                    if counter > 5:
-                        bTooManyPages = True
-                        pdfFile.close()
-                        os.remove(pdfPath)
-                    else:
-                        bTooManyPages = False
+                    try:
+                        #count the number of pages and delete if too many:---------------------------------------------------
+                        pdfFile = open(pdfPath, "rb")
+                        reader = PdfFileReader(pdfFile)
+                        counter = 0
+                        number_of_pages = reader.getNumPages()
+                        for page_num in xrange(number_of_pages):
+                            counter += 1
+                        if counter > 5:
+                            bTooManyPages = True
+                            pdfFile.close()
+                            os.remove(pdfPath)
+                        else:
+                            bTooManyPages = False
+                    except:
+                        return HttpResponse(json.dumps({"error":"You can only use 5 pages or less.  If this keeps happening, try printing the document as a pdf and reload the new document."}))
                     
                     
                     
                     if not bTooManyPages:
-                        #Convert pages to images:-------------------------------------------------------------------------
-                        bItConverted = covertPDFtoImage(pdfPath, os.path.join(baseFilePath, title+ '.jpg'))
-                        if bItConverted:
-                            pdfFile.close()
-                            os.remove(pdfPath)
-                            
-                        
-                        #store file paths----------------------------------------------------------------------------------
-                        filenames = []
-                        if number_of_pages > 1:
-                            for pageNumber in range(0,counter):
-                                filenames.append(os.path.join(baseFilePath,title + '-' + str(pageNumber) + '.jpg'))
-                        else:
-                            filenames.append(os.path.join(baseFilePath,title + '.jpg'))
-                            
-                            
-                            
-                        if Project.objects.filter(title__istartswith=rawTitle):
-                            nameCount = Project.objects.filter(title__istartswith=rawTitle).count()
-                            nameCount+=1
-                            nameNumber=" ("+str(nameCount)+")"
-                        else:
-                            nameNumber=""
-                            
-                        #create a project-----------------------------------------------------------------------------------
-                        newProject = Project.objects.create(
-                            title = rawTitle+str(nameNumber),
-                            originalFileID = fileId,
-                            ownerID = request.user.id,
-                        )
-                        userInfo.projects.add(newProject)
-                        
-                        
-                        #create background images for the project----------------------------------------------------------
-                        pageNum = 0
-                        for filename in filenames:
-                            pageNum += 1
-                            fileComponentsList = filename.split(os.sep)
-                            newList = []
-                            listLen = int(len(fileComponentsList))
-                            for number in range((listLen-4),listLen):
-                                newList.append(fileComponentsList[number])
-                            lastFileName = os.path.join('/',*newList)
-                            newFilename = display_path(lastFileName)
-                            
-                            
-                            newBackImage = BackImage.objects.create(
-                                imagePath = newFilename,
-                                pageNumber = pageNum
-                            )
-                            newProject.backgroundImages.add(newBackImage)
-                        
-                        
-                        #Create a json file to store all file information---------------------------------------------------
-                        projectData = {
-                            'user_id':request.user.id,
-                            'userInfo_id':userInfo.id,
-                            'project_id':newProject.id,
-                        }
-                        jsonFilePath = makeJsonFile(request.user, projectData, title, baseFilePath)
-                        #filenames.append(jsonFilePath)
-                        
-                        '''
-                        uploadedFileID = createGoogleShortcut(request.user, newProject.title.title(), os.path.join(duckThumbPath,'icon_600.png'), json.dumps(projectData))
-                        if uploadedFileID:
-                            newProject.uploadedFileID = uploadedFileID
-                            newProject.save()
-                        
-                        '''
-                        if ClassUser.objects.filter(user=request.user):
-                            classUser = ClassUser.objects.get(user=request.user)
-                            if classUser.googleFolderID:
-                                checkFolderID = checkOrCreateGoogleFolder(request.user, classUser.googleFolderID, False, False)
-                                if not classUser.googleFolderID == checkFolderID:
-                                    classUser.googleFolderID = checkFolderID
-                                    classUser.save()
-                            else:
-                                classUser.googleFolderID = checkOrCreateGoogleFolder(request.user, False, False, False)
-                                classUser.save()
+                        try:
+                            #Convert pages to images:-------------------------------------------------------------------------
+                            bItConverted = covertPDFtoImage(pdfPath, os.path.join(baseFilePath, title+ '.jpg'))
+                            if bItConverted:
+                                pdfFile.close()
+                                os.remove(pdfPath)
                                 
-                        uploadedFileID = driveUpload(request.user, os.path.join(baseFilePath,title), os.path.join(duckThumbPath,'icon_600.png'), json.dumps(projectData), newProject.title.title(), classUser.googleFolderID)
-                        if uploadedFileID:
-                            os.remove(os.path.join(baseFilePath,title))
-                            newProject.uploadedFileID = uploadedFileID
+                            
+                            #store file paths----------------------------------------------------------------------------------
+                            filenames = []
+                            if number_of_pages > 1:
+                                for pageNumber in range(0,counter):
+                                    filenames.append(os.path.join(baseFilePath,title + '-' + str(pageNumber) + '.jpg'))
+                            else:
+                                filenames.append(os.path.join(baseFilePath,title + '.jpg'))
+                                
+                                
+                                
+                            if Project.objects.filter(title__istartswith=rawTitle):
+                                nameCount = Project.objects.filter(title__istartswith=rawTitle).count()
+                                nameCount+=1
+                                nameNumber=" ("+str(nameCount)+")"
+                            else:
+                                nameNumber=""
+                                
+                            #create a project-----------------------------------------------------------------------------------
+                            newProject = Project.objects.create(
+                                title = rawTitle+str(nameNumber),
+                                originalFileID = fileId,
+                                ownerID = request.user.id,
+                            )
+                            userInfo.projects.add(newProject)
+                            
+                            
+                            #create background images for the project----------------------------------------------------------
+                            pageNum = 0
+                            for filename in filenames:
+                                pageNum += 1
+                                fileComponentsList = filename.split(os.sep)
+                                newList = []
+                                listLen = int(len(fileComponentsList))
+                                for number in range((listLen-4),listLen):
+                                    newList.append(fileComponentsList[number])
+                                lastFileName = os.path.join('/',*newList)
+                                newFilename = display_path(lastFileName)
+                                
+                                
+                                newBackImage = BackImage.objects.create(
+                                    imagePath = newFilename,
+                                    pageNumber = pageNum
+                                )
+                                newProject.backgroundImages.add(newBackImage)
+                            
+                            
+                            #Create a json file to store all file information---------------------------------------------------
+                            projectData = {
+                                'user_id':request.user.id,
+                                'userInfo_id':userInfo.id,
+                                'project_id':newProject.id,
+                            }
+                            jsonFilePath = makeJsonFile(request.user, projectData, title, baseFilePath)
+                            #filenames.append(jsonFilePath)
+                            
+                            if ClassUser.objects.filter(user=request.user):
+                                classUser = ClassUser.objects.get(user=request.user)
+                                if classUser.googleFolderID:
+                                    checkFolderID = checkOrCreateGoogleFolder(request.user, classUser.googleFolderID, False, False)
+                                    if not classUser.googleFolderID == checkFolderID:
+                                        classUser.googleFolderID = checkFolderID
+                                        classUser.save()
+                                else:
+                                    classUser.googleFolderID = checkOrCreateGoogleFolder(request.user, False, False, False)
+                                    classUser.save()
+                                    
+                            uploadedFileID = driveUpload(request.user, os.path.join(baseFilePath,title), os.path.join(duckThumbPath,'icon_600.png'), json.dumps(projectData), newProject.title.title(), classUser.googleFolderID)
+                            if uploadedFileID:
+                                os.remove(os.path.join(baseFilePath,title))
+                                newProject.uploadedFileID = uploadedFileID
+                                
                             newProject.save()
+                        except:
+                            return HttpResponse(json.dumps({"error":"This is so embarrassing. Something went wrong, that's all we know."}))
+                                
                             
+                        try:
+                            size = 200, 260
+                            thumbPath = os.path.join(baseFilePath,"thumbnail.png")
+                            im = Image.open(filenames[0])
+                            im.thumbnail(size)
+                            im.save(thumbPath, "PNG")
+                            #Now trim the thumbpath down for a url link to the image
+                            newThumbPath = thumbPath.split('worksheet_creator')
                             
-                        
-                        
-                        size = 200, 260
-                        thumbPath = os.path.join(baseFilePath,"thumbnail.png")
-                        im = Image.open(filenames[0])
-                        im.thumbnail(size)
-                        im.save(thumbPath, "PNG")
-                        #Now trim the thumbpath down for a url link to the image
-                        newThumbPath = thumbPath.split('worksheet_creator')
-                        
-                        newProject.thumb = newThumbPath[1]
-                        newProject.save()
+                            newProject.thumb = newThumbPath[1]
+                            newProject.save()
+                        except:
+                            data = {
+                                'success': "success",
+                                'projectID':newProject.id,
+                            }
+                            return HttpResponse(json.dumps(data))
                         
                         
                     else:

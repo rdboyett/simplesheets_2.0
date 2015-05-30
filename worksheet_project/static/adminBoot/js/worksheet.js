@@ -69,9 +69,9 @@ $('document').ready(function(){
                     var text;
                     //console.log(responseText.allowJoin);
                     if (responseText.status=='locked'){
-                        text = "<i class='fa fa-unlock'></i>  activate"
+                        text = "<i class='fa fa-lock'></i>  locked"
                     }else{
-                        text = "<i class='fa fa-lock'></i>  lock"
+                        text = "<i class='fa fa-unlock'></i>  unlocked"
                     };
                     $("#toggle-lock-worksheet-form button").toggleClass("btn-success")
                         .toggleClass("btn-danger")

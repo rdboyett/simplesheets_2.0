@@ -28,9 +28,9 @@
                 <div class="">
                 {% if classUser.teacher%}
                   {% if currentProject.status == "locked" %}
-                  <button type="submit" class="btn btn-success btn-block pull-right"><i class="fa fa-unlock"></i>  activate</button>
+                  <button type="submit" class="btn btn-success btn-block pull-right"><i class="fa fa-lock"></i>  locked</button>
                   {% else %}
-                  <button type="submit" class="btn btn-danger btn-block pull-right"><i class="fa fa-lock"></i>  lock</button>
+                  <button type="submit" class="btn btn-danger btn-block pull-right"><i class="fa fa-unlock"></i>  unlocked</button>
                   {% endif %}
                 {% endif %}
                 </div>
@@ -45,7 +45,9 @@
           <div class="">
             <div class="content-panel pn">
               <div id="profile-01" class="bg{{ randomNumber|random }}">
+                {% if currentProject.thumb %}
                 <img src="{{ currentProject.thumb }}" alt="worksheet">
+                {% endif %}
               </div>
               <div class="profile-01 centered">
                 <p  data-toggle="modal" data-target="#worksheet-settings">{{ currentProject.title|capfirst }}</p>

@@ -72,6 +72,9 @@ def index(request):
 
     
 def auth(request):
+    request.session['popup'] = True
+    request.session.set_expiry(300)
+    
     credential = None
         
     if credential is None or credential.invalid == True:
@@ -81,6 +84,23 @@ def auth(request):
                                                         request.user)
         authorize_url = FLOW.step1_get_authorize_url()
         return HttpResponseRedirect(authorize_url)
+
+
+
+def noPopAuth(request):
+    request.session['popup'] = False
+    request.session.set_expiry(300)
+    
+    credential = None
+        
+    if credential is None or credential.invalid == True:
+        FLOW.params['access_type'] = 'offline'
+        FLOW.params['approval_prompt'] = 'force'
+        FLOW.params['state'] = xsrfutil.generate_token(settings.SECRET_KEY,
+                                                        request.user)
+        authorize_url = FLOW.step1_get_authorize_url()
+        return HttpResponseRedirect(authorize_url)
+
 
 
 def auth_return(request):
@@ -154,9 +174,13 @@ def auth_return(request):
     storage.put(credential)
     #return HttpResponseRedirect(settings.LOGIN_SUCCESS)
     #return HttpResponse('<script>window.close();</script>')
-    return render_to_response('google_login/login_return.html', {
-	    "user":request.user,
-	})
+    
+    if 'popup' in request.session:
+        popup = request.session['popup']
+    	if popup:
+    	    return render_to_response('google_login/login_return.html', {"user":request.user,})
+	    
+    return redirect("worksheet_project.views.dashboard")
 
 
 

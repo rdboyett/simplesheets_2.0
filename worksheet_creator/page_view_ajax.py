@@ -508,24 +508,30 @@ def deleteProject(request):
                         for image in oldProject.backgroundImages.all():
                             imagePath = image.imagePath
                                 
-                        a, b = os.path.split(imagePath)
-                        fdir, folderName = os.path.split(a)
-                            
-                        #check if other projects with the same googleID are using the files
-                        if Project.objects.filter(originalFileID=oldProject.originalFileID):
-                            if Project.objects.filter(originalFileID=oldProject.originalFileID).count()<2:
-                                basePath = os.path.join(settings.ROOT_PATH,'media', request.user.first_name+request.user.last_name+str(request.user.id), str(folderName))
-                                make_sure_path_exists(basePath)
-                                shutil.rmtree(basePath)
+                        try:
+                            a, b = os.path.split(imagePath)
+                            fdir, folderName = os.path.split(a)
+                                
+                            #check if other projects with the same googleID are using the files
+                            if Project.objects.filter(originalFileID=oldProject.originalFileID):
+                                if Project.objects.filter(originalFileID=oldProject.originalFileID).count()<2:
+                                    basePath = os.path.join(settings.ROOT_PATH,'media', request.user.first_name+request.user.last_name+str(request.user.id), str(folderName))
+                                    make_sure_path_exists(basePath)
+                                    shutil.rmtree(basePath)
+                        except:
+                            pass
                             
                         #build Service
                         service = get_service(request.user)
                             
                         #put the file in trash
-                        file = delete_file(service, oldProject.uploadedFileID)
+                        if oldProject.uploadedFileID:
+                            file = delete_file(service, oldProject.uploadedFileID)
                             
-                        oldProject.backgroundImages.all().delete()
-                        oldProject.formInputs.all().delete()
+                        if oldProject.backgroundImages.all():
+                            oldProject.backgroundImages.all().delete()
+                        if oldProject.backgroundImages.all():
+                            oldProject.formInputs.all().delete()
                             
                         userInfo.projects.remove(oldProject)
                         oldProject.delete()

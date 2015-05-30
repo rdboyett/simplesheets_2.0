@@ -31,8 +31,8 @@ log = logging.getLogger(__name__)
 def google_picker(request):
     userInfo = UserInfo.objects.get(user=request.user)
     
-    developerKey = 'AIzaSyBCDTzK30075L2-J6pd5QB5ttY-QCpLNkU'
-    clientId = '1060273265897-6mkm41unjhbfiu8sc85cvbvrm32522v3.apps.googleusercontent.com'
+    developerKey = 'AIzaSyCYJX4cSPn1U2-ZPZCCKe7NGG6QBM8teJ0'
+    clientId = '1060273265897-v1inhpkb97uasl3goq82j9hiuhc9nhnn.apps.googleusercontent.com'
     
     
     #Get all users Classes
