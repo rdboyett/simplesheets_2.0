@@ -240,6 +240,12 @@ def handGrade(request, projectID=False, pageNumber=False, classID=False, student
             teacher = teacher,
         )
         
+    if not bTeacher:
+        request.session['error'] = 'Sorry, you must be a teacher to view this page.'
+        request.session.set_expiry(300)
+        return redirect('worksheet_project.views.dashboard')
+        
+        
     #Get all users Class
     if classUser.classrooms.all():
         allClasses = classUser.classrooms.all().order_by('name')

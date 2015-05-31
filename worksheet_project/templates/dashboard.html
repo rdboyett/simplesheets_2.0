@@ -27,6 +27,7 @@
                 <img src="{{ worksheet.thumb }}" alt="e-sheet">
 		{% endif %}
 		
+		{% if classUser.teacher %}
 		<div class="dropdown worksheet-extras">
 			<i class="fa fa-ellipsis-v fa-3x" data-toggle="dropdown" aria-expanded="true"></i>
 			<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
@@ -64,7 +65,7 @@
 			  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#worksheetID-hidden-input').val({{ worksheet.id }});$('#delete-worksheet').modal('show');"><i class="fa fa-trash"></i>&nbsp;&nbsp;Delete</a></li>
 			</ul>
 		</div>
-	
+		{%endif%}
 		
               </div>
               <div class="profile-01 centered">

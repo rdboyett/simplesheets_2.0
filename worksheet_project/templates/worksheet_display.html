@@ -47,7 +47,9 @@
               <div id="profile-01" class="bg{{ randomNumber|random }}">
                 {% if currentProject.thumb %}
                 <img src="{{ currentProject.thumb }}" alt="e-sheet">
-                {% endif %}
+		{% endif %}
+		
+		{% if classUser.teacher %}
 		<div class="dropdown worksheet-extras">
 			<i class="fa fa-ellipsis-v fa-3x" data-toggle="dropdown" aria-expanded="true"></i>
 			<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
@@ -91,7 +93,7 @@
 			  
 			</ul>
 		</div>
-	
+		{% endif %}
               </div>
               <div class="profile-01 centered">
                 <p  data-toggle="modal" data-target="#worksheet-settings">{{ currentProject.title|capfirst }}</p>
