@@ -19,7 +19,7 @@
           {% if currentClass %}
           <div class="col-xs-12 col-sm-6">
               <button id="class-code-container" class="btn btn-block btn-lg btn-warning rounded space" data-toggle="modal" data-target="#class-code">
-                Class code: <span class="class-code">{{ currentClass.code }}</span></button>
+                Class code: <span class="class-code">{{ currentClass.code }}</span>
               </button>
               {% if students %}
               <button class="btn btn-block btn-lg btn-warning rounded space" data-toggle="modal" data-target="#manage-students">
@@ -33,7 +33,15 @@
           </div>
           {% endif %}
           <br class="visible-xs">
+        {%elif currentClass %}
+          <div class="col-xs-12 col-sm-6">
+              <button id="class-code-container" class="btn btn-block btn-lg btn-warning rounded space" data-toggle="modal" data-target="#class-code">
+                <i class="fa fa-sign-out fa-lg text-danger" onclick="$('#remove-from-class-form .userID').val({{ classUser.id }});$('#remove-from-class').modal('show');">  drop this class</i>
+              </button>
+          </div>
+          <br class="visible-xs">
         {%endif%}
+        
     </div>
   </div> <!-- end of row -->
   
@@ -342,29 +350,6 @@
 
 
 
-<!---------------- modal ------------------------------------->
-<div id="remove-from-class" class="modal fade" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content rounded">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h4 class="modal-title">Remove this student from this class?</h4>
-      </div>
-      <div class="modal-body text-center">
-        
-            <form id="remove-from-class-form" class="form-horizontal style-form" action="{% url "classrooms.ajax.removeFromClass" %}" enctype='multipart/form-data' method="post" autocomplete="off">{% csrf_token %}
-              <input class="userID" type="hidden" name="userID" value="">
-	      <input type="hidden" name="classID" value="{{ currentClass.id }}">
-	      <button type="button" class="btn btn-success rounded" data-dismiss="modal">no</button>
-	      <button type="submit" class="btn btn-danger rounded">remove</button>
-            </form>
-                  
-                  
-        
-      </div>
-    </div>
-  </div>
-</div>
 
 
 
@@ -426,6 +411,32 @@
 		          </div>
 		          <!-- modal -->
 {% endif %}
+
+
+<!---------------- modal ------------------------------------->
+<div id="remove-from-class" class="modal fade" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content rounded">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">{% if classUser.teacher %}Remove this student from this class?{%else%}Drop this class?{%endif%}</h4>
+      </div>
+      <div class="modal-body text-center">
+        
+            <form id="remove-from-class-form" class="form-horizontal style-form" action="{% url "classrooms.ajax.removeFromClass" %}" enctype='multipart/form-data' method="post" autocomplete="off">{% csrf_token %}
+              <input class="userID" type="hidden" name="userID" value="">
+	      <input type="hidden" name="classID" value="{{ currentClass.id }}" required>
+	      <button type="button" class="btn btn-success rounded" data-dismiss="modal">no</button>
+	      <button type="submit" class="btn btn-danger rounded">remove</button>
+            </form>
+                  
+                  
+        
+      </div>
+    </div>
+  </div>
+</div>
+
 
 {% endblock %}  <!-- end of modal block -->
 

@@ -364,6 +364,8 @@ def classes(request, classID=False):
     if classID:
         if Classroom.objects.filter(id=classID):
             currentClass = Classroom.objects.get(id=classID)
+            if not Classroom.objects.filter(classuser=classUser):
+                return redirect('worksheet_project.views.classes')
         else:
             currentClass = False
     else:
@@ -376,6 +378,8 @@ def classes(request, classID=False):
             currentClass = allClasses[0]
     else:
         allClasses = False
+    
+    
     
     if GoogleUserInfo.objects.filter(user=request.user):
         googleUserInfo = GoogleUserInfo.objects.get(user=request.user)
