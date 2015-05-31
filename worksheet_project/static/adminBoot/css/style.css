@@ -2879,6 +2879,13 @@ fieldset[disabled] .btn-schoology.active {
 
 
 
+.worksheet-extras{
+    position: absolute;
+    top: 10px;
+    right:30px;
+    color: #fff;
+    cursor: pointer;
+}
 
 
 

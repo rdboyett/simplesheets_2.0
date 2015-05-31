@@ -48,6 +48,50 @@
                 {% if currentProject.thumb %}
                 <img src="{{ currentProject.thumb }}" alt="e-sheet">
                 {% endif %}
+		<div class="dropdown worksheet-extras">
+			<i class="fa fa-ellipsis-v fa-3x" data-toggle="dropdown" aria-expanded="true"></i>
+			<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+			  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#worksheetFormWorksheetID').val('{{ currentProject.id }}');
+			  $('#worksheetFormWorksheetName').val('{{ currentProject.title|capfirst }}');
+			  $('#worksheetFormNumberOfRetry').val('{{ currentProject.numberOfRetry }}');
+			  $('#renameWorksheet-modal').modal('show');"><i class="fa fa-repeat"></i>&nbsp;&nbsp;rename</a></li>
+			  
+			  
+			  
+			  <li role="presentation"><a role="menuitem" tabindex="-1" href="{% url "worksheet_project.views.assign" currentProject.id %}">
+				<i class="fa fa-thumb-tack"></i>&nbsp;&nbsp;assign/unassign</a>
+			  </li>
+			  
+			  
+			  
+			  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#forceTurnIn-baseForm-WorksheetID').val({{ currentProject.id }});$('#forceTurnIn-baseForm').submit();">
+				<i class="fa fa-inbox"></i>&nbsp;&nbsp;force all to turn-in</a>
+			  </li>
+			  
+			  
+			  
+			  
+			  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#worksheetFormWorksheetID').val('{{ currentProject.id }}');
+			  $('#worksheetFormWorksheetName').val('{{ currentProject.title|capfirst }}');
+			  $('#worksheetFormNumberOfRetry').val('{{ currentProject.numberOfRetry }}');
+			  $('#renameWorksheet-modal').modal('show');"><i class="fa fa-arrows-v"></i>&nbsp;&nbsp;change retries</a></li>
+			  
+			  
+			  <li role="presentation"><a role="menuitem" tabindex="-1" href="{% url "worksheet_project.views.handGrade" currentProject.id %}"><i class="fa fa-check-circle"></i>&nbsp;&nbsp;hand grade</a></li>
+			  
+			  
+			  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#toggle-lock-worksheet-base-form-WorksheetID').val({{ currentProject.id }});
+				$('#toggle-lock-worksheet-base-form').submit();">
+				{% if currentProject.status == "locked" %}
+					<i class="fa fa-unlock"></i>&nbsp;&nbsp;unlock this e-sheet
+				{%else%}
+					<i class="fa fa-lock"></i>&nbsp;&nbsp;lock this e-sheet
+				{%endif%}
+			  </a></li>
+			  
+			</ul>
+		</div>
+	
               </div>
               <div class="profile-01 centered">
                 <p  data-toggle="modal" data-target="#worksheet-settings">{{ currentProject.title|capfirst }}</p>

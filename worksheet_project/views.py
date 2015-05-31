@@ -247,7 +247,32 @@ def handGrade(request, projectID=False, pageNumber=False, classID=False, student
         allClasses = False
     
     
+    
+    if not classID and Classroom.objects.filter(worksheets=newProject):
+        classID = Classroom.objects.filter(worksheets=newProject)[0].id
+    elif not classID and not Classroom.objects.filter(worksheets=newProject):
+        request.session['error'] = 'Sorry, there are no classes assigned this e-sheet.'
+        request.session.set_expiry(300)
+        return redirect('worksheet_project.views.dashboard')
+    
+    if ClassUser.objects.filter(classrooms__id=classID, teacher=False):
+        allStudents = ClassUser.objects.filter(classrooms__id=classID, teacher=False).order_by('user__last_name')
+    else:
+        allStudents = False
+        
+    if Classroom.objects.filter(worksheets=newProject):
+        allProjectClasses = Classroom.objects.filter(worksheets=newProject).order_by('name')
+    else:
+        allProjectClasses = False
+        
     #get student userInfo
+    if not studentID and allStudents:
+        studentID = allStudents[0].id
+    elif not studentID and not allStudents:
+        request.session['error'] = 'Sorry, there are no students assigned this e-sheet.'
+        request.session.set_expiry(300)
+        return redirect('worksheet_project.views.dashboard')
+    
     if ClassUser.objects.filter(id=studentID):
         studentClassUser = ClassUser.objects.get(id=studentID)
         if UserInfo.objects.filter(user=studentClassUser.user):
@@ -255,11 +280,6 @@ def handGrade(request, projectID=False, pageNumber=False, classID=False, student
         else:
             return render_to_response('error_page.html', {'error':"Oops! We can't find that student.",})
     
-    
-    if ClassUser.objects.filter(classrooms__id=classID, teacher=False):
-        allStudents = ClassUser.objects.filter(classrooms__id=classID, teacher=False).order_by('user__last_name')
-    else:
-        allStudents = False
     
     #Load the project, inputs and student's answers
     if newProject:
@@ -290,6 +310,7 @@ def handGrade(request, projectID=False, pageNumber=False, classID=False, student
                 "googleUserInfo":googleUserInfo,
                 "allClasses":allClasses,
                 "allStudents":allStudents,
+                "allProjectClasses":allProjectClasses,
                 "classUser":classUser,
                   'newProject':newProject,
                   'myAnswers':myAnswers,
@@ -581,6 +602,7 @@ def assign(request, projectID=False):
     if projectID:
         if Project.objects.filter(id=projectID):
             currentProject = Project.objects.get(id=projectID)
+            allProjects = False
         else:
             currentProject = False
     else:
@@ -608,6 +630,7 @@ def assign(request, projectID=False):
             "userInfo":userInfo,
             "classUser":classUser,
             "allProjects":allProjects,
+            "currentProject":currentProject,
             "allClasses":allClasses,
             "googleUserInfo":googleUserInfo,
             "assign":True,

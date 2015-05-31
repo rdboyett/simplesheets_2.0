@@ -572,7 +572,10 @@ def changeWorksheetName(request):
     if request.method == 'POST':
         project_id = request.POST["worksheetID"]
         worksheetName = request.POST["worksheet_name"].strip().title()
-        numberOfRetry = int(request.POST["numberOfRetry"].strip())
+        try:
+            numberOfRetry = int(request.POST["numberOfRetry"].strip())
+        except:
+            numberOfRetry = False
         
         
         if UserInfo.objects.filter(user=request.user):
@@ -582,7 +585,9 @@ def changeWorksheetName(request):
                 for testUser in oldProject.userinfo_set.all():
                     if userInfo == testUser:
                         oldProject.title = str(worksheetName)
-                        oldProject.numberOfRetry = numberOfRetry
+                        if numberOfRetry:
+                            oldProject.numberOfRetry = numberOfRetry
+                            
                         oldProject.save()
                             
                             
@@ -875,11 +880,34 @@ def forceGradeWorksheet(request):
             user_id = False
             
         project_id = request.POST["project_id"].strip()
-        class_id = request.POST["class_id"].strip()
+        
+        try:
+            class_id = request.POST["class_id"].strip()
+        except:
+            class_id = False
             
         
+        if not user_id and not class_id:  #then get all students that have this project
+            if ClassUser.objects.filter(user=request.user, teacher=True): #check that this is a teacher that is requesting
+                #Get all the classrooms that have this worksheet
+                if Classroom.objects.filter(worksheets__id=project_id):
+                    allClasses = Classroom.objects.filter(worksheets__id=project_id)
+                    if ClassUser.objects.filter(classrooms=allClasses, teacher=False):
+                        allUsers = [x.user for x in ClassUser.objects.filter(classrooms=allClasses, teacher=False)]
+                        if UserInfo.objects.filter(user__in=allUsers):
+                            allUserInfos = UserInfo.objects.filter(user__in=allUsers)
+                        else:
+                            return HttpResponse(json.dumps({'error':"Sorry, there are no students in this class."}))
+                    else:
+                        return HttpResponse(json.dumps({'error':"Sorry, there are no students in this class."}))
+                    
+                else:
+                    return HttpResponse(json.dumps({'error':"Sorry, this e-sheet is not assigned to any classes."}))
+            else:
+                return HttpResponse(json.dumps({'error':"Sorry, you must be a teacher."}))
+            
         #get all the userInfo's for the class
-        if not user_id and ClassUser.objects.filter(user=request.user, classrooms__id=class_id, teacher=True):  #if class_id then force turn in for whole class
+        elif not user_id and ClassUser.objects.filter(user=request.user, classrooms__id=class_id, teacher=True):  #if class_id then force turn in for whole class
             if ClassUser.objects.filter(classrooms__id=class_id, teacher=False):
                 allUsers = [x.user for x in ClassUser.objects.filter(classrooms__id=class_id, teacher=False)]
                 if UserInfo.objects.filter(user__in=allUsers):
@@ -888,6 +916,7 @@ def forceGradeWorksheet(request):
                     return HttpResponse(json.dumps({'error':"Sorry, there are no students in this class."}))
             else:
                 return HttpResponse(json.dumps({'error':"Sorry, there are no students in this class."}))
+            
         else:
             if ClassUser.objects.filter(user=request.user, classrooms__id=class_id, teacher=True):  #ensure that this is a teacher trying to force turn in.
                 if UserInfo.objects.filter(user__id=user_id):
@@ -901,12 +930,12 @@ def forceGradeWorksheet(request):
             
             
             
+        if Project.objects.filter(id=project_id):
+            project = Project.objects.get(id=project_id)
+        else:
+            return HttpResponse(json.dumps({'error':"We can't find the worksheet."}))
         
         for userInfo in allUserInfos:
-            if Project.objects.filter(id=project_id):
-                project = Project.objects.get(id=project_id)
-            else:
-                return HttpResponse(json.dumps({'error':"We can't find the worksheet."}))
                 
             if MyGrade.objects.filter(userInfo=userInfo, project=project):
                 myGrade = MyGrade.objects.get(userInfo=userInfo, project=project)
@@ -1002,7 +1031,25 @@ def forceGradeWorksheet(request):
                                     bCorrect = True,
                                 )
                                 pointsEarned += float(question.points)
-                                        
+                                
+                            elif question.inputType == 'drawing':
+                                myNewAnswerObject = MyAnswer.objects.create(
+                                    project = project,
+                                    userInfo=userInfo,
+                                    answer = question,
+                                    bCorrect = True,
+                                )
+                                pointsEarned += float(question.points)
+                                
+                            else:
+                                myNewAnswerObject = MyAnswer.objects.create(
+                                    project = project,
+                                    userInfo=userInfo,
+                                    answer = question,
+                                    bCorrect = False,
+                                )
+                                
+                                
                             pointsPossible += float(question.points)
                             
                 else:

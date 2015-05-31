@@ -226,8 +226,56 @@ jQuery.validator.addMethod("complete_url", function(val, elem) {
     
     
     
+    $("#rename-worksheetName-form").ajaxForm({ 
+            success:       function(responseText){
+                console.log(responseText);
+                if (responseText.error) {
+                    alert(responseText.error);
+                }else {
+                    location.reload();
+                }
+            },
+            dataType:  'json',
+            timeout:   4000 
+        });
+    
+    
+    
+    $("#toggle-lock-worksheet-base-form").ajaxForm({ 
+            success:       function(responseText){
+                //console.log(responseText);
+                if (responseText.error) {
+                    alert(responseText.error);
+                }else {
+		    location.reload();
+                }
+            },
+            dataType:  'json',
+            timeout:   4000 
+        });
+    
+    
+    
+    $('#forceTurnIn-baseForm').ajaxForm({ 
+        success:       function(responseText){
+            console.log(responseText);
+            if (responseText.error) {
+                alert(responseText.error);
+            }else {
+		location.reload();
+            }
+        },
+        dataType:  'json',
+        timeout:   4000 
+    });
+    
+    
     
     
     
 
 }();
+
+
+
+

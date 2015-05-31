@@ -206,7 +206,7 @@
     <div class="modal-content rounded">
       <div class="modal-header top-rounded">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h4 class="modal-title">create a class</h4>
+        <h4 class="modal-title">e-sheet settings</h4>
       </div>
       <div class="modal-body centered">
             <form id="create-class-form" class="form-horizontal style-form" action="{% url "classrooms.ajax.createGroup" %}" enctype='multipart/form-data' method="post" autocomplete="off">{% csrf_token %}
@@ -229,6 +229,57 @@
     </div>
   </div>
 </div>
+
+
+
+<!---------------- modal ------------------------------------->
+<div id="renameWorksheet-modal" class="modal fade" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content rounded">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">rename e-sheet</h4>
+      </div>
+      <div class="modal-body text-center">
+        
+            <form id="rename-worksheetName-form" class="form-horizontal style-form" action="{% url "worksheet_creator.page_view_ajax.changeWorksheetName" %}" enctype='multipart/form-data' method="post" autocomplete="off">{% csrf_token %}
+              <div class="form-group">
+                <input id="worksheetFormWorksheetID" type="hidden" name="worksheetID" value="{{ currentProject.id }}">
+		<label class="col-sm-3 control-label">E-sheet Name</label>
+		  <div class="col-sm-9">
+		    <input id="worksheetFormWorksheetName" class="form-control" type="text" name="worksheet_name" minlength="3" maxlength="95" required placeholder="E-sheet Name..." value="{{ currentProject.title|capfirst }}" autofocus>
+		  </div>
+	      </div>
+              <div class="form-group">
+		<label class="col-sm-3 control-label">Number of Attempts per Student</label>
+		  <div class="col-sm-9">
+		    <input id="worksheetFormNumberOfRetry" class="form-control" type="number" name="numberOfRetry" min="1" step="1" pattern="\d+" value="{{ currentProject.numberOfRetry }}" required>
+		  </div>
+	      </div>
+            </form>
+                  
+                  
+        
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default rounded" data-dismiss="modal">close</button>
+        <button type="submit" form="rename-worksheetName-form" class="btn btn-primary rounded">update</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+            <form id="toggle-lock-worksheet-base-form" class="" action="{% url "worksheet_creator.page_view_ajax.toggleLockWorksheet" %}" enctype='multipart/form-data' method="post" autocomplete="off">{% csrf_token %}
+              <div class="">
+                <input id="toggle-lock-worksheet-base-form-WorksheetID" type="hidden" name="worksheetID" value="{{ currentProject.id }}">
+              </div>
+            </form>
+
+		<form id="forceTurnIn-baseForm" action="{% url "worksheet_creator.page_view_ajax.forceGradeWorksheet" %}" enctype='multipart/form-data' method="post" autocomplete="off">{% csrf_token %}
+		  <input id="forceTurnIn-baseForm-WorksheetID" type="hidden" name="project_id" value="{{ worksheet.id }}">
+                </form>
+
 {% else %}
 <!-- *****************    Join a New Class   ******************************************************* -->
 <div id="join-class" class="modal fade" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
@@ -308,6 +359,9 @@
 
 
     <!--common script for all pages-->
+    <script>
+      var forceGradeWorksheetURL = "{% url "worksheet_creator.page_view_ajax.forceGradeWorksheet" %}"
+    </script>
     <script src="{% static "adminBoot/js/common-scripts.js" %}"></script>
     
     

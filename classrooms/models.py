@@ -36,7 +36,7 @@ class Classroom(models.Model):
     code = models.CharField(max_length=10)
     messages = models.ManyToManyField(Message, blank=True, null=True)
     allowJoin = models.BooleanField(default=True)
-    classOwnerID = models.IntegerField()
+    classOwnerID = models.IntegerField() #this is classUser.id
     worksheets = models.ManyToManyField(Project, blank=True, null=True)
     googleClassFolderID = models.CharField(max_length=45, blank=True, null=True)
 

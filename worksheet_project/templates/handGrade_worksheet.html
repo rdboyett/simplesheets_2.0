@@ -55,6 +55,21 @@
 		</ul>
 	    </div>
 	    
+	    <div class="btn-group">
+		<button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+		    Next Class <span class="caret"></span>
+		</button>
+		<ul class="dropdown-menu" role="menu">
+		    {% if allProjectClasses %}
+			{% for currentClass in allProjectClasses %}
+		    <li><a href="{% url "worksheet_project.views.handGrade" newProject.id currentClass.id %}">{{ currentClass.name }}</a></li>
+			{% endfor %}
+		    {% else %}
+		    <li>Sorry, there are no students.</li>
+		    {% endif %}
+		</ul>
+	    </div>
+	    
 	    <button id="zoom-out-btn" class="btn btn-primary" data-toggle="modal" data-target="#changeGrade-modal">Change Grade</button>
 	    <button id="zoom-out-btn" class="btn btn-primary"><span class="fa fa-search-minus"></span></button>
 	    <button id="zoom-in-btn" class="btn btn-primary"><span class="fa fa-search-plus"></button>

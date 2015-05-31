@@ -66,6 +66,46 @@
           <!------------------------------ End of Worksheet Display ------------------------------------->
           {% endfor %}
           
+{% elif currentProject %}
+
+          <!------------------------------ Worksheet Display ------------------------------------->
+          <div class="col-lg-4 col-md-4 col-sm-4 mb">
+            <div class="content-panel pn" data-options='{"worksheet_id":{{ currentProject.id }}}'>
+              <div id="profile-01" class="bg{{ randomNumber|random }}">
+                {% if currentProject.thumb %}
+                <img src="{{ currentProject.thumb }}" alt="e-sheet">
+                {% endif %}
+              </div>
+	      <div class="checkBox text-center">
+		<div style="margin-top: 90px;">
+		  <i class="checkButton fa fa-square-o fa-3x" style="color: #000;width: 100%;"></i>
+		  <span class="" style="color: #000;width: 100%;">assign</span>
+		</div>
+	      </div>
+              <div class="profile-01 centered">
+                <p>{{ currentProject.title|capfirst }}</p>
+              </div>
+              <div class="centered">
+                <a href="{% url "worksheet_project.views.showNextPage" currentProject.id 1 %}"><button type="button" class="col-xs-4 btn btn-default" data-container="body"
+                  data-toggle="popover" data-placement="bottom" data-trigger="hover"
+                  data-content="Edit">
+                  <i class="fa fa-edit fa-2x"></i>
+                </button>
+                <a href="{% url "worksheet_project.views.monitor" currentProject.id %}"><button type="button" class="col-xs-4 btn btn-default" data-container="body"
+                  data-toggle="popover" data-placement="bottom" data-trigger="hover"
+                  data-content="Monitor">
+                  <i class="fa fa-bar-chart-o fa-2x"></i>
+                </button></a>
+                <button type="button" class="col-xs-4 btn btn-default" data-container="body"
+                  data-toggle="popover" data-placement="bottom" data-trigger="hover"
+                  data-content="Delete" onclick="$('#worksheetID-hidden-input').val({{ currentProject.id }});$('#delete-worksheet').modal('show');">
+                  <i class="fa fa-trash-o fa-2x"></i>
+                </button>
+              </div>
+            </div>
+          </div><! --/col-md-4 -->
+          <!------------------------------ End of Worksheet Display ------------------------------------->
+
 {% else %}
   <h5>Sorry, there are no assignments yet.</h5>
 {% endif %}
@@ -167,6 +207,9 @@
   <script>
     var sendAssignmentsURL="{% url "worksheet_creator.ajax.assignWorksheets" %}";
   </script>
+  {% if currentProject %}
+    <script>var currentProject = true; </script>
+  {% endif %}
   <script src="{% static "page_view/js/spin.js" %}"></script>
   <script src="{% static "adminBoot/js/assign.js" %}"></script>
 {% endblock %}

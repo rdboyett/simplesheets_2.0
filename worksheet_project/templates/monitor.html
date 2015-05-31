@@ -19,7 +19,7 @@
           </span>
               <button class="btn btn-default pull-right" id="download-btn" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover"
                   data-content="download grades">
-                <i class="glyphicon glyphicon-download-alt"></i>
+                <i class="fa fa-download"></i>
               </button>
               <form id="uploadGoogleDriveGrades-form" action="{% url "userInfo_profile.views.googleDriveGradeUpload" %}" enctype='multipart/form-data' method="post" autocomplete="off">{% csrf_token %}
                 <input type="hidden" name="projectID" value="{{ currentProject.id }}">

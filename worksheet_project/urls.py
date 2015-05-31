@@ -39,6 +39,8 @@ urlpatterns += patterns('worksheet_project.views',
     (r'^worksheet_display/(?P<projectID>(\d+))/$', 'worksheet_display'),
     (r'^student_display/(?P<classID>(\d+))/(?P<studentID>(\d+))/$', 'student_display'),
     (r'^handGrade/(?P<projectID>(\d+))/(?P<pageNumber>(\d+))/(?P<classID>(\d+))/(?P<studentID>(\d+))/$', 'handGrade'),
+    (r'^handGrade/(?P<projectID>(\d+))/(?P<classID>(\d+))/$', 'handGrade'),
+    (r'^handGrade/(?P<projectID>(\d+))/$', 'handGrade'),
     
 
     (r'^test/$', 'test'),

@@ -25,7 +25,47 @@
               <div id="profile-01" class="bg{{ randomNumber|random }}">
                 {% if worksheet.thumb %}
                 <img src="{{ worksheet.thumb }}" alt="e-sheet">
-                {% endif %}
+		{% endif %}
+		
+		<div class="dropdown worksheet-extras">
+			<i class="fa fa-ellipsis-v fa-3x" data-toggle="dropdown" aria-expanded="true"></i>
+			<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+			  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#worksheetFormWorksheetID').val('{{ worksheet.id }}');
+			  $('#worksheetFormWorksheetName').val('{{ worksheet.title|capfirst }}');
+			  $('#worksheetFormNumberOfRetry').val('{{ worksheet.numberOfRetry }}');
+			  $('#renameWorksheet-modal').modal('show');"><i class="fa fa-repeat"></i>&nbsp;&nbsp;rename</a></li>
+			  
+			  
+			  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#forceTurnIn-baseForm-WorksheetID').val({{ worksheet.id }});$('#forceTurnIn-baseForm').submit();">
+				<i class="fa fa-inbox"></i>&nbsp;&nbsp;force all to turn-in</a>
+			  </li>
+			  
+			  
+			  
+			  
+			  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#worksheetFormWorksheetID').val('{{ worksheet.id }}');
+			  $('#worksheetFormWorksheetName').val('{{ worksheet.title|capfirst }}');
+			  $('#worksheetFormNumberOfRetry').val('{{ worksheet.numberOfRetry }}');
+			  $('#renameWorksheet-modal').modal('show');"><i class="fa fa-arrows-v"></i>&nbsp;&nbsp;change retries</a></li>
+			  
+			  
+			  <li role="presentation"><a role="menuitem" tabindex="-1" href="{% url "worksheet_project.views.handGrade" worksheet.id %}"><i class="fa fa-check-circle"></i>&nbsp;&nbsp;hand grade</a></li>
+			  
+			  
+			  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#toggle-lock-worksheet-base-form-WorksheetID').val({{ worksheet.id }});
+				$('#toggle-lock-worksheet-base-form').submit();">
+				{% if worksheet.status == "locked" %}
+					<i class="fa fa-unlock"></i>&nbsp;&nbsp;unlock this e-sheet
+				{%else%}
+					<i class="fa fa-lock"></i>&nbsp;&nbsp;lock this e-sheet
+				{%endif%}
+			  </a></li>
+			  
+			  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#worksheetID-hidden-input').val({{ worksheet.id }});$('#delete-worksheet').modal('show');"><i class="fa fa-trash"></i>&nbsp;&nbsp;Delete</a></li>
+			</ul>
+		</div>
+	
+		
               </div>
               <div class="profile-01 centered">
                 <a href="{% url "worksheet_project.views.worksheet_display" worksheet.id %}"><p>{{ worksheet.title|capfirst }}</p></a>
@@ -35,17 +75,17 @@
                   data-toggle="popover" data-placement="bottom" data-trigger="hover"
                   data-content="Edit">
                   <i class="fa fa-edit fa-2x"></i>
-                </button>
+                </button></a>
                 <a href="{% url "worksheet_project.views.monitor" worksheet.id %}"><button type="button" class="col-xs-4 btn btn-default" data-container="body"
                   data-toggle="popover" data-placement="bottom" data-trigger="hover"
                   data-content="Monitor">
                   <i class="fa fa-bar-chart-o fa-2x"></i>
                 </button></a>
-                <button type="button" class="col-xs-4 btn btn-default" data-container="body"
+                <a href="{% url "worksheet_project.views.assign" worksheet.id %}"><button type="button" class="col-xs-4 btn btn-default" data-container="body"
                   data-toggle="popover" data-placement="bottom" data-trigger="hover"
-                  data-content="Delete" onclick="$('#worksheetID-hidden-input').val({{ worksheet.id }});$('#delete-worksheet').modal('show');">
-                  <i class="fa fa-trash-o fa-2x"></i>
-                </button>
+                  data-content="Assign/Unassign">
+                  <i class="fa fa-thumb-tack fa-2x"></i>
+                </button></a>
               </div>
             </div>
           </div><! --/col-md-4 -->

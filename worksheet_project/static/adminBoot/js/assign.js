@@ -175,7 +175,13 @@ $.ajaxSetup({
     
     
     
-    
+    if (currentProject) {
+	  $(".content-panel").each(function(){
+	      $(this).toggleClass('active');
+	      $(this).find( ".checkButton" ).toggleClass('fa-check-square-o').toggleClass('fa-square-o');
+	      checkActive();
+	  });
+    }
     
     
     
