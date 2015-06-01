@@ -38,6 +38,12 @@ class FormInput(models.Model):
       ordering = ['questionNumber']
       
 
+
+class SharedWithUser(models.Model):
+  user = models.ForeignKey(User)
+  dateShared = models.DateTimeField(auto_now_add=True, blank=True)
+  dateTouched = models.DateTimeField(auto_now_add=True, blank=True)
+  copyCreated = models.BooleanField(default=False)
   
 
 class Project(models.Model):
@@ -51,14 +57,18 @@ class Project(models.Model):
   status = models.CharField(max_length=10, default="active")
   numberOfRetry = models.IntegerField(default=2)
   ownerID = models.IntegerField(blank=True, null=True)  #this is the django request.user.id
+  modifiedDate = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+  shared = models.BooleanField(default=False)
+  sharedWithUsers = models.ManyToManyField(SharedWithUser, blank=True, null=True)
   
   def __unicode__(self):
         return u'%s %s' % (self.title, self.dateTime)
     
   class Meta:
-      ordering = ['dateTime', 'title']
+      ordering = ['modifiedDate', 'title']
 
 
 
+admin.site.register(Project)
 
 

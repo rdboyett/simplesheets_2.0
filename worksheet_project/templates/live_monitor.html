@@ -113,16 +113,16 @@
                               
                             {% endfor %}
                                   {% if student.user|myGrade:currentProject == 'no grade' %}
-                                    <td class="text-center">
+                                    <td id="{{ student.user.last_name }}{{ student.user.id }}grade" class="text-center">
                                       <i class="fa fa-minus fa-lg"></i>
                                     </td>
                                   {% else %}
                                       {% if student.user|myGrade:currentProject >= 70 %}
-                                        <td class="text-center success">
+                                        <td id="{{ student.user.last_name }}{{ student.user.id }}grade" class="text-center success">
                                           <span>{{ student.user|myGrade:currentProject|floatformat:2 }}%</span>
                                         </td>
                                       {% else %}
-                                        <td class="text-center danger">
+                                        <td id="{{ student.user.last_name }}{{ student.user.id }}grade" class="text-center danger">
                                           <span>{{ student.user|myGrade:currentProject|floatformat:2 }}%</span>
                                         </td>
                                       {% endif %}

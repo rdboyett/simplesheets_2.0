@@ -2,6 +2,8 @@ import os
 ROOT_PATH = os.path.dirname(__file__)
 
 from datetime import date
+
+import datetime
 import json
 import errno
 import zipfile
@@ -585,6 +587,7 @@ def changeWorksheetName(request):
                 for testUser in oldProject.userinfo_set.all():
                     if userInfo == testUser:
                         oldProject.title = str(worksheetName)
+                        oldProject.modifiedDate = datetime.datetime.now()
                         if numberOfRetry:
                             oldProject.numberOfRetry = numberOfRetry
                             
@@ -691,6 +694,10 @@ def submitGradeWorksheet(request):
     if request.method == 'POST':
         userInfo_id = request.POST["userInfo_id"]
         project_id = request.POST["project_id"]
+        try:
+            classID = request.POST["classID"]
+        except:
+            classID = False
         
         
         
@@ -699,6 +706,8 @@ def submitGradeWorksheet(request):
             userInfo = UserInfo.objects.get(id=userInfo_id)
             if Project.objects.filter(id=project_id):
                 project = Project.objects.get(id=project_id)
+                project.modifiedDate = datetime.datetime.now()
+                project.save()
             else:
                 args = {
                         'error':"There is no project with ID: "+str(project_id),
@@ -846,6 +855,13 @@ def submitGradeWorksheet(request):
                 
                 allMyAnswers = MyAnswer.objects.filter(project=project, userInfo=userInfo).order_by('answer__pageNumber','answer__questionNumber')
                 
+                if classID:
+                    if LiveMonitorSession.objects.filter(project=project, classroom__id=classID):
+                        liveSession = LiveMonitorSession.objects.get(project=project, classroom__id=classID)
+                        liveSession.grades.add(myGrade)
+                        liveSession.save()
+                
+                
                 args = {
                     'myGrade':myGrade,
                     'project': project,
@@ -932,6 +948,8 @@ def forceGradeWorksheet(request):
             
         if Project.objects.filter(id=project_id):
             project = Project.objects.get(id=project_id)
+            project.modifiedDate = datetime.datetime.now()
+            project.save()
         else:
             return HttpResponse(json.dumps({'error':"We can't find the worksheet."}))
         
@@ -1462,6 +1480,7 @@ def toggleLockWorksheet(request):
                         else:
                             oldProject.status = 'active'
                             
+                        oldProject.modifiedDate = datetime.datetime.now()
                         oldProject.save()
                             
                             
@@ -1518,6 +1537,19 @@ def liveMonitorAnswers(request):
                         allNewAnswers.append({'id':newId, 'bCorrect':answer.bCorrect})
                 #Now clear all the answers from the liveSession
                 liveSession.answers.clear()
+            
+            if liveSession.grades.all():
+                allGrades = liveSession.grades.all()
+                for grade in allGrades:
+                    if UserInfo.objects.filter(id=grade.userInfo.id):
+                        user = UserInfo.objects.get(id=grade.userInfo.id).user
+                        newId = user.last_name + str(user.id) + 'grade'
+                        #newAnswers = {'id':'last_name-question#', 'bCorrect':'true'}
+                        allNewAnswers.append({'id':newId, 'grade':grade.average})
+                #Now clear all the answers from the liveSession
+                liveSession.grades.clear()
+                
+            if allNewAnswers:
                 return HttpResponse(json.dumps({'answers':allNewAnswers}))
             else:
                 return HttpResponse(json.dumps({'noAnswers':'noAnswers'}))

@@ -47,7 +47,14 @@ $(document).ready(function(){
                         //console.log(data.answers[i].id);
                         //console.log(data.answers[i].bCorrect);
                         if ($("#"+data.answers[i].id).length) {
-                            if (data.answers[i].bCorrect) {
+			    if (data.answers[i].grade) {
+				if (parseFloat(data.answers[i].grade)>69) {
+				    $("#"+data.answers[i].id).removeClass('danger').addClass('success');
+				}else{
+				    $("#"+data.answers[i].id).removeClass('success').addClass('danger');
+				}
+				$("#"+data.answers[i].id).html('<span>'+ data.answers[i].grade.toFixed(2) +'%</span>');
+			    }else if (data.answers[i].bCorrect) {
                                 $("#"+data.answers[i].id).html('<i class="fa fa-check fa-lg text-success"></i>');
                             }else{
                                 $("#"+data.answers[i].id).html('<i class="fa fa-close fa-lg text-danger"></i>');

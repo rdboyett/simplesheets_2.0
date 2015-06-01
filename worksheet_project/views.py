@@ -1,3 +1,5 @@
+import datetime
+
 from django.shortcuts import render_to_response, redirect
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
@@ -61,7 +63,7 @@ def dashboard(request, *args, **kwargs):
         
     
     if userInfo.projects.all():
-        allProjects = userInfo.projects.all().order_by('-id')
+        allProjects = userInfo.projects.all().order_by('status','-modifiedDate', 'title')
     else:
         allProjects = False
     
@@ -120,6 +122,9 @@ def showNextPage(request, projectID=False, pageNumber=False, classID=False):
     
     (newProject, userInfo, bTeacher) = checkIfTeacher(request.user, projectID)
     
+    if newProject:
+        newProject.modifiedDate = datetime.datetime.now()
+        newProject.save()
     
     #Check if it's a new user
     if not request.user.first_name or not request.user.last_name or not userInfo.teacher_student:
@@ -220,6 +225,10 @@ def handGrade(request, projectID=False, pageNumber=False, classID=False, student
     
     (newProject, userInfo, bTeacher) = checkIfTeacher(request.user, projectID)
     
+    
+    if newProject:
+        newProject.modifiedDate = datetime.datetime.now()
+        newProject.save()
     
     if GoogleUserInfo.objects.filter(user=request.user):
         googleUserInfo = GoogleUserInfo.objects.get(user=request.user)
@@ -618,7 +627,7 @@ def assign(request, projectID=False):
     else:
         currentProject = False
         if userInfo.projects.all():
-            allProjects = userInfo.projects.all().order_by('-id')
+            allProjects = userInfo.projects.all().order_by('status','-modifiedDate', 'title')
         else:
             allProjects = False
         

@@ -62,6 +62,7 @@ class LiveMonitorSession(models.Model):
   project = models.ForeignKey(Project)
   classroom = models.ForeignKey(Classroom)
   answers = models.ManyToManyField(MyAnswer, blank=True, null=True)
+  grades = models.ManyToManyField(MyGrade, blank=True, null=True)
 
 
 

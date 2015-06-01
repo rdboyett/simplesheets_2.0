@@ -831,6 +831,7 @@ function showGradeColors() {
 		xhr.ontimeout = function () { location.reload(); }
 		fd.append('userInfo_id', userInfo_id_ajax);
 		fd.append('project_id', project_id_ajax);
+		fd.append('classID', classID_ajax);
 		
 		// Initiate a multipart/form-data upload
 		xhr.setRequestHeader("X-CSRFToken", csrftoken);
