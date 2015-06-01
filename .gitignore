@@ -16,6 +16,9 @@
 *.log
 *.sql
 *.sqlite
+*.sqlite3
+logfile
+logfile.*
  
 # OS generated files #
 ######################
@@ -31,8 +34,11 @@ Thumbs.db
 ######################
 *.pyc
 settings.py
+*/settings.py
 
-# Directories #
+
+# Media Directories #
 ######################
 media/
 secrets/
+migrations/
