@@ -39,6 +39,7 @@ from worksheet_creator.models import Project, BackImage, FormInput
 from classrooms.models import Classroom, ClassUser
 from google_login.models import CredentialsModel
 from worksheet_creator import settings
+from google_drive.views import get_service, rename_google_file
 
 #Test where the settings file is located (in home computer or on the server)
 testPath = ROOT_PATH.split(os.sep)
@@ -593,6 +594,9 @@ def changeWorksheetName(request):
                             
                         oldProject.save()
                             
+                        drive_service = get_service(request.user)
+                        
+                        rename_google_file(drive_service, oldProject.uploadedFileID, oldProject.title)
                             
                         data = {
                             'success': "success",

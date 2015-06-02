@@ -349,6 +349,44 @@ def update_file(service, file_id, file_with_update, new_revision):
     
     
     
+def rename_google_file(service, file_id, new_title):
+  """Update an existing file's metadata and content.
+
+  Args:
+    service: Drive API service instance.
+    file_id: ID of the file to update.
+    new_title: New title for the file.
+    new_description: New description for the file.
+    new_mime_type: New MIME type for the file.
+    file_with_update: Filename of the new content to upload.
+    new_revision: Whether or not to create a new revision for this file.
+  Returns:
+    Updated file metadata if successful, None otherwise.
+  """
+  try:
+    # First retrieve the file from the API.
+    file = service.files().get(fileId=file_id).execute()
+    
+    file['title'] = new_title
+    '''
+    # File's new metadata.
+    file['title'] = new_title
+    file['description'] = new_description
+    file['mimeType'] = new_mime_type
+    '''
+
+
+    # Send the request to the API.
+    updated_file = service.files().update(
+        fileId=file_id,
+        body=file).execute()
+    return updated_file
+  except errors.HttpError, error:
+    print 'An error occurred: %s' % error
+    return None
+    
+    
+    
 def get_service(user):
     storage = Storage(CredentialsModel, 'id', user, 'credential')
     credential = storage.get()
