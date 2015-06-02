@@ -30,7 +30,7 @@
 		{% if classUser.teacher %}
 		<div class="dropdown worksheet-extras">
 			<i class="fa fa-ellipsis-v fa-3x" data-toggle="dropdown" aria-expanded="true"></i>
-			<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+			<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu1">
 			  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#worksheetFormWorksheetID').val('{{ worksheet.id }}');
 			  $('#worksheetFormWorksheetName').val('{{ worksheet.title|capfirst }}');
 			  $('#worksheetFormNumberOfRetry').val('{{ worksheet.numberOfRetry }}');

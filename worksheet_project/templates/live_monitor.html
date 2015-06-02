@@ -87,7 +87,7 @@
                           {% for student in class.students %}
                           <tr class="row">
                             <td class="col-xs-3">
-                              <strong>{{ student.user.last_name }}, {{ student.user.first_name }}</strong>
+                              <a href="{% url "worksheet_project.views.handGrade" currentProject.id 1 class.class.id student.id %}"><strong>{{ student.user.last_name }}, {{ student.user.first_name }}</strong></a>
                             </td>
                             {% for myAnswer in student.user|myAnswers:currentProject %}
                               
