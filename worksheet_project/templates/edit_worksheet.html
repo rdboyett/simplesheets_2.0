@@ -16,7 +16,7 @@
     <section id="wrapper">
 	{% for backImage in newProject.backgroundImages.all %}
 	    {% ifequal backImage.pageNumber pageNumber %}
-	    <img id="backgroundImage" class="large-img-rounded shadow" src="{{ MEDIA_URL }}{{ backImage.imagePath }}"/>
+	    <img id="backgroundImage" class="large-img-rounded shadow" src="{{ MEDIA_URL }}{{ backImage.imagePath }}" style="cursor:crosshair;"/>
 	    {% endifequal %}
 	{% endfor %}
 	

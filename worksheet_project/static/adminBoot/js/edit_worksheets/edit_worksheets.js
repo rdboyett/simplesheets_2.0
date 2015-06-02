@@ -1060,6 +1060,11 @@ function resizeInput(answer_id) {
                 //ias.setSelection(myx1, myy1, myx2, myy2);
                 //ias.setOptions({ show: true });
                 //ias.update();
+		
+	$('#backgroundImage').unbind('click').click(function(){
+		makeImageAreaSelection();
+	}).unbind('click').click(function(){ hideSideBarMenu(); });
+	
 }
 
 
@@ -1092,6 +1097,12 @@ function resizeQuestionElement(selection, input_id) {
     
     //submit percentage changes
     updateInputPosition(input_id, parseFloat(leftPercentage), parseFloat(topPercentage), parseFloat(widthPercentage), parseFloat(heightPercentage));
+    
+    //Then turn back on original selection
+    makeImageAreaSelection();
+    $('#backgroundImage').unbind('click').click(function(){
+		hideSideBarMenu();
+	});
 }
     
 
