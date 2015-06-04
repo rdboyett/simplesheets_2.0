@@ -41,7 +41,8 @@ $('#fileTabs a').click(function (e) {
 	$("#selectBtn").hide();
     });
     
-    $(".googleFileSelect").click(function(){
+    $(document).on('click', '.googleFileSelect', function(){
+	console.log('googleFileSelect clicked');
 	var fileID = $(this).find('.googleFileID').html();
 	$("#googleFileID").val(fileID);
     });
@@ -54,7 +55,7 @@ $('#fileTabs a').click(function (e) {
     });
     
     
-    $(".googleFileSelect").dblclick(function(){
+    $(document).on('dblclick', '.googleFileSelect', function(){
 	var fileID = $(this).find('.googleFileID').html();
 	checkProjectExists(fileID);
     });
