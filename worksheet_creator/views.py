@@ -436,7 +436,11 @@ def createFromPDF(request):
 
 def openGoogleFile(request):
     if request.method == 'GET':
-        idList = json.loads(request.GET["state"])['ids']
+        try:
+            idList = json.loads(request.GET["state"])['ids']
+        except:
+            idList = json.loads(request.GET["state"])['exportIds']
+            
         action = json.loads(request.GET["state"])['action']
         googleUserID = json.loads(request.GET["state"])['userId']
         
