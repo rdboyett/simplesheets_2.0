@@ -1,0 +1,130 @@
+
+    <script type="text/javascript">
+    /*
+      // The API developer key obtained from the Google Developers Console.
+      var developerKey = '{{ developerKey }}';
+
+      // The Client ID obtained from the Google Developers Console.
+      var clientId = '{{ clientId }}';
+
+      // Scope to use to access user's photos.
+      var scope = ['https://www.googleapis.com/auth/drive'];
+
+      var oauthToken;
+      
+      function fileList(result) {
+        console.log('inside fileList');
+        console.log(result);
+      }
+      
+      function retrieveAllFiles(callback) {
+        var retrievePageOfFiles = function(request, result) {
+          request.execute(function(resp) {
+            result = result.concat(resp.items);
+            var nextPageToken = resp.nextPageToken;
+            if (nextPageToken) {
+              request = gapi.client.drive.files.list({
+                'pageToken': nextPageToken
+              });
+              retrievePageOfFiles(request, result);
+            } else {
+              callback(result);
+            }
+          });
+        }
+        var initialRequest = gapi.client.drive.files.list();
+        retrievePageOfFiles(initialRequest, []);
+      }
+      
+
+      // Use the API Loader script to load google.picker and gapi.auth.
+      function onApiLoad() {
+        gapi.load('auth', {'callback': onAuthApiLoad});
+        
+      }
+
+      function onAuthApiLoad() {
+        window.gapi.auth.authorize(
+            {
+              'client_id': clientId,
+              'scope': scope,
+              'immediate': false
+            },
+            handleAuthResult);
+      }
+
+
+      function handleAuthResult(authResult) {
+        if (authResult && !authResult.error) {
+          oauthToken = authResult.access_token;
+          console.log('we got the token');
+          gapi.client.load("drive", "v2").then(retrieveAllFiles(fileList));
+        }
+      }
+    */
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+      var CLIENT_ID = '{{ clientId }}';
+      var developerKey = '{{ developerKey }}';
+      var SCOPES = 'https://www.googleapis.com/auth/drive';
+
+      /**
+       * Called when the client library is loaded.
+       */
+      function onApiLoad() {
+        checkAuth();
+      }
+
+      /**
+       * Check if the current user has authorized the application.
+       */
+      function checkAuth() {
+        gapi.auth.authorize(
+            {'client_id': CLIENT_ID, 'scope': SCOPES, 'immediate': true},
+            handleAuthResult);
+      }
+
+      /**
+       * Called when authorization server replies.
+       *
+       * @param {Object} authResult Authorization result.
+       */
+      function handleAuthResult(authResult) {
+        if (authResult) {
+          // Access token has been successfully retrieved, requests can be sent to the API
+          console.log('got auth');
+          loadClient();
+        } else {
+          // No access token could be retrieved, force the authorization flow.
+          gapi.auth.authorize(
+              {'client_id': CLIENT_ID, 'scope': SCOPES, 'immediate': false},
+              handleAuthResult);
+        }
+      }
+    
+    
+    
+    
+      function loadClient() {
+        gapi.client.setDeveloperKey(developerKey)
+        gapi.client.load('drive', 'v2').then(driveAquired());
+      }
+    
+      function driveAquired(result) {
+        console.log(result);
+        console.log('in drive aquired');
+      }
+    
+    
+    
+    </script>

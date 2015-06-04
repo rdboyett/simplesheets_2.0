@@ -2887,12 +2887,49 @@ fieldset[disabled] .btn-schoology.active {
     cursor: pointer;
 }
 
+.selected{
+    color: #53B2C0 !important;
+}
+
+.outline-fileUpload{
+    width: 100%;
+    border: 1px solid #ccc;
+    padding-top: 50px;
+    padding-bottom: 50px;
+}
 
 
-
-
-
-
-
+.item-holder {
+    cursor: pointer;
+    border:1px solid #ECEAEA;
+    width: 150px;
+    height: 200px;
+    float: left;
+    margin-top:16px;
+    margin-right: 16px;
+    background-color: #FFF;
+    overflow: hidden;
+}
+.thumbHolder {
+    padding: 5px;
+    background-color: #FFF;
+    height: 160px;
+    overflow: hidden;
+}
+.thumbHolder img {
+    width: 90%;
+}
+.fileName {
+    padding: 3px;
+    height: 40px;
+    overflow: hidden;
+    background-color:#FFF;
+    color: #797979;
+}
+.fileName.active {
+    background-color:#4285f4;
+    color: #FFF;
+}
+.item-holder:hover{border-color: #64c3c2;}
 
 

@@ -2,10 +2,13 @@ import os
 import logging
 import httplib2
 from datetime import date
+import datetime
 import base64
+import json
 
 
 from django.shortcuts import render_to_response, redirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.context_processors import csrf
@@ -60,7 +63,18 @@ def google_picker(request):
     else:
         googleUser = False
     
+    today = datetime.date.today()
+    yearAgo = datetime.date(today.year - 1, today.month, today.day)
+    yearAgo = yearAgo.strftime("%Y-%m-%d")+'T12:00:00'
     
+    drive_service = get_service(request.user)
+    
+    pdfFiles = retrieve_all_files(drive_service, "mimeType = 'application/pdf' and lastViewedByMeDate > '"+ yearAgo +"'")
+    
+    
+    docFiles = retrieve_all_files(drive_service, "mimeType = 'application/vnd.google-apps.document' and lastViewedByMeDate > '"+ yearAgo +"'")
+    
+    #return HttpResponse(docFiles);
     
     args = {
               'worksheet':True,
@@ -71,6 +85,8 @@ def google_picker(request):
               "classUser":classUser,
               "create":True,
               "googleUser":googleUser,
+              "docFiles":docFiles,
+              "pdfFiles":pdfFiles,
         }
     args.update(csrf(request))
         
@@ -80,34 +96,6 @@ def google_picker(request):
 
 
 #------------------------------------------------- Misc Functions -----------------------------------------------#
-def retrieve_all_files(service):
-  """Retrieve a list of File resources.
-
-  Args:
-    service: Drive API service instance.
-  Returns:
-    List of File resources.
-  """
-  result = []
-  page_token = None
-  while True:
-    try:
-      param = {}
-      if page_token:
-        param['pageToken'] = page_token
-      files = service.files().list(**param).execute()
-
-      result.extend(files['items'])
-      page_token = files.get('nextPageToken')
-      if not page_token:
-        break
-    except errors.HttpError, error:
-      print 'An error occurred: %s' % error
-      break
-  return result
-
-
-
 
 def driveUpload(user, FILENAME, thumbPath, projectData, googleTitle, parentFolderID):
     storage = Storage(CredentialsModel, 'id', user, 'credential')
@@ -407,25 +395,36 @@ def get_service(user):
     
     
     
-def driveList(request):
-    isItOn()
-    storage = Storage(CredentialsModel, 'id', request.user, 'credential')
-    credential = storage.get()
-    
-    if credential is None or credential.invalid == True:
-        #return HttpResponseRedirect("/login/")
-        return render_to_response('google-login-wait.html', {})
-    
-    else:
-        http = httplib2.Http()
-        http = credential.authorize(http)
-        drive_service = build("drive", "v2", http=http)
-        
-        result = retrieve_all_files(drive_service)
-        
-        return render_to_response('list_files.html', {
-        'userName': request.user.first_name,
-        })
+def retrieve_all_files(service, search):
+  """Retrieve a list of File resources.
+
+  Args:
+    service: Drive API service instance.
+  Returns:
+    List of File resources.
+  """
+  result = []
+  page_token = None
+  while True:
+    try:
+      param = {}
+      param['q'] = search
+      param['maxResults'] = 50
+      param['fields'] = "items(thumbnailLink,owners/displayName,id,iconLink,mimeType,lastViewedByMeDate,fileExtension,title),nextPageToken"
+      if page_token:
+        param['pageToken'] = page_token
+      files = service.files().list(**param).execute()
+
+      result.extend(files['items'])
+      page_token = files.get('nextPageToken')
+      if not page_token:
+        break
+      if param['maxResults']:
+        break
+    except errors.HttpError, error:
+      return error
+      break
+  return result
     
     
     

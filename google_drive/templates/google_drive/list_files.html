@@ -1,12 +1,9 @@
 {% extends "base.html" %}
 {% load staticfiles %}
+{% load googleDrive_tags %}
 
 {% block title %}Select File{% endblock %}
     
-    
-    {% block extraBottomHead %}
-	{% include "includes/googlePicker.html" %}
-    {% endblock %}
     
     
     
@@ -15,11 +12,201 @@
 
     <div class="container theme-showcase" role="main">
       <!-- Main jumbotron for a primary marketing message or call to action -->
-      <div class="jumbotron">
-        <h1>Pick a File!</h1>
-        <p>Convert any pdf{% if googleUser %} or document from your computer or google drive.{%else%} to a worksheet.{%endif%}</p>
-        <p><button id="openPicker" type="button" class="btn btn-primary btn-lg rounded">pick a file &raquo;</button></p>
+      <div class="jumbotron" style="background-color: #FFF;">
+	<div class="text-center mb">
+	  <img src="{% static "adminBoot/img/Google-Drive-icon.png" %}" alt="google drive" width="50px">
+	  <span style="font-size: 14px;color: #000;">&nbsp;&nbsp;Your Google Drive</span>
+	  <h4 class="modal-title" style="color: #000;">Select a File to Convert to an E-Sheet...</h4>
+	</div>
+	
+	<div role="tabpanel">
+
+  <!-- Nav tabs -->
+	  <ul id="fileTabs" class="nav nav-tabs" role="tablist">
+	    <li role="presentation" class="active selectVisible"><a href="#docs" aria-controls="docs" role="tab" data-toggle="tab">
+	      <img src="{% static "adminBoot/img/google_doc_icon.png" %}" alt="google doc">&nbsp;&nbsp;Documents</a>
+	    </li>
+	    <li role="presentation" class="selectVisible"><a href="#pdfs" aria-controls="pdfs" role="tab" data-toggle="tab">
+	      <img src="{% static "adminBoot/img/google_pdf_icon.png" %}" alt="google doc">&nbsp;&nbsp;PDF's</a>
+	    </li>
+	    <li role="presentation" class="uploadVisible"><a href="#upload" aria-controls="upload" role="tab" data-toggle="tab">
+	      <i class="fa fa-upload"></i>&nbsp;&nbsp;Upload</a>
+	    </li>
+	  </ul>
+	
+	
+	  <!-- Tab panes -->
+	  <div class="tab-content">
+	    <div role="tabpanel" class="tab-pane fade in active" id="docs">
+	      
+	      
+	      <!---  Tabs for grid and list display ----------------->
+	      <div class="row">
+		<div class="col-xs-12 mt">
+		  <button class="docListBtn btn btn-default"><i class="fa fa-list"></i></button>
+		  <button class="docGridBtn btn btn-default"><i class="fa fa-th"></i></button>
+		</div>
+	      </div>
+	      
+	      <div id="docListView" class="row" style="display: none;">
+		<div class="col-xs-12">
+		  
+              <table class="table table-striped" data-toggle="table" data-search="true" 
+        data-pagination="true"  data-click-to-select="true" data-select-item-name="radioName"
+	data-sort-name="lastViewed" data-sort-order="desc">
+                <thead>
+                  <tr>
+		    <th data-field="state" data-radio="true"></th>
+                    <th data-field="name" data-sortable="true">Name</th>
+                    <th data-field="owner" data-sortable="true">Owner</th>
+                    <th data-field="lastViewed" data-sortable="true">Last Viewed</th>
+                  </tr>
+                </thead>
+                <tbody>
+		  {% if docFiles %}
+		    {% for file in docFiles %}
+		    <tr class="googleFileSelect">
+		      <td></td>
+		      <td>
+			<img src="{% static "adminBoot/img/google_doc_icon.png" %}" alt="google doc">
+			&nbsp;&nbsp;{{ file.title|title }}
+			<span class="googleFileID hidden">{{file.id}}</span>
+		      </td>
+		      {% for owner in file.owners %}
+			{% if owner.displayName == userInfo.user.get_full_name %}
+		      <td>me</td>
+			{%else%}
+		      <td>{{ owner.displayName }}</td>
+			{%endif%}
+		      {% endfor %}
+		      <td><span class="hidden">{{ file.lastViewedByMeDate }}</span>{{ file.lastViewedByMeDate|googleDate|date }}</td>
+		    </tr>
+		    {% endfor %}
+		  {% endif %}
+                </tbody>
+              </table>
+	      
+		</div>
+	      </div>  <!--------- End of docListView ------------->
+	      
+	      
+	      <div id="docGridView" class="row">
+		<div class="col-xs-12">
+		  
+		  <ul class="list-group">
+		  {% if docFiles %}
+		    {% for file in docFiles %}
+		    <li class="list-item item-holder" data-fileid='{{ file.id }}'>
+		      <div class="thumbHolder">
+			<img src="{{ file.thumbnailLink }}" alt="thumbnail link">
+		      </div>
+		      <div class="fileName text-center" title="{{ file.title|title }}">
+			<img src="{% static "adminBoot/img/google_doc_icon.png" %}" alt="google doc">
+			&nbsp;&nbsp;{{ file.title|title }}</div>
+		    </li>
+		    {% endfor %}
+		  {% endif %}
+		  </ul>
+		</div>
+	      </div>  <!--------- End of docGridView ------------->
+	
+	    </div>
+	    <div role="tabpanel" class="tab-pane fade" id="pdfs">
+	      
+	      <!---  Tabs for grid and list display ----------------->
+	      <div class="row">
+		<div class="col-xs-12 mt">
+		  <button class="docListBtn btn btn-default"><i class="fa fa-list"></i></button>
+		  <button class="docGridBtn btn btn-default"><i class="fa fa-th"></i></button>
+		</div>
+	      </div>
+	      
+	      
+	      <div id="pdfListView" class="row" style="display: none;">
+		<div class="col-xs-12">
+		  
+              <table class="table table-striped" data-toggle="table" data-search="true" 
+        data-pagination="true"  data-click-to-select="true" data-select-item-name="radioName"
+	data-sort-name="lastViewed" data-sort-order="desc">
+                <thead>
+                  <tr>
+		    <th data-field="state" data-radio="true"></th>
+                    <th data-field="name" data-sortable="true">Name</th>
+                    <th data-field="owner" data-sortable="true">Owner</th>
+                    <th data-field="lastViewed" data-sortable="true">Last Viewed</th>
+                  </tr>
+                </thead>
+                <tbody>
+		  {% if pdfFiles %}
+		    {% for file in pdfFiles %}
+		    <tr class="googleFileSelect">
+		      <td></td>
+		      <td>
+			<img src="{% static "adminBoot/img/google_pdf_icon.png" %}" alt="google doc">
+			&nbsp;&nbsp;{{ file.title|title }}
+			<span class="googleFileID hidden">{{file.id}}</span>
+		      </td>
+		      {% for owner in file.owners %}
+			{% if owner.displayName == userInfo.user.get_full_name %}
+		      <td>me</td>
+			{%else%}
+		      <td>{{ owner.displayName }}</td>
+			{%endif%}
+		      {% endfor %}
+		      <td><span class="hidden">{{ file.lastViewedByMeDate }}</span>{{ file.lastViewedByMeDate|googleDate|date }}</td>
+		    </tr>
+		    {% endfor %}
+		  {% endif %}
+                </tbody>
+              </table>
+	      
+		</div>
+	      </div>  <!----- End of pdfListView ----------->
+	
+	      <div id="pdfGridView" class="row">
+		<div class="col-xs-12">
+		  
+		  <ul class="list-group">
+		  {% if pdfFiles %}
+		    {% for file in pdfFiles %}
+		    <li class="list-item item-holder" data-fileid='{{ file.id }}'>
+		      <div class="thumbHolder">
+			<img src="{{ file.thumbnailLink }}" alt="thumbnail link">
+		      </div>
+		      <div class="fileName text-center" title="{{ file.title|title }}">
+			<img src="{% static "adminBoot/img/google_pdf_icon.png" %}" alt="google doc">
+			&nbsp;&nbsp;{{ file.title|title }}</div>
+		    </li>
+		    {% endfor %}
+		  {% endif %}
+		  </ul>
+		</div>
+	      </div>  <!--------- End of pdfGridView ------------->
+	
+	    </div>
+	    <div role="tabpanel" class="tab-pane fade" id="upload">
+	      
+		    <form id="upload-pdf-form" class="" action="{% url "worksheet_creator.views.createFromPDF" %}" enctype='multipart/form-data' method="post" autocomplete="off">{% csrf_token %}
+		      
+		      <div class="outline-fileUpload">
+			<div class="col-xs-12 text-center">
+			  <input id="uploadPDF" class="" type="file" name="uploadFile" checkExtension="true" required>
+			  
+			</div>
+		      </div>
+		    </form>
+	    </div>
+	  </div>
+	
+	</div>
+	
+	  <input type="hidden" id="googleFileID" value="">
+	  
+	<button id="selectBtn" type="submit" form="upload-googleFile-form" class="btn btn-primary rounded mt">select</button>
+	<button id="uploadBtn" style="display: none;" type="submit" form="upload-pdf-form" class="btn btn-primary rounded mt">upload</button>
+	<p style="font-size: 14px;" class="mt">all drive files were viewed within the last year</p>
       </div>
+      
     </div>
 
 <!---------------- modal ------------------------------------->
@@ -69,7 +256,9 @@
     </div>
   </div>
 </div>
--->
+<!---->
+
+{% endif %}
 
 	  <div id="login-page" style="z-index: 10000000;position: fixed;left: 0;right: 0;bottom: 0;top: 0;display: none;">
 	  	<div class="container">
@@ -82,8 +271,6 @@
 		  </div>
 	  	</div>
 	  </div>
-{% endif %}
-
 <div id="shade"></div>
 <div id="wait"></div>
 <div id="wait-spinner"></div>
@@ -99,14 +286,19 @@
 
 
 {% block extraScript %}
+    <script src="{% static "adminBoot/js/bootstrap-table/bootstrap-table.js" %}"></script>
     <script src="{% static "google_drive/js/spin.js" %}"></script>
     <!-- The Google API Loader script. -->
     {% if googleUser %}
+    <script src="{% static "google_drive/js/my-picker.js" %}"></script>
+    <!--
     <script src="{% static "google_drive/js/pick-script.js" %}"></script>
     <script type="text/javascript" src="https://apis.google.com/js/api.js?onload=onApiLoad"></script>
+    -->
     {% else %}
     <script src="{% static "google_drive/js/noGoogle-script.js" %}"></script>
     {% endif %}
+  
 {% endblock %}
 
 
