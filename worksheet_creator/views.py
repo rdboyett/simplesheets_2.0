@@ -506,8 +506,14 @@ def openGoogleFile(request):
               
             except errors.HttpError, error:
                 #return error
-                request.session['error'] = "Sorry, we couldn't get the the worksheet info from your google drive."
-                return redirect("google_login.views.index")
+                
+                #Now assume that the user wants to create a worksheet with this file
+                try:
+                    return redirect("worksheet_creator.views.startCreate", fileId=idList[0])
+                
+                except:
+                    request.session['error'] = "Sorry, we couldn't get the the worksheet info from your google drive."
+                    return redirect("google_login.views.index")
     return HttpResponse(googleUserID)
         
         
