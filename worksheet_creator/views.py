@@ -437,9 +437,9 @@ def createFromPDF(request):
 @login_required
 def openGoogleFile(request):
     if request.method == 'GET':
-        try:
+        if 'ids' in json.loads(request.GET["state"]):
             idList = json.loads(request.GET["state"])['ids']
-        except:
+        else:
             idList = json.loads(request.GET["state"])['exportIds']
             
         action = json.loads(request.GET["state"])['action']
