@@ -434,6 +434,7 @@ def createFromPDF(request):
         
         
 
+@login_required
 def openGoogleFile(request):
     if request.method == 'GET':
         try:
