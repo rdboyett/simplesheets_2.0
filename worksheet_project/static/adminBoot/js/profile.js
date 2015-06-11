@@ -138,6 +138,21 @@ $.validator.addMethod("wordCount",
     
     
     
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 $.validator.addMethod("noWhitespace",
    function(value) {
     var noWhitespaces = /^\w+$/;

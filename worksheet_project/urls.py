@@ -16,6 +16,7 @@ urlpatterns = patterns('',
     url(r'^profile/', include('userInfo_profile.urls')),
     url(r'^drive/', include('google_drive.urls')),
     url(r'^worksheet/', include('worksheet_creator.urls')),
+    url(r'^tour/', include('tourBuilder.urls')),
     
     
     (r'^media/(?P<path>.*)$', 'django.views.static.serve',

@@ -179,8 +179,10 @@ def auth_return(request):
         popup = request.session['popup']
     	if popup:
     	    return render_to_response('google_login/login_return.html', {"user":request.user,})
-	    
-    return redirect("worksheet_project.views.dashboard")
+	else:
+	    return redirect("worksheet_project.views.dashboard")
+    else:
+	return render_to_response('google_login/login_return.html', {"user":request.user,})
 
 
 

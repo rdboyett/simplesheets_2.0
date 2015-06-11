@@ -65,7 +65,7 @@
                     <button type="button" class="btn btn-block btn-primary rounded" data-toggle="modal" data-target="#reset-password">Password</button>
                   </div>
                   <div class="col-xs-6 col-sm-5 col-md-3">
-                    <button type="submit" class="btn btn-block btn-primary rounded">Update</button>
+                    <button id="updateBtn" type="submit" class="btn btn-block btn-primary rounded">Update</button>
                   </div>
                 </div>
               </form>
@@ -140,7 +140,7 @@
               </div>
               <div class="row">
               <div class="col-xs-6 col-xs-offset-3">
-                <button class="btn btn-block btn-social btn-danger rounded {% if googleUserInfo %}disabled{%endif%} google-authorize" type="button" style="height: 50px;">
+                <button id="addGoogleBtn" class="btn btn-block btn-social btn-danger rounded {% if googleUserInfo %}disabled{%endif%} google-authorize" type="button" style="height: 50px;">
                   <i class="fa fa-google-plus fa-2x" style="line-height: 30px;vertical-align: middle;"></i>
                   <span style="line-height: 30px;vertical-align: middle;">&nbsp;&nbsp;Connect with Google</span>
                 </button>
@@ -306,6 +306,8 @@
 {% block extraScript %}
 <script>
 $(document).ready(function(){
+  
+  
   {% if not teacherStudent %}
     $("#teacher-student").modal({
         "backdrop" : "static",
@@ -313,6 +315,7 @@ $(document).ready(function(){
     });
     $("#teacher-student").modal("show");
   {%endif%}
+  
   
   
   $('.google-authorize').click(function(){
@@ -353,6 +356,22 @@ function getCookie(name) {
     }
     return cookieValue;
 }
+
+
+    
+
+var csrftoken = getCookie('csrftoken');
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
     /************************** check username **********************************************************************************/
 	function syncGoogleAccount(oldUserID, newUserID) {
 		console.log('In syncGoogleAccount');
@@ -387,6 +406,75 @@ function getCookie(name) {
 	
 var checkUsernameURI = "{% url 'google_login.views.checkUsername' %}";
 
+
+
+{% if myTour %}
+    //  Go to http://bootstraptour.com/api/ for documentation
+    
+    var tour = new Tour({
+	name: "tour",
+	steps: [
+	  {% if not googleUserInfo %}
+	    {
+	      element: "#addGoogleBtn",
+	      title: "Add Google",
+	      content: "While this app will work without Google Drive, it is really meant to work with your Google Account...",
+	      placement: 'top',
+	    },
+	  {%endif%}
+	    {
+	      element: "#fullName-input",
+	      title: "Your Name",
+	      content: "First, let's check and make sure your name's right...",
+	      placement: 'top',
+	    },
+	    {
+	      element: "#updateBtn",
+	      title: "Update",
+	      content: 'Make sure you "Update" any changes...',
+	      placement: 'top',
+	    },
+	    {
+	      element: "#blinky-class",
+	      title: "Classes",
+	      content: "Now, let's get some class...",
+	      backdropPositioning: 'fixed',
+	    }
+	],
+	container: "body",
+	keyboard: true,
+	storage: false,
+	debug: true,
+	backdrop: true,
+	backdropPadding: 5,
+	onEnd: function (tour) {
+	  $.ajax({
+	    method: "POST",
+	    url: "{% url "tourBuilder.views.countTour" %}",
+	    data: { tourID: {{ myTour.id }} },
+	    dataType: "json",
+	  })
+	    .done(function( responseText ) {
+	      console.log( responseText );
+	    });
+	},
+    });
+    
+    // Initialize the tour
+    tour.init();
+    
+    // Start the tour
+    setTimeout(function(){
+      if (!$("#teacher-student").is(':visible')) {
+	tour.start();
+      }
+    },300)
+    
+    
+    $("#blinky-class").click(function(){
+      tour.end();
+    });
+{% endif %}
 
 </script>
 <script src="{% static "adminBoot/js/profile.js" %}"></script>

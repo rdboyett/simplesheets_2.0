@@ -24,6 +24,7 @@ from google_login.models import CredentialsModel, GoogleUserInfo
 from userInfo_profile.models import UserInfo
 from classrooms.models import ClassUser
 from google_drive import settings
+from tourBuilder.models import MyTour
 
 
 
@@ -38,6 +39,9 @@ def google_picker(request):
     developerKey = settings.DEVELOPER_KEY
     clientId = settings.CLIENT_ID
     
+    
+    if not request.user.first_name or not request.user.last_name or not userInfo.teacher_student:
+        return HttpResponseRedirect("/edit-profile/")
     
     #Get all users Classes
     if ClassUser.objects.filter(user=request.user):
@@ -60,21 +64,35 @@ def google_picker(request):
     
     if GoogleUserInfo.objects.filter(user=request.user):
         googleUser = GoogleUserInfo.objects.get(user=request.user)
+        today = datetime.date.today()
+        yearAgo = datetime.date(today.year - 1, today.month, today.day)
+        yearAgo = yearAgo.strftime("%Y-%m-%d")+'T12:00:00'
+        
+        drive_service = get_service(request.user)
+        
+        pdfFiles = retrieve_all_files(drive_service, "mimeType = 'application/pdf' and lastViewedByMeDate > '"+ yearAgo +"'")
+        
+        
+        docFiles = retrieve_all_files(drive_service, "mimeType = 'application/vnd.google-apps.document' and lastViewedByMeDate > '"+ yearAgo +"'")
+        
     else:
         googleUser = False
+        docFiles = False
+        pdfFiles = False
+        
+        
     
-    today = datetime.date.today()
-    yearAgo = datetime.date(today.year - 1, today.month, today.day)
-    yearAgo = yearAgo.strftime("%Y-%m-%d")+'T12:00:00'
-    
-    drive_service = get_service(request.user)
-    
-    pdfFiles = retrieve_all_files(drive_service, "mimeType = 'application/pdf' and lastViewedByMeDate > '"+ yearAgo +"'")
-    
-    
-    docFiles = retrieve_all_files(drive_service, "mimeType = 'application/vnd.google-apps.document' and lastViewedByMeDate > '"+ yearAgo +"'")
-    
-    #return HttpResponse(docFiles);
+    if MyTour.objects.filter(name='pic_file', user=request.user):
+        myTour = MyTour.objects.get(name='pic_file', user=request.user)
+        if myTour.nTimesRan >= myTour.nManditoryRuns:
+            myTour = False
+    else:
+        myTour = MyTour.objects.create(
+            user = request.user,
+            name = 'pic_file',
+            nManditoryRuns = 1,
+            nTimesRan = 0,
+        )
     
     args = {
               'worksheet':True,
@@ -87,6 +105,8 @@ def google_picker(request):
               "googleUser":googleUser,
               "docFiles":docFiles,
               "pdfFiles":pdfFiles,
+              "myTour":myTour,
+              "tourReset":'pic_file',
         }
     args.update(csrf(request))
         

@@ -341,19 +341,26 @@
 			    {% if input.inputType == 'textarea' %}
 				$('#input{{ input.id }}').val('{{ myAnswer.myAnswer }}');
 				{% if myAnswer.bCorrect %}
-				$("#input{{ input.id }}").data('bCorrect','correct').addClass('correctOutline');
+				    {% if myGrade %}$("#input{{ input.id }}").data('bCorrect','correct').addClass('correctOutline');{%endif%}
 				{% elif myAnswer.partialCredit > 0 %}
-				$("#input{{ input.id }}").data('bCorrect','correct').addClass('correctOutline');
-				$("#textareaOverlay{{ input.id }}").html("Partial Credit: {{ myAnswer.partialCredit|floatformat:2 }} pts.").fadeIn(600);
+				    {% if myGrade %}
+					$("#input{{ input.id }}").data('bCorrect','correct').addClass('correctOutline');
+					$("#textareaOverlay{{ input.id }}").html("Partial Credit: {{ myAnswer.partialCredit|floatformat:2 }} pts.").fadeIn(600);
+				    {%endif%}
 				{% else %}
-				$("#input{{ input.id }}").addClass('incorrectOutline');
+				    {% if myGrade %}$("#input{{ input.id }}").addClass('incorrectOutline');{%endif%}
 				{% endif %}
 				
 					
 			    {% elif myAnswer.bCorrect %}
-			    $("#input{{ input.id }}").data('bCorrect','correct').addClass('correctOutline');
+				    $("#input{{ input.id }}").data('bCorrect','correct');
+				{% if myGrade %}
+				    $("#input{{ input.id }}").addClass('correctOutline');
+				{% endif %}
 			    {% else %}
-			    $("#input{{ input.id }}").addClass('incorrectOutline');
+				{% if myGrade %}
+				    $("#input{{ input.id }}").addClass('incorrectOutline');
+				{% endif %}
 			    {% endif %}
 			{% if input.inputType == 'work' %}
 			    {% if myAnswer.workImagePath %}
@@ -365,30 +372,48 @@
 			    
 			{% elif input.inputType == 'drawing' %}
 			    {% if myAnswer.workImagePath %}
-			    $('#drawinginput{{ input.id }} img').attr('src', '{{ MEDIA_URL }}{{ myAnswer.workImagePath }}')
+				$('#drawinginput{{ input.id }} img').attr('src', '{{ MEDIA_URL }}{{ myAnswer.workImagePath }}')
 			    {% endif %}
 			    {% if myAnswer.bCorrect %}
-			    $("#drawinginput{{ input.id }}").data('bCorrect','correct').addClass('correctOutline');
+				    $("#drawinginput{{ input.id }}").data('bCorrect','correct');
+				{% if myGrade %}
+				    $("#drawinginput{{ input.id }}").addClass('correctOutline');
+				{% endif %}
 			    {% else %}
-			    $("#drawinginput{{ input.id }}").addClass('incorrectOutline');
+				{% if myGrade %}
+				    $("#drawinginput{{ input.id }}").addClass('incorrectOutline');
+				{% endif %}
 			    {% endif %}
 			    
 			{% elif input.inputType == 'checkbox' %}
 			    $('#input{{ input.id }}').prop("checked", {% if myAnswer.myAnswer == "true" %}{{ myAnswer.myAnswer }}{%else%}false{%endif%});
 			    {% if myAnswer.bCorrect %}
-			    $("#input{{ input.id }}").data('bCorrect','correct').addClass('correctOutline');
+				    $("#input{{ input.id }}").data('bCorrect','correct');
+				{% if myGrade %}
+				    $("#input{{ input.id }}").addClass('correctOutline');
+				{% endif %}
 			    {% else %}
-			    $("#input{{ input.id }}").addClass('incorrectOutline');
+				{% if myGrade %}
+				    $("#input{{ input.id }}").addClass('incorrectOutline');
+				{% endif %}
 			    {% endif %}
 				    
 			{% elif input.inputType == 'textarea' %}
 			    $('#input{{ input.id }}').val('{{ myAnswer.myAnswer }}');
 			    {% if myAnswer.bCorrect %}
-			    $("#input{{ input.id }}").data('bCorrect','correct').addClass('correctOutline');
+				$("#input{{ input.id }}").data('bCorrect','correct');
+				{% if myGrade %}
+				    $("#input{{ input.id }}").addClass('correctOutline');
+				{% endif %}
 			    {% elif myAnswer.partialCredit %}
-			    $("#input{{ input.id }}").data('bCorrect','correct').addClass('correctOutline');
+				$("#input{{ input.id }}").data('bCorrect','correct');
+				{% if myGrade %}
+				    $("#input{{ input.id }}").addClass('correctOutline');
+				{% endif %}
 			    {% else %}
-			    $("#input{{ input.id }}").addClass('incorrectOutline');
+				{% if myGrade %}
+				    $("#input{{ input.id }}").addClass('incorrectOutline');
+				{% endif %}
 			    {% endif %}
 			    
 			{% else %}

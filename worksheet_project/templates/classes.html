@@ -455,5 +455,62 @@
 	
       });
     </script>
-    {% endif %}
+  {% endif %}
+  
+  {% if classUser.teacher and not students and currentClass and currentClass.worksheets.all%}
+    <script>
+$(document).ready(function(){
+	//  Go to http://bootstraptour.com/api/ for documentation
+	
+	var tour = new Tour({
+	    name: "tour",
+	    steps: [
+		{
+		  element: "#class-code .modal-content",
+		  title: "No Students",
+		  content: 'Looks like you need to give this code to your students for them to join the class...',
+                  template: '<div class="popover" role="tooltip">'+
+			    '<div class="arrow"></div>'+
+			    '<h3 class="popover-title primary"></h3>'+
+				    '<div class="row">'+
+					'<div class="col-xs-10 col-xs-offset-1">'+
+					    '<div class="text-center">'+
+						"<h4 class='popover-content'></h4>"+
+						'</div>'+
+					'</div'+
+                                            '</div>'+
+                            '<div class="popover-navigation">'+
+                              '<button class="btn btn-sm btn-danger" data-role="end" style="margin-left:5px;">Got It!</button>'+
+                            '</div>'+
+			  '</div>',
+		  placement: 'bottom',
+		  backdropPositioning: 'fixed',
+		  position: 'fixed',
+		},
+	    ],
+	    container: "body",
+	    keyboard: true,
+	    storage: false,
+	    debug: true,
+	    backdrop: true,
+	    backdropPadding: 5,
+	    onStart: function(tour) {
+		$(window).scrollTop(0);
+	    },
+	});
+	
+	// Initialize the tour
+	tour.init();
+	
+	// Start the tour
+	//tour.start();
+        $('#class-code').modal('show');
+	$('#class-code').on('shown.bs.modal', function () {
+	    tour.start();
+	});
+	
+	
+});
+    </script>
+  {% endif %}
 {% endblock %}

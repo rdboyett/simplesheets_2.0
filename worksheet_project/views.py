@@ -12,6 +12,7 @@ from userInfo_profile.models import UserInfo, MyAnswer, MyGrade, LiveMonitorSess
 from worksheet_creator.models import Project, FormInput, BackImage
 from classrooms.models import ClassUser, Classroom, HashTag, Message
 from google_login.models import GoogleUserInfo
+from tourBuilder.models import MyTour
 
 
 #this is commited again
@@ -183,7 +184,19 @@ def showNextPage(request, projectID=False, pageNumber=False, classID=False):
         else:
             myGrade = False
         
-        
+        tourName = 'edit_worksheet'
+        if MyTour.objects.filter(name=tourName, user=request.user):
+            myTour = MyTour.objects.get(name=tourName, user=request.user)
+            if myTour.nTimesRan >= myTour.nManditoryRuns:
+                myTour = False
+        else:
+            myTour = MyTour.objects.create(
+                user = request.user,
+                name = tourName,
+                nManditoryRuns = 1,
+                nTimesRan = 0,
+            )
+            
         args = {
                 "worksheet":True,
                   'user':request.user,
@@ -200,6 +213,8 @@ def showNextPage(request, projectID=False, pageNumber=False, classID=False):
                 'formInputs':formInputs,
                 'bTeacher':bTeacher,
                 'classID':classID,
+                'myTour':myTour,
+                'resetTour':tourName,
             }
         args.update(csrf(request))
     
@@ -316,6 +331,20 @@ def handGrade(request, projectID=False, pageNumber=False, classID=False, student
             myGrade = False
         
         
+        tourName = 'handGrade'
+        if MyTour.objects.filter(name=tourName, user=request.user):
+            myTour = MyTour.objects.get(name=tourName, user=request.user)
+            if myTour.nTimesRan >= myTour.nManditoryRuns:
+                myTour = False
+        else:
+            myTour = MyTour.objects.create(
+                user = request.user,
+                name = tourName,
+                nManditoryRuns = 1,
+                nTimesRan = 0,
+            )
+            
+        
         args = {
                 "worksheet":True,
                   'user':request.user,
@@ -336,6 +365,8 @@ def handGrade(request, projectID=False, pageNumber=False, classID=False, student
                   'formInputs':formInputs,
                   'bTeacher':bTeacher,
                   'classID':classID,
+                  'myTour':myTour,
+                  'resetTour':tourName,
             }
         args.update(csrf(request))
     
@@ -355,6 +386,10 @@ def classes(request, classID=False):
         userInfo = UserInfo.objects.get(user=request.user)
     else:
         userInfo = False
+    
+    #Check if it's a new user
+    if not request.user.first_name or not request.user.last_name or not userInfo.teacher_student:
+        return HttpResponseRedirect("/edit-profile/")
     
     #Get all users Classes
     if ClassUser.objects.filter(user=request.user):
@@ -576,15 +611,28 @@ def profile(request):
         allClasses = False
     
     
+    if MyTour.objects.filter(name='profile', user=request.user):
+        myTour = MyTour.objects.get(name='profile', user=request.user)
+        if myTour.nTimesRan >= myTour.nManditoryRuns:
+            myTour = False
+    else:
+        myTour = MyTour.objects.create(
+            user = request.user,
+            name = 'profile',
+            nManditoryRuns = 1,
+            nTimesRan = 0,
+        )
         
     
     args = {
             "profile":True,
+            "user":request.user,
             "userInfo":userInfo,
             "googleUserInfo":googleUserInfo,
             "teacherStudent":teacherStudent,
             "classUser":classUser,
             "allClasses":allClasses,
+            "myTour":myTour,
         }
     args.update(csrf(request))
         

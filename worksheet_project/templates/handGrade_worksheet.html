@@ -558,4 +558,124 @@
     <script src="{% static "adminBoot/js/edit_worksheets/handGrade_worksheet.js" %}"></script>
     
     
+  
+{% if myTour %}
+  <script>
+$(document).ready(function(){
+    // using jQuery
+    function getCookie(name) {
+	var cookieValue = null;
+	if (document.cookie && document.cookie != '') {
+	    var cookies = document.cookie.split(';');
+	    for (var i = 0; i < cookies.length; i++) {
+		var cookie = jQuery.trim(cookies[i]);
+		// Does this cookie string begin with the name we want?
+		if (cookie.substring(0, name.length + 1) == (name + '=')) {
+		    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+		    break;
+		}
+	    }
+	}
+	return cookieValue;
+    }
+    
+    var csrftoken = getCookie('csrftoken');
+    function csrfSafeMethod(method) {
+	// these HTTP methods do not require CSRF protection
+	return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+    $.ajaxSetup({
+	beforeSend: function(xhr, settings) {
+	    if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+		xhr.setRequestHeader("X-CSRFToken", csrftoken);
+	    }
+	}
+    });
+    
+	//  Go to http://bootstraptour.com/api/ for documentation
+	
+	var tour = new Tour({
+	    name: "tour",
+	    steps: [
+		{
+		  element: "#changeGrade-modal .modal-body",
+		  title: "Hand Grade",
+		  content: 'You can correct students answers yourself or even give extra credit...',
+		  placement: 'right',
+		  backdropPositioning: 'fixed',
+		  position: 'fixed',
+		},
+		{
+		  element: "#changeGrade-modal .modal-footer",
+		  title: "Close or Apply",
+		  content: 'Click <span class="text-danger">CLOSE</span> to take a look at the student eSheet or "Apply" to reset their grade...',
+		  template: '<div class="popover" role="tooltip">'+
+			    '<div class="arrow"></div>'+
+			    '<h3 class="popover-title primary"></h3>'+
+				    '<div class="row">'+
+					'<div class="col-xs-10 col-xs-offset-1">'+
+					    '<div class="text-center">'+
+						"<h4 class='popover-content'></h4>"+
+						'</div>'+
+					'</div'+
+				    '</div>'+
+			    '<div class="popover-navigation">'+
+			      '<div class="btn-group">'+
+				'<button class="btn btn-sm btn-primary" data-role="prev"><i class="fa fa-angle-double-left"></i> Prev</button>'+
+			      '</div>'+
+			    '</div>'+
+			  '</div>',
+		  placement: 'right',
+		  backdropPositioning: 'fixed',
+		  onHide: function(){$(window).scrollTop(0);},
+		  onShow: function(tour) {
+			$('#changeGrade-modal').unbind('hidden.bs.modal').on('hidden.bs.modal', function () {
+			    tour.next();
+			})
+		  },
+		},
+		{
+		  element: "#backgroundImage",
+		  title: "Hand Grade",
+		  content: 'Any changes you make will show up on the student eSheet...',
+		  placement: 'top',
+		  backdropPositioning: 'fixed',
+		},
+	    ],
+	    container: "body",
+	    keyboard: true,
+	    storage: false,
+	    debug: true,
+	    backdrop: true,
+	    backdropPadding: 5,
+	    onStart: function(tour) {
+		$(window).scrollTop(0);
+	    },
+	    onEnd: function (tour) {
+	      $.ajax({
+		method: "POST",
+		url: "{% url "tourBuilder.views.countTour" %}",
+		data: { tourID: {{ myTour.id }} },
+		dataType: "json",
+	      })
+		.done(function( responseText ) {
+		  console.log( responseText );
+		});
+	    },
+	});
+	
+	// Initialize the tour
+	tour.init();
+	
+	// Start the tour
+	//tour.start();
+	$('#changeGrade-modal').on('shown.bs.modal', function () {
+	    tour.start();
+	});
+	
+	
+});
+  </script>
+{% endif %}
+
 {% endblock %}

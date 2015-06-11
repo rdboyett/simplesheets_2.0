@@ -14,22 +14,34 @@
       <!-- Main jumbotron for a primary marketing message or call to action -->
       <div class="jumbotron" style="background-color: #FFF;">
 	<div class="text-center mb">
+	  {% if googleUser %}
 	  <img src="{% static "adminBoot/img/Google-Drive-icon.png" %}" alt="google drive" width="50px">
 	  <span style="font-size: 14px;color: #000;">&nbsp;&nbsp;Your Google Drive</span>
+	  {% else %}
+	    <div class="row">
+	    <div class="col-sm-4 col-sm-offset-4">
+                <a href="{% url "worksheet_project.views.profile" %}"><button id="addGoogleBtn" class="btn btn-block btn-social btn-danger rounded google-authorize" type="button" style="height: 50px;">
+                  <i class="fa fa-google-plus fa-2x" style="line-height: 30px;vertical-align: middle;"></i>
+                  <span style="line-height: 30px;vertical-align: middle;">&nbsp;&nbsp;Connect with Google</span>
+                </button></a>
+	    </div></div>
+	  {% endif %}
 	  <h4 class="modal-title" style="color: #000;">Select a File to Convert to an E-Sheet...</h4>
 	</div>
 	
-	<div role="tabpanel">
+	<div id="tabPanel" role="tabpanel">
 
   <!-- Nav tabs -->
 	  <ul id="fileTabs" class="nav nav-tabs" role="tablist">
+	    {% if googleUser %}
 	    <li role="presentation" class="active selectVisible"><a href="#docs" aria-controls="docs" role="tab" data-toggle="tab">
 	      <img src="{% static "adminBoot/img/google_doc_icon.png" %}" alt="google doc">&nbsp;&nbsp;Documents</a>
 	    </li>
 	    <li role="presentation" class="selectVisible"><a href="#pdfs" aria-controls="pdfs" role="tab" data-toggle="tab">
 	      <img src="{% static "adminBoot/img/google_pdf_icon.png" %}" alt="google doc">&nbsp;&nbsp;PDF's</a>
 	    </li>
-	    <li role="presentation" class="uploadVisible"><a href="#upload" aria-controls="upload" role="tab" data-toggle="tab">
+	    {% endif %}
+	    <li role="presentation" class="uploadVisible{% if not googleUser %} active{% endif %}"><a href="#upload" aria-controls="upload" role="tab" data-toggle="tab">
 	      <i class="fa fa-upload"></i>&nbsp;&nbsp;Upload</a>
 	    </li>
 	  </ul>
@@ -37,13 +49,14 @@
 	
 	  <!-- Tab panes -->
 	  <div class="tab-content">
+	    {% if googleUser %}
 	    <div role="tabpanel" class="tab-pane fade in active" id="docs">
 	      
 	      
 	      <!---  Tabs for grid and list display ----------------->
 	      <div class="row">
 		<div class="col-xs-12 mt">
-		  <button class="docListBtn btn btn-default"><i class="fa fa-list"></i></button>
+		  <button id="docListBtn" class="docListBtn btn btn-default"><i class="fa fa-list"></i></button>
 		  <button class="docGridBtn btn btn-default"><i class="fa fa-th"></i></button>
 		</div>
 	      </div>
@@ -184,7 +197,8 @@
 	      </div>  <!--------- End of pdfGridView ------------->
 	
 	    </div>
-	    <div role="tabpanel" class="tab-pane fade" id="upload">
+	    {% endif %}
+	    <div role="tabpanel" class="tab-pane fade{% if not googleUser %} in active{% endif %}" id="upload">
 	      
 		    <form id="upload-pdf-form" class="" action="{% url "worksheet_creator.views.createFromPDF" %}" enctype='multipart/form-data' method="post" autocomplete="off">{% csrf_token %}
 		      
@@ -202,8 +216,8 @@
 	
 	  <input type="hidden" id="googleFileID" value="">
 	  
-	<button id="selectBtn" type="submit" form="upload-googleFile-form" class="btn btn-primary rounded mt">select</button>
-	<button id="uploadBtn" style="display: none;" type="submit" form="upload-pdf-form" class="btn btn-primary rounded mt">upload</button>
+	<button id="selectBtn" {% if not googleUser %}style="display: none;"{% endif %} type="submit" form="upload-googleFile-form" class="btn btn-primary rounded mt">select</button>
+	<button id="uploadBtn" {% if googleUser %}style="display: none;"{% endif %} type="submit" form="upload-pdf-form" class="btn btn-primary rounded mt">upload</button>
 	<p style="font-size: 14px;" class="mt">all drive files were viewed within the last year</p>
       </div>
       
@@ -285,6 +299,45 @@
 
 
 
+
+
+{% block modal %}
+  
+{% if googleUser and myTour %}
+<!---------------- modal ------------------------------------->
+<div id="tour-intro-modal" class="modal fade" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content rounded">
+      <div class="modal-header top-rounded">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">Welcome</h4>
+      </div>
+      <div class="modal-body">
+	<div class="row">
+	  <div class="text-center">
+	    <img class="" src="{% static "adminBoot/img/Google-Drive-icon.png" %}" alt="google drive" width="200px">
+	    <h1>Duck Soup Works with Your Google Drive</h1>
+	  </div>
+	</div>
+	
+      </div>
+      <div class="modal-footer bottom-rounded">
+        <button type="button" class="btn btn-danger rounded" data-dismiss="modal">Next</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!---->
+
+{% endif %}
+{% endblock %}
+
+
+
+
+
+
+
 {% block extraScript %}
     <script src="{% static "adminBoot/js/bootstrap-table/bootstrap-table.js" %}"></script>
     <script src="{% static "google_drive/js/spin.js" %}"></script>
@@ -296,8 +349,133 @@
     <script type="text/javascript" src="https://apis.google.com/js/api.js?onload=onApiLoad"></script>
     -->
     {% else %}
-    <script src="{% static "google_drive/js/noGoogle-script.js" %}"></script>
+    <script src="{% static "google_drive/js/my-picker.js" %}"></script>
+     <!--<script src="{% static "google_drive/js/noGoogle-script.js" %}"></script>-->
     {% endif %}
+  
+  
+{% if myTour %}
+  <script>
+$(document).ready(function(){
+    // using jQuery
+    function getCookie(name) {
+	var cookieValue = null;
+	if (document.cookie && document.cookie != '') {
+	    var cookies = document.cookie.split(';');
+	    for (var i = 0; i < cookies.length; i++) {
+		var cookie = jQuery.trim(cookies[i]);
+		// Does this cookie string begin with the name we want?
+		if (cookie.substring(0, name.length + 1) == (name + '=')) {
+		    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+		    break;
+		}
+	    }
+	}
+	return cookieValue;
+    }
+    
+    var csrftoken = getCookie('csrftoken');
+    function csrfSafeMethod(method) {
+	// these HTTP methods do not require CSRF protection
+	return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+    $.ajaxSetup({
+	beforeSend: function(xhr, settings) {
+	    if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+		xhr.setRequestHeader("X-CSRFToken", csrftoken);
+	    }
+	}
+    });
+    
+	//  Go to http://bootstraptour.com/api/ for documentation
+	
+	var tour = new Tour({
+	    name: "tour",
+	    steps: [
+	      {% if not googleUser %}
+		{
+		  element: "#addGoogleBtn",
+		  title: "Add Google",
+		  content: "While this app will work without Google Drive, it is really meant to work with your Google Account...",
+		  placement: 'bottom',
+		},
+	      {%endif%}
+		{
+		  {% if googleUser %}
+		  element: "#fileTabs",
+		  {% else %}
+		  element: "#tabPanel",
+		  {% endif %}
+		  title: "File Type",
+		  {% if googleUser %}
+		  content: "Choose any document or pdf from your google drive or pdf from your computer...",
+		  {% else %}
+		  content: "Choose any pdf from your computer...",
+		  {% endif %}
+		  placement: 'top',
+		},
+		
+		  {% if googleUser %}
+		{
+		  element: "#docGridView",
+		  title: "Grid View",
+		  content: 'You can use grid view to find your file...',
+		  placement: 'top',
+		},
+		{
+		  element: "#docListBtn",
+		  title: "List View",
+		  content: "Or switch to list view...",
+		  backdrop: false,
+		  onShow: function(tour){
+		    $("#docListBtn").click();
+		  }
+		},
+		{
+		  element: "#docListView .search",
+		  title: "Search",
+		  content: "You could always search for a file...",
+		  placement: 'top',
+		},
+		  {% endif %}
+	    ],
+	    container: "body",
+	    keyboard: true,
+	    storage: false,
+	    debug: true,
+	    backdrop: true,
+	    backdropPadding: 5,
+	    onEnd: function (tour) {
+	      $.ajax({
+		method: "POST",
+		url: "{% url "tourBuilder.views.countTour" %}",
+		data: { tourID: {{ myTour.id }} },
+		dataType: "json",
+	      })
+		.done(function( responseText ) {
+		  console.log( responseText );
+		});
+	    },
+	});
+	
+	// Initialize the tour
+	tour.init();
+	
+	// Start the tour
+	//tour.start();
+	{% if googleUser%}
+	$("#tour-intro-modal").modal('show');
+	$('#tour-intro-modal').on('hidden.bs.modal', function () {
+	    tour.start();
+	})
+	{% else %}
+	tour.start();
+	{% endif %}
+	
+});
+  </script>
+{% endif %}
+  
   
 {% endblock %}
 

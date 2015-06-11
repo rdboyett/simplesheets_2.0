@@ -2738,11 +2738,9 @@ border-radius: 20px;
 }
 
 .question-sidebar-btn {
-    margin: 17px 20px 0 0;
+    margin: 15px 20px 0 0;
     cursor: pointer;
-    opacity: 0.6;
 }
-.question-sidebar-btn:hover {opacity: 1;}
 
 
 @media (min-width: 768px) {
@@ -2931,5 +2929,59 @@ fieldset[disabled] .btn-schoology.active {
     color: #FFF;
 }
 .item-holder:hover{border-color: #64c3c2;}
+
+
+.shade-outer{
+    background-color: #000;
+    filter: alpha(opacity=50);
+    opacity: 0.5;
+    position: fixed;
+    overflow: hidden;
+    z-index: 10000;
+    display: block;
+}
+.shade-outer.left{
+    left: 0;
+    top: 0;
+    bottom: 0;
+}
+.shade-outer.top{top: 0;}
+.shade-outer.right{
+    top: 0;
+    bottom: 0;
+    right: 0;
+}
+.shade-outer.bottom{bottom: 0;}
+
+
+
+
+.imgareaselect-outer{
+    background-color: #000;
+  filter: alpha(opacity=50);
+  opacity: 0.8;
+}
+
+.popover-title.primary{
+    background-color: #68dff0;
+    color: #FFF;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

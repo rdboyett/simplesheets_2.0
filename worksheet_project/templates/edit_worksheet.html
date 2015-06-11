@@ -9,7 +9,7 @@
 
 {% block body %}
 	<a href="{% url "worksheet_project.views.worksheet_display" newProject.id %}" class="btn btn-primary">settings</a>
-	<button id="addQuestion-btn" class="btn btn-primary">add a question</button>
+	<button id="addQuestion-btn" class="btn btn-danger">add answer block</button>
 	<button id="zoom-out-btn" class="btn btn-primary"><span class="fa fa-search-minus"></span></button>
 	<button id="zoom-in-btn" class="btn btn-primary"><span class="fa fa-search-plus"></button>
 <section id="wrapper-holder">
@@ -157,6 +157,131 @@
 {% endblock %}
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% block modal %}
+{% if myTour %}
+<!---------------- modal ------------------------------------->
+<div id="tour-intro-modal" class="modal fade" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content rounded">
+      <div class="modal-header top-rounded">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+        <h1 class="modal-title">Creating Your First eSheet</h1>
+      </div>
+      <div class="modal-body">
+	<div class="row">
+	  <div class="text-center">
+	    
+	    
+	    
+	    
+	    
+<div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
+  <!-- Indicators -->
+  <ol class="carousel-indicators">
+    <li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
+    <li data-target="#carousel-example-generic" data-slide-to="1"></li>
+    <li data-target="#carousel-example-generic" data-slide-to="2"></li>
+  </ol>
+
+  <!-- Wrapper for slides -->
+  <div class="carousel-inner text-center" role="listbox">
+    <div class="item active text-center">
+      <div class="">
+	<img src="{% static "adminBoot/img/answer_blank.png" %}" alt="answer blanks" width="500px">
+      </div>
+      <div class="carousel-caption">
+	<h1 class="rounded" style="background-color: #424a5d;border: 2px solid #FFF;padding: 5px;">Create Answer Blank</h1>
+      </div>
+    </div>
+    <div class="item text-center">
+      <div class="">
+	<img src="{% static "adminBoot/img/answer_type.png" %}" alt="answer blanks" width="500px">
+      </div>
+      <div class="carousel-caption">
+	<h1 class="rounded" style="background-color: #424a5d;border: 2px solid #FFF;padding: 5px;">Define Answer Type</h1>
+      </div>
+    </div>
+    <div class="item text-center">
+      <div class="">
+	<img src="{% static "adminBoot/img/correct_answer.png" %}" alt="answer blanks" width="500px">
+      </div>
+      <div class="carousel-caption">
+	<h1 class="rounded" style="background-color: #424a5d;border: 2px solid #FFF;padding: 5px;">Give Correct Answer</h1>
+      </div>
+    </div>
+  </div>
+
+  <!-- Controls 
+  <a class="left carousel-control" href="#carousel-example-generic" role="button" data-slide="prev">
+    <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+    <span class="sr-only">Previous</span>
+  </a>
+  <a class="right carousel-control" href="#carousel-example-generic" role="button" data-slide="next">
+    <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+    <span class="sr-only">Next</span>
+  </a>
+</div>-->
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	  </div>
+	</div>
+	
+      </div>
+      <div class="modal-footer bottom-rounded">
+        <button type="button" class="btn btn-danger rounded" data-dismiss="modal">Get Started</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!---->
+
+{% endif %}
+    
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 {% block extraScript %}
     
     <link rel="stylesheet" type="text/css" href="{% static "page_view/css/imgareaselect-animated.css" %}" />
@@ -224,4 +349,381 @@
     <script src="{% static "adminBoot/js/edit_worksheets/edit_worksheets.js" %}"></script>
     
     
+  
+{% if myTour %}
+  <script>
+$(document).ready(function(){
+    // using jQuery
+    function getCookie(name) {
+	var cookieValue = null;
+	if (document.cookie && document.cookie != '') {
+	    var cookies = document.cookie.split(';');
+	    for (var i = 0; i < cookies.length; i++) {
+		var cookie = jQuery.trim(cookies[i]);
+		// Does this cookie string begin with the name we want?
+		if (cookie.substring(0, name.length + 1) == (name + '=')) {
+		    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+		    break;
+		}
+	    }
+	}
+	return cookieValue;
+    }
+    
+    var csrftoken = getCookie('csrftoken');
+    function csrfSafeMethod(method) {
+	// these HTTP methods do not require CSRF protection
+	return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+    $.ajaxSetup({
+	beforeSend: function(xhr, settings) {
+	    if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+		xhr.setRequestHeader("X-CSRFToken", csrftoken);
+	    }
+	}
+    });
+    
+	//  Go to http://bootstraptour.com/api/ for documentation
+	
+	var tour = new Tour({
+	    name: "tour",
+	    steps: [
+		{
+		  element: "#addQuestion-btn",
+		  title: "Add Answer Block",
+		  content: 'First we need to draw a box over the answer blanks in our eSheet...',
+		  placement: 'bottom',
+		},
+		{
+		  element: "#backgroundImage",
+		  title: "Answer Blocks",
+		  placement: 'top',
+		  template: '<div class="popover" role="tooltip" style="margin-left:-150px;width:300px;">'+
+			    '<div class="arrow"></div>'+
+			    '<h3 class="popover-title primary"></h3>'+
+			    '<div class="row">'+
+				'<div class="col-xs-12">'+
+				    '<div class="text-center">'+
+					'<img src="{% static "adminBoot/img/draw_select.gif" %}" alt="drawing demo" width="267px">'+
+					'<h4><span class="text-danger">CLICK</span> and <span class="text-danger">DRAG</span> anywhere to draw blocks for questions!</h4>'+
+					'</div>'+
+				'</div'+
+			    '</div>'+
+			  '</div>',
+		  delay: 500,
+		},
+		{
+		  element: "body #enter_area",
+		  title: "Make the Block",
+		  template: '<div class="popover" role="tooltip" style="margin-top:-150px;width:300px;">'+
+			    '<div class="arrow"></div>'+
+			    '<h3 class="popover-title primary"></h3>'+
+			    '<div class="row">'+
+				'<div class="col-xs-10 col-xs-offset-1">'+
+				    '<div class="text-center">'+
+					'<h4>Press <span class="text-danger">ENTER</span> to create the block!</h4>'+
+					'</div>'+
+				'</div'+
+			    '</div>'+
+			  '</div>',
+		  placement: 'top',
+		  orphan: true,
+		  backdrop: false,
+		  delay: 500,
+		},
+		{
+		  element: "#default_form .answers",
+		  title: "Select the Block",
+		  template: '<div class="popover" role="tooltip" style="width:300px;">'+
+			    '<div class="arrow"></div>'+
+			    '<h3 class="popover-title primary"></h3>'+
+			    '<div class="row">'+
+				'<div class="col-xs-10 col-xs-offset-1">'+
+				    '<div class="text-center">'+
+					'<h4>Now, <span class="text-danger">CLICK</span> inside the block!</h4>'+
+					'</div>'+
+				'</div'+
+			    '</div>'+
+			  '</div>',
+		  placement: 'top',
+		  orphan: true,
+		  backdrop: false,
+		  delay: 500,
+		},
+		{
+		  element: "#sidebar-right",
+		  title: "Question Info",
+		  template: '<div class="popover" role="tooltip" style="width:300px;">'+
+			    '<div class="arrow"></div>'+
+			    '<h3 class="popover-title primary"></h3>'+
+			    '<div class="row">'+
+				'<div class="col-xs-10 col-xs-offset-1">'+
+				    '<div class="text-center">'+
+					"<h4>Here's where you control question info...</h4>"+
+					'</div>'+
+				'</div'+
+			    '</div>'+
+			  '</div>',
+		  placement: 'left',
+		  duration: 5000,
+		  backdrop: false,
+		  delay: 1000,
+		},
+		{
+		  element: "#question-properties-btn",
+		  title: "Change Question Info",
+		  template: '<div class="popover" role="tooltip" style="width:300px;">'+
+			    '<div class="arrow"></div>'+
+			    '<h3 class="popover-title primary"></h3>'+
+			    '<div class="row">'+
+				'<div class="col-xs-10 col-xs-offset-1">'+
+				    '<div class="text-center">'+
+					"<h4>Change Anything About the Questions...</h4>"+
+					'</div>'+
+				'</div'+
+			    '</div>'+
+			  '</div>',
+		  placement: 'left',
+		  onShow: function(){
+		    $('#question-properties-btn').click();
+		  },
+		  duration: 3000,
+		},
+		{
+		  element: "#questionType",
+		  title: "Question Type",
+		  template: '<div class="popover" role="tooltip" style="width:300px;">'+
+			    '<div class="arrow"></div>'+
+			    '<h3 class="popover-title primary"></h3>'+
+			    '<div class="row">'+
+				'<div class="col-xs-10 col-xs-offset-1">'+
+				    '<div class="text-center">'+
+					"<h4>We are most proud of our question types...</h4>"+
+					'</div>'+
+				'</div'+
+			    '</div>'+
+			  '</div>',
+		  placement: 'left',
+		  duration: 3000,
+		},
+		{
+		  element: "#sidebar-right",
+		  title: "Text and Number",
+		  template: '<div class="popover" role="tooltip" style="width:300px;">'+
+			    '<div class="arrow"></div>'+
+			    '<h3 class="popover-title primary"></h3>'+
+			    '<div class="row">'+
+				'<div class="col-xs-10 col-xs-offset-1">'+
+				    '<div class="text-center">'+
+					"<h4>You can force your students to answer text or only numbers...</h4>"+
+					'</div>'+
+				'</div'+
+			    '</div>'+
+			    '<div class="popover-navigation">'+
+			      '<div class="btn-group">'+
+				'<button class="btn btn-sm btn-primary" data-role="prev"><i class="fa fa-angle-double-left"></i> Prev</button>'+
+				'<button class="btn btn-sm btn-primary" data-role="next">Next <i class="fa fa-angle-double-right"></i></button>'+
+				'<button class="btn btn-sm btn-primary" data-role="pause-resume" data-pause-text="Pause" data-resume-text="Resume">Pause</button>'+
+			      '</div>'+
+			    '</div>'+
+			  '</div>',
+		  placement: 'left',
+		},
+		{
+		  element: "#sidebar-right",
+		  title: "Paragraph",
+		  template: '<div class="popover" role="tooltip" style="width:300px;">'+
+			    '<div class="arrow"></div>'+
+			    '<h3 class="popover-title primary"></h3>'+
+			    '<div class="row">'+
+				'<div class="col-xs-10 col-xs-offset-1">'+
+				    '<div class="text-center">'+
+					"<h4>Have a written response that is partially graded by keywords...</h4>"+
+					'</div>'+
+				'</div'+
+			    '</div>'+
+			    '<div class="popover-navigation">'+
+			      '<div class="btn-group">'+
+				'<button class="btn btn-sm btn-primary" data-role="prev"><i class="fa fa-angle-double-left"></i> Prev</button>'+
+				'<button class="btn btn-sm btn-primary" data-role="next">Next <i class="fa fa-angle-double-right"></i></button>'+
+				'<button class="btn btn-sm btn-primary" data-role="pause-resume" data-pause-text="Pause" data-resume-text="Resume">Pause</button>'+
+			      '</div>'+
+			    '</div>'+
+			  '</div>',
+		  placement: 'left',
+		  onShow: function(){
+		    $('#questionType').val('textarea');
+		    $('#questionType').change();
+		  },
+		},
+		{
+		  element: "#sidebar-right",
+		  title: "Multiple Choice",
+		  template: '<div class="popover" role="tooltip" style="width:300px;">'+
+			    '<div class="arrow"></div>'+
+			    '<h3 class="popover-title primary"></h3>'+
+			    '<div class="row">'+
+				'<div class="col-xs-10 col-xs-offset-1">'+
+				    '<div class="text-center">'+
+					"<h4>Be sure to mark the correct answer...</h4>"+
+					'</div>'+
+				'</div'+
+			    '</div>'+
+			    '<div class="popover-navigation">'+
+			      '<div class="btn-group">'+
+				'<button class="btn btn-sm btn-primary" data-role="prev"><i class="fa fa-angle-double-left"></i> Prev</button>'+
+				'<button class="btn btn-sm btn-primary" data-role="next">Next <i class="fa fa-angle-double-right"></i></button>'+
+				'<button class="btn btn-sm btn-primary" data-role="pause-resume" data-pause-text="Pause" data-resume-text="Resume">Pause</button>'+
+			      '</div>'+
+			    '</div>'+
+			  '</div>',
+		  placement: 'left',
+		  onShow: function(){
+		    $('#questionType').val('select');
+		    $('#questionType').change();
+		  },
+		},
+		{
+		  element: "#sidebar-right",
+		  title: "Show Your Work",
+		  template: '<div class="popover" role="tooltip" style="width:300px;">'+
+			    '<div class="arrow"></div>'+
+			    '<h3 class="popover-title primary"></h3>'+
+			    '<div class="row">'+
+				'<div class="col-xs-10 col-xs-offset-1">'+
+				    '<div class="text-center">'+
+					"<h4>That's right!  <span class='text-danger'>WRITE AND DRAW</span> on the paper.  Be sure to draw over the entire problem...</h4>"+
+					'</div>'+
+				'</div'+
+			    '</div>'+
+			    '<div class="popover-navigation">'+
+			      '<div class="btn-group">'+
+				'<button class="btn btn-sm btn-primary" data-role="prev"><i class="fa fa-angle-double-left"></i> Prev</button>'+
+				'<button class="btn btn-sm btn-primary" data-role="next">Next <i class="fa fa-angle-double-right"></i></button>'+
+				'<button class="btn btn-sm btn-primary" data-role="pause-resume" data-pause-text="Pause" data-resume-text="Resume">Pause</button>'+
+			      '</div>'+
+			    '</div>'+
+			  '</div>',
+		  placement: 'left',
+		  onShow: function(){
+		    $('#questionType').val('work');
+		    $('#questionType').change();
+		  },
+		},
+		{
+		  element: "#sidebar-right",
+		  title: "Drawing",
+		  template: '<div class="popover" role="tooltip" style="width:300px;">'+
+			    '<div class="arrow"></div>'+
+			    '<h3 class="popover-title primary"></h3>'+
+			    '<div class="row">'+
+				'<div class="col-xs-10 col-xs-offset-1">'+
+				    '<div class="text-center">'+
+					'<h4>Just like "Show Your Work" but no correct answer is given...</h4>'+
+					'</div>'+
+				'</div'+
+			    '</div>'+
+			    '<div class="popover-navigation">'+
+			      '<div class="btn-group">'+
+				'<button class="btn btn-sm btn-primary" data-role="prev"><i class="fa fa-angle-double-left"></i> Prev</button>'+
+				'<button class="btn btn-sm btn-primary" data-role="next">Next <i class="fa fa-angle-double-right"></i></button>'+
+				'<button class="btn btn-sm btn-primary" data-role="pause-resume" data-pause-text="Pause" data-resume-text="Resume">Pause</button>'+
+			      '</div>'+
+			    '</div>'+
+			  '</div>',
+		  placement: 'left',
+		  onShow: function(){
+		    $('#questionType').val('drawing');
+		    $('#questionType').change();
+		  },
+		  onHide: function(){
+		    $('#questionType').val('text');
+		    $('#questionType').change();
+		  },
+		},
+		{
+		  element: "#default_form .answers",
+		  title: "Correct Answer",
+		  template: '<div class="popover" role="tooltip" style="width:300px;">'+
+			    '<div class="arrow"></div>'+
+			    '<h3 class="popover-title primary"></h3>'+
+			    '<div class="row">'+
+				'<div class="col-xs-10 col-xs-offset-1">'+
+				    '<div class="text-center">'+
+					"<h4>Don't forget the <span class='text-danger'>CORRECT ANSWER</span> is needed in order to grade.</h4>"+
+					'</div>'+
+				'</div'+
+			    '</div>'+
+			    '<div class="popover-navigation">'+
+			      '<div class="btn-group">'+
+				'<button class="btn btn-sm btn-primary" data-role="prev"><i class="fa fa-angle-double-left"></i> Prev</button>'+
+				'<button class="btn btn-sm btn-primary" data-role="next">Next <i class="fa fa-angle-double-right"></i></button>'+
+				'<button class="btn btn-sm btn-primary" data-role="pause-resume" data-pause-text="Pause" data-resume-text="Resume">Pause</button>'+
+			      '</div>'+
+			      '<button class="btn btn-sm btn-danger" data-role="end" style="margin-left:5px;">Got It!</button>'+
+			    '</div>'+
+			  '</div>',
+		  placement: 'top',
+		  orphan: true,
+		  backdrop: false,
+		},
+	    ],
+	    container: "body",
+	    keyboard: true,
+	    storage: false,
+	    debug: true,
+	    backdrop: true,
+	    backdropPadding: 5,
+	    onEnd: function (tour) {
+	      $.ajax({
+		method: "POST",
+		url: "{% url "tourBuilder.views.countTour" %}",
+		data: { tourID: {{ myTour.id }} },
+		dataType: "json",
+	      })
+		.done(function( responseText ) {
+		  console.log( responseText );
+		});
+	    },
+	});
+	
+	// Initialize the tour
+	tour.init();
+	
+	// Start the tour
+	//tour.start();
+	$("#tour-intro-modal").modal('show');
+	$('#tour-intro-modal').on('hidden.bs.modal', function () {
+	    tour.start();
+	})
+	
+	var ias = $('#backgroundImage').imgAreaSelect({ instance: true });
+	ias.setOptions({
+	    onSelectStart: function(){
+		tour.next();
+	    }
+	});
+	ias.update();
+	
+	
+	$(document).keydown(function (e) {
+	    console.log("keydown: "+e.keyCode);
+	    if (e.keyCode == 13){
+		e.preventDefault();
+		console.log('current step: '+tour.getCurrentStep());
+		if (tour.getCurrentStep()==2) {
+		    tour.next();
+		}
+	    }
+	});
+	
+	$(document).on('focus', '#default_form .answers', function(){
+		if (tour.getCurrentStep()==3) {
+		    tour.next();
+		}
+	});
+});
+  </script>
+{% endif %}
+
 {% endblock %}
