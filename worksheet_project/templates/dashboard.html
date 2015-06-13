@@ -41,8 +41,18 @@
 				<i class="fa fa-inbox"></i>&nbsp;&nbsp;force all to turn-in</a>
 			  </li>
 			  
-			  
-			  
+			  <!--
+			  <li role="presentation" onclick="$('#print-student-work-form-WorksheetID').val({{ worksheet.id }});$('#print-student-work-form').submit();">
+				<a role="menuitem" tabindex="-1" href="#" onclick="">
+					<i style="display: inline-block;vertical-align: middle;margin-left: -3px;">
+						<img src="{% static "googleDrive_icons/product20.png" %}" alt="google drive">
+					</i>
+					<span style="display: inline-block;vertical-align: middle;">
+						&nbsp;&nbsp;print student work
+					</span>
+				</a>
+			  </li>
+			  -->
 			  
 			  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#worksheetFormWorksheetID').val('{{ worksheet.id }}');
 			  $('#worksheetFormWorksheetName').val('{{ worksheet.title|capfirst }}');

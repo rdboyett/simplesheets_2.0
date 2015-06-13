@@ -271,6 +271,20 @@ jQuery.validator.addMethod("complete_url", function(val, elem) {
     
     
     
+    $('#print-student-work-form').ajaxForm({ 
+        success:       function(responseText){
+            console.log(responseText);
+            if (responseText.error) {
+                alert(responseText.error);
+            }else {
+		location.reload();
+            }
+        },
+        dataType:  'json',
+        timeout:   4000 
+    });
+    
+    
     
     
 

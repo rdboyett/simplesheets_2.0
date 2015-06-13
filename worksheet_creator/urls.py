@@ -6,6 +6,7 @@ urlpatterns = patterns('worksheet_creator.views',
     (r'^create/$', 'create'),
     (r'^open/$', 'openGoogleFile'),
     (r'^createFromPDF/$', 'createFromPDF'),
+    (r'^printStudentWork/$', 'printStudentWork'),
 )
 
 urlpatterns += patterns('worksheet_creator.ajax',

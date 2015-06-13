@@ -1,4 +1,5 @@
 import os
+ROOT_PATH = os.path.dirname(__file__)
 import logging
 import httplib2
 from datetime import date
@@ -7,7 +8,8 @@ import base64
 import json
 
 
-from django.shortcuts import render_to_response, redirect
+from django.shortcuts import render_to_response, redirect, render
+from django.template.loader import render_to_string
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -25,6 +27,7 @@ from userInfo_profile.models import UserInfo
 from classrooms.models import ClassUser
 from google_drive import settings
 from tourBuilder.models import MyTour
+from worksheet_creator.models import Project
 
 
 
@@ -497,10 +500,6 @@ def djangoLogin(request, user):
     
     
     
-    
-    
-    
-    
-    
+
     
     

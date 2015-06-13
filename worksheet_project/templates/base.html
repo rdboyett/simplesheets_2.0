@@ -292,6 +292,11 @@
 		<form id="forceTurnIn-baseForm" action="{% url "worksheet_creator.page_view_ajax.forceGradeWorksheet" %}" enctype='multipart/form-data' method="post" autocomplete="off">{% csrf_token %}
 		  <input id="forceTurnIn-baseForm-WorksheetID" type="hidden" name="project_id" value="{{ worksheet.id }}">
                 </form>
+		
+		
+		<form id="print-student-work-form" action="{% url "worksheet_creator.views.printStudentWork" %}" enctype='multipart/form-data' method="post" autocomplete="off">{% csrf_token %}
+		  <input id="print-student-work-form-WorksheetID" type="hidden" name="project_id" value="{{ worksheet.id }}">
+                </form>
 
 {% else %}
 <!-- *****************    Join a New Class   ******************************************************* -->

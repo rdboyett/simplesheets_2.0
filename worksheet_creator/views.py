@@ -36,6 +36,10 @@ from tempfile import NamedTemporaryFile
 import zipfile
 import StringIO
 
+import PIL
+from PIL import ImageFont
+from PIL import Image
+from PIL import ImageDraw
 
 try:
     from PIL import Image
@@ -43,7 +47,10 @@ except ImportError:
     import Image
 
 
-from userInfo_profile.models import UserInfo
+import logging
+log = logging.getLogger(__name__)
+
+from userInfo_profile.models import UserInfo, MyAnswer
 from classrooms.models import ClassUser, Classroom
 from classrooms.views import generateCode
 from google_login.models import CredentialsModel
@@ -526,8 +533,156 @@ def openGoogleFile(request):
         
         
         
+import textwrap
+
+@login_required
+def printStudentWork(request):
+    if request.method == 'POST':
+        project_id = request.POST["project_id"].strip()
+                
+                
+        if Project.objects.filter(id=project_id):
+            project = Project.objects.get(id=project_id)
+            
+            if project.backgroundImages.all():
+                backgroundImages = project.backgroundImages.all()
+                for backgroundImage in backgroundImages:
+                    filePathList = backgroundImage.imagePath[1:].split('/')
+                    baseImagePath = os.path.join(ROOT_PATH, *filePathList)
+                    
+                    baseFolderPath, imageFile = os.path.split(baseImagePath)
+                                
+                    newImagePath = os.path.join(baseFolderPath,"copy"+ str(imageFile.split('.')[0])+".png")
+                    
+                    
+                    if ClassUser.objects.filter(user=request.user, teacher=True): #check that this is a teacher that is requesting
+                        #Get all the classrooms that have this worksheet
+                        if Classroom.objects.filter(worksheets=project):
+                            allClasses = Classroom.objects.filter(worksheets=project)
+                            if ClassUser.objects.filter(classrooms=allClasses, teacher=False):
+                                allUsers = [x.user for x in ClassUser.objects.filter(classrooms=allClasses, teacher=False)]
+                                if UserInfo.objects.filter(user__in=allUsers):
+                                    allUserInfos = UserInfo.objects.filter(user__in=allUsers)
+                                    
+                                    
+                                    for userInfo in allUserInfos:
+                                        if MyAnswer.objects.filter(project=project, userInfo=userInfo, answer__pageNumber=backgroundImage.pageNumber):
+                                            myAnswers = MyAnswer.objects.filter(project=project, userInfo=userInfo, answer__pageNumber=backgroundImage.pageNumber)
+                                            
+                                            #opens an image:
+                                            im = Image.open(baseImagePath)
+                                            width,height=im.size
+                                            #creates a new empty image, RGB mode, and size 400 by 400.
+                                            new_im = Image.new('RGB', (width,height))
+                                            
+                                            new_im.paste(im)
+                    
+                    
+                                    
+                                            for myAnswer in myAnswers:
+                                                if myAnswer.answer.inputType == 'drawing' or myAnswer.answer.inputType == 'work':
+                                                    workImagePathList = myAnswer.workImagePath[1:].split('/')
+                                                    workImagePath = os.path.join(ROOT_PATH, *workImagePathList)
+                                                    img = Image.open(workImagePath)
+                                                    answerWidth = float(myAnswer.answer.width)*float(width)*.01
+                                                    answerHeight = float(myAnswer.answer.height)*float(height)*.01
+                                                    left = (float(myAnswer.answer.left)*float(width)*.01)
+                                                    top = (float(myAnswer.answer.top)*float(height)*.01)
+                                                    img.thumbnail((int(answerWidth),int(answerHeight)),Image.ANTIALIAS)
+                                                else:
+                                                    answerText = myAnswer.myAnswer
+                                                    answerWidth = float(myAnswer.answer.width)*float(width)*.01
+                                                    answerHeight = float(myAnswer.answer.height)*float(height)*.01
+                                                    left = (float(myAnswer.answer.left)*float(width)*.01)
+                                                    top = (float(myAnswer.answer.top)*float(height)*.01)
+                                                    if myAnswer.bCorrect:
+                                                        backColor = (155,252,159, 0)
+                                                    else:
+                                                        backColor = (252,155,155, 0)
+                                                    
+                                                    para = textwrap.wrap(answerText, width=int(answerWidth*.066))
+                                                    #Create the test from the students answer and get the position to paste it
+                                                    fonts_path = os.path.join(ROOT_PATH, 'fonts')
+                                                    font = ImageFont.truetype(os.path.join(fonts_path, "arial.ttf"), 35)
+                                                    img=Image.new("RGBA", (int(answerWidth),int(answerHeight)),backColor)
+                                                    draw = ImageDraw.Draw(img)
+                                                    #draw.text((0, 0),answerText,(0,0,0),font=font)
+                                                    
+                                                    current_h, pad = 25, 10
+                                                    for line in para:
+                                                        w, h = draw.textsize(line, font=font)
+                                                        draw.text(((answerWidth - w) / 2, current_h), line, (0,0,0), font=font)
+                                                        current_h += h + pad
+                                                    
+                                                    
+                                                    draw = ImageDraw.Draw(img)
+                                                
+                                                
+                                                
+                                                new_im.paste(img, (int(left),int(top)))
+                                    
+                                    
+                                            new_im.save(newImagePath, "PNG")
+                                    
+                                else:
+                                    return HttpResponse(json.dumps({'error':"Sorry, there are no students in this class."}))
+                            else:
+                                return HttpResponse(json.dumps({'error':"Sorry, there are no students in this class."}))
+                            
+                        else:
+                            return HttpResponse(json.dumps({'error':"Sorry, this e-sheet is not assigned to any classes."}))
+                    else:
+                        return HttpResponse(json.dumps({'error':"Sorry, you must be a teacher."}))
+                    
+                    
+                    
+            
+            '''
+            pdf = pdfkit.from_url('http://amazon.com', False)
+            
+            baseFilePath = os.path.join(ROOT_PATH,'media', request.user.first_name+request.user.last_name+str(request.user.id))
+            make_sure_path_exists(baseFilePath)
+                        
+            pdfPath = os.path.join(baseFilePath,"temp.pdf")
+                
+            with open(pdfPath, 'w') as f:
+                f.write(pdf)
+            '''
+            
+            '''
+            args = {
+                'newProject':project,
+                'pageNumber':1,
+            }
+            worksheet = render_to_string('google_drive/worksheet.html', args)
+            
+            baseFilePath = os.path.join(ROOT_PATH,'media', request.user.first_name+request.user.last_name+str(request.user.id))
+            make_sure_path_exists(baseFilePath)
+                        
+            #htmlPath = os.path.join(baseFilePath,"worksheet.html")
+            pdfPath = os.path.join(baseFilePath,"temp.pdf")
+            pdf = pdfkit.from_string(worksheet, False)
+            
+            with open(pdfPath, 'w') as f:
+                f.write(pdf)
+            '''
+            
+            
+            data = {'success':'success'}
         
         
+        
+    else:
+        data = {
+            'error': "There was an error posting this request. Please try again.",
+        }
+            
+    return HttpResponse(json.dumps(data))
+
+
+
+    
+    
         
         
         
