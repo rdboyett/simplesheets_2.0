@@ -7,12 +7,17 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 from django.core.context_processors import csrf
 from django.core.mail import send_mail
+from django.core.urlresolvers import reverse
 
 from userInfo_profile.models import UserInfo, MyAnswer, MyGrade, LiveMonitorSession
 from worksheet_creator.models import Project, FormInput, BackImage
 from classrooms.models import ClassUser, Classroom, HashTag, Message
 from google_login.models import GoogleUserInfo
 from tourBuilder.models import MyTour
+
+from paypal.standard.forms import PayPalPaymentsForm
+
+from worksheet_project import settings
 
 
 #this is commited again
@@ -865,6 +870,105 @@ def student_display(request, classID=False, studentID=False):
 
 
 
+@login_required
+def initiatePayment(request):
+    if UserInfo.objects.filter(user=request.user):
+        userInfo = UserInfo.objects.get(user=request.user)
+    else:
+        userInfo = False
+        
+    #if there is a google account
+    if GoogleUserInfo.objects.filter(user=request.user):
+        googleUserInfo = GoogleUserInfo.objects.get(user=request.user)
+    else:
+        googleUserInfo = False
+        
+    #check if teacher or student is set
+    if not userInfo.teacher_student:
+        teacherStudent = False
+    else:
+        teacherStudent = True
+        
+    #Get all users Classes
+    if ClassUser.objects.filter(user=request.user):
+        classUser = ClassUser.objects.get(user=request.user)
+    else:
+        if userInfo.teacher_student == 'teacher':
+            teacher = True
+        else:
+            teacher = False
+        classUser = ClassUser.objects.create(
+            user = request.user,
+            teacher = teacher,
+        )
+        
+    #Get all users Class
+    if classUser.classrooms.all():
+        allClasses = classUser.classrooms.all().order_by('name')
+    else:
+        allClasses = False
+    
+    
+    if MyTour.objects.filter(name='profile', user=request.user):
+        myTour = MyTour.objects.get(name='profile', user=request.user)
+        if myTour.nTimesRan >= myTour.nManditoryRuns:
+            myTour = False
+    else:
+        myTour = MyTour.objects.create(
+            user = request.user,
+            name = 'profile',
+            nManditoryRuns = 1,
+            nTimesRan = 0,
+        )
+        
+    
+    baseWebsite = "http://127.0.0.1:8000"
+    # What you want the button to do.
+    monthly_paypal_dict = {
+        "cmd": "_xclick-subscriptions",
+        "business": settings.PAYPAL_RECEIVER_EMAIL,
+        "a3": "9.99",                      # monthly price
+        "p3": 1,                           # duration of each unit (depends on unit)
+        "t3": "M",                         # duration unit ("M for Month")
+        "src": "1",                        # make payments recur
+        "sra": "1",                        # reattempt payment on payment error
+        "no_note": "1",                    # remove extra notes (optional)
+        "item_name": "Ducksoup Subscription",
+        "notify_url": baseWebsite+reverse('paypal-ipn'),
+        "return_url": baseWebsite+reverse('worksheet_project.views.dashboard'),
+        "cancel_return": baseWebsite+reverse('worksheet_project.views.initiatePayment'),
+    }
+    yearly_paypal_dict = {
+        "business": settings.PAYPAL_RECEIVER_EMAIL,
+        "amount": "100.00",
+        "item_name": "Ducksoup Onetime Payment",
+        "invoice": "unique-invoice-id",
+        "notify_url": "http://www.example.com/your-ipn-location/",
+        "return_url": "https://www.example.com/your-return-location/",
+        "cancel_return": "https://www.example.com/your-cancel-location/",
+    }
+
+    # Create the instance.
+    yearlyForm = PayPalPaymentsForm(initial=yearly_paypal_dict)
+
+    # Create the instance.
+    monthlyForm = PayPalPaymentsForm(initial=monthly_paypal_dict, button_type="subscribe")
+
+    args = {
+            "monthlyForm":monthlyForm,
+            "yearlyForm":yearlyForm,
+            "profile":True,
+            "user":request.user,
+            "userInfo":userInfo,
+            "googleUserInfo":googleUserInfo,
+            "teacherStudent":teacherStudent,
+            "classUser":classUser,
+            "allClasses":allClasses,
+            "myTour":myTour,
+        }
+    args.update(csrf(request))
+        
+    return render_to_response('paypal.html', args)
 
 
 

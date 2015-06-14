@@ -2,16 +2,21 @@
 {% load staticfiles %}
 
 
-{% block title %}Profile{% endblock %}
+{% block title %}Payment{% endblock %}
+
+
+{% block extraBottomHead %}
+  <link href="{% static "index/css/pricing.css" %}" rel="stylesheet">
+{% endblock %}
+
 
 {% block body %}
 
 
 
   <div id="main-region" class="mt">
-    <div>
       <div class="row">
-	<div class="col-xs-12 col-sm-6 col-md-7">
+	<div class="col-xs-12">
           
           
           <div class="showback">
@@ -29,130 +34,113 @@
                 </div> <!-- end of row -->
             </div>
 	    <div id="profile-01" class="noBg" style="margin-top: 10px;">
-              <form id="profile-form" class="form-horizontal style-form" action="{% url "userInfo_profile.views.profileUpdate" %}" enctype='multipart/form-data' method="post">{% csrf_token %}
-                
                 <div class="row">
                   <div class="col-xs-12">
-                    <h4 style="margin-bottom: 40px;"><i class="fa fa-angle-right"></i>&nbsp;&nbsp;Name and Password</h4>
-                    
-                    {% if classUser.teacher %}
-                    <div class="form-group">
-                        <label class="col-sm-2 col-sm-2 control-label">Title</label>
-                        <div class="col-sm-10">
-                          <select class="form-control" name="title">
-                            <option value="False">None</option>
-                            <option {% ifequal userInfo.title "Mr" %}selected{%endifequal%} value="Mr">Mr</option>
-                            <option {% ifequal userInfo.title "Ms" %}selected{%endifequal%} value="Ms">Ms</option>
-                            <option {% ifequal userInfo.title "Dr" %}selected{%endifequal%} value="Dr">Dr</option>
-                          </select>
-                        </div>
-                    </div>
-		    {% endif %}
-                    
-                    <div class="form-group">
-                      <label class="col-sm-2 col-sm-2 control-label">Name</label>
-                      <div class="col-sm-10">
-                        <input id="fullName-input" type="text" class="form-control" name="fullName" value="{% if userInfo.user.first_name %}{{ userInfo.user.first_name|capfirst }} {{ userInfo.user.last_name|capfirst }}{%endif%}" minlength="3" maxlength="60" required placeholder="Name...">
-                        <span class="register-check register-check-error"></span>
-                      </div>
-                    </div>
-                    
-                  </div>
+		    
+		        
+	<div class="row">
+	    <!---------------------------------------- price table ---------------------------->
+	    <div class="col-sm-8 col-sm-offset-2 col-md-4 col-md-offset-0">
+		  <div class="pricing-table pricing-table-highlighted">
+			<div class="pricing-table-header">
+			      <span class="heading">Monthly</span>
+			      <span class="price-value">$<span>9</span>.99/ mo<span class="mo"><!--/mo--></span></span>
+			</div>
+			<div class="pricing-table-space"></div>
+			<div class="pricing-table-text">
+			      <p><span class="attention" style="font-size: 25px;">GET STARTED</span></p>
+			</div>
+			<div class="pricing-table-features">
+			      <p><i class="fa fa-check main-color"></i> <strong> Show Your Work</strong> Boxes</p>
+			      <p><i class="fa fa-check main-color"></i> <strong> Unlimited </strong> Classes</p>
+			      <p><i class="fa fa-check main-color"></i> <strong> Unlimited </strong> Students</p>
+			      <p><i class="fa fa-check main-color"></i> <strong> Unlimited </strong> eSheets</p>
+			      <p><i class="fa fa-check main-color"></i> <strong> BYOD</strong> Works With Any Device</p>
+			      <p><i class="fa fa-check main-color"></i> <strong> Auto-Grading</strong> Reports and Downloads</p>
+			      <p><i class="fa fa-check main-color"></i> <strong> Live</strong> Student Monitoring</p>
+			      <p><strong> Unlimited </strong> Support</p>
+			</div>
+			<div class="pricing-table-sign-up text-danger">
+			      {{ monthlyForm.render }}
+			      <h5>No Paypal Account?</h5>
+			      <h5>Paypal Accepts Credit Cards!</h5>
+			</div>
+		  </div>
+	    </div>
+	    <!---------------------------------------- end of price table ---------------------------->
+
+	    <!---------------------------------------- price table ---------------------------->
+	    <div class="col-sm-8 col-sm-offset-2 col-md-4 col-md-offset-0">
+		  <div class="pricing-table pricing-table-highlighted">
+			<div class="pricing-table-header">
+			      <span class="heading">Yearly</span>
+			      <span class="price-value">$<span>99</span>.99/ year<span class="mo"><!--/mo--></span></span>
+			</div>
+			<div class="pricing-table-space"></div>
+			<div class="pricing-table-text">
+			      <p><span class="attention" style="font-size: 25px;">2 MONTHS FREE</span></p>
+			</div>
+			<div class="pricing-table-features">
+			      <p><i class="fa fa-check main-color"></i> <strong> Show Your Work</strong> Boxes</p>
+			      <p><i class="fa fa-check main-color"></i> <strong> Unlimited </strong> Classes</p>
+			      <p><i class="fa fa-check main-color"></i> <strong> Unlimited </strong> Students</p>
+			      <p><i class="fa fa-check main-color"></i> <strong> Unlimited </strong> eSheets</p>
+			      <p><i class="fa fa-check main-color"></i> <strong> BYOD</strong> Works With Any Device</p>
+			      <p><i class="fa fa-check main-color"></i> <strong> Auto-Grading</strong> Reports and Downloads</p>
+			      <p><i class="fa fa-check main-color"></i> <strong> Live</strong> Student Monitoring</p>
+			      <p><strong> Unlimited </strong> Support</p>
+			</div>
+			<div class="pricing-table-sign-up text-danger">
+			      {{ yearlyForm.render }}
+			      <h5>No Paypal Account?</h5>
+			      <h5>Paypal Accepts Credit Cards!</h5>
+			</div>
+		  </div>
+	    </div>
+	    <!---------------------------------------- end of price table ---------------------------->
+	    
+	    <!---------------------------------------- price table ---------------------------->
+	    <div class="col-sm-8 col-sm-offset-2 col-md-4 col-md-offset-0">
+		  <div class="pricing-table">
+			<div class="pricing-table-header">
+			      <span class="heading">Free</span>
+			      <span class="price-value">$<span>0</span><span class="mo"><!--/mo--></span></span>
+			</div>
+			<div class="pricing-table-space"></div>
+			<div class="pricing-table-features">
+			      <p><i class="fa fa-check main-color"></i> <strong>First Five</strong> Free E-sheets</p>
+			      <p><strong> One Free</strong> E-sheet A Month</p>
+			      <p><strong>Website</strong> Support</p>
+			</div>
+			<div class="pricing-table-sign-up">
+			      <a href="{% url "worksheet_project.views.dashboard" %}" class="btn btn-large btn-block btn-primary">CONTINUE</a>
+			</div>
+		  </div>
+	    </div>
+	    <!---------------------------------------- end of price table ---------------------------->
+
+			
+	</div><!-- / row-fluid-->
+	    
+		    
+                  
+		  
+		  
+		  </div>
                 </div>
                 <br>
-                <div class="row">
-                  <div class="col-xs-6 col-sm-offset-2 col-sm-5 col-md-offset-6 col-md-3">
-                    <button type="button" class="btn btn-block btn-primary rounded" data-toggle="modal" data-target="#reset-password">Password</button>
-                  </div>
-                  <div class="col-xs-6 col-sm-5 col-md-3">
-                    <button id="updateBtn" type="submit" class="btn btn-block btn-primary rounded">Update</button>
-                  </div>
-                </div>
-              </form>
-            </div> <!-- end of profile-02 -->
-          </div>
+		  
+		  <!-- PayPal Logo --><table class="mb" border="0" cellpadding="10" cellspacing="0" align="center"><tr><td align="center"></td></tr><tr><td align="center"><a href="https://www.paypal.com/webapps/mpp/paypal-popup" title="How PayPal Works" onclick="javascript:window.open('https://www.paypal.com/webapps/mpp/paypal-popup','WIPaypal','toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=yes, resizable=yes, width=1060, height=700'); return false;"><img src="https://www.paypalobjects.com/webstatic/mktg/logo/bdg_now_accepting_pp_2line_w.png" border="0" alt="Now Accepting PayPal"></a><div style="text-align:center"><a href="https://www.paypal.com/webapps/mpp/how-paypal-works"><font size="2" face="Arial" color="#0079CD">How PayPal Works</font></a></div></td></tr></table><!-- PayPal Logo -->
+		  <img src="https://www.paypalobjects.com/webstatic/en_US/i/buttons/cc-badges-ppppcmcvdam.png" alt="Pay with PayPal, PayPal Credit or any major credit card" />
+	    </div> <!-- end of profile-01 -->
+          </div> <!-- end of showback -->
           
           
-          
-          
-          
-          <div class="showback">
-	    <div id="profile-01" class="noBg">
-              <h4><i class="fa fa-angle-right"></i>&nbsp;&nbsp;School</h4>
-              <div class="row">
-                <div class="col-xs-12">
-                  <div class="col-xs-12 col-sm-10">
-                    <h3 id="schoolName-span">{% if userInfo.school %}{{ userInfo.school|capfirst }}{%else%}please add your school{%endif%}</h3>
-                  </div>
-                  <div class="col-xs-offset-9 col-xs-3 col-sm-offset-0 col-sm-2">
-                    <button id="show-school" class="btn btn-primary btn-block rounded" data-toggle="modal" data-target="#update-school" >
-                      <i class="fa fa-pencil"></i>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-            
-            
             
         </div>
             
-        <div class="col-xs-12 col-sm-6 col-md-5">
-          
-          <div class="showback">
-            <h3>Your Accounts</h3>
-	    <div id="auth-connections" class="profile-card">
-              <div>
-                <div class="row">
-                  <div class="col-xs-12">
-                    <div class="media">
-                      <div class="pull-left">
-                        <img class="media-object rounded" src="{% static "adminBoot/img/duck.png" %}" alt="google-thumbnail">
-                      </div>
-                      <div class="media-body">
-                        <h5 class="media-heading">Your Duck Soup Account:</h5>
-                        <h5 class="media-heading text-danger">FREE ACCOUNT</h5>
-                        <strong>Username: </strong><span id="username-label">{% if userInfo.user.username %}{{ userInfo.user.username }}{%endif%}</span>
-                        <div class="row">
-                          <div class="col-xs-12">
-                            <button class="btn btn-xs btn-info rounded" data-toggle="modal" data-target="#change-username">change</button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    {% if googleUserInfo %}
-                    <div class="media">
-                      <div class="pull-left">
-                        <img class="rounded" src="{% static "main_project/images/google-logo.png" %}" width="50" alt="google-thumbnail">
-                      </div>
-                      <div class="media-body">
-                        <h5 class="media-heading">You are connected to the Google account:</h5>
-                        <strong>Email: </strong>{% if userInfo.user.email %}{{ userInfo.user.email }}{%endif%}
-                      </div>
-                    </div>
-                    {% endif %}
-                  </div>
-                </div>
-                <hr>
-                <div class="row">
-                  <div id="account-connection-mssg">
-                </div>
-              </div>
-              <div class="row">
-              <div class="col-xs-6 col-xs-offset-3">
-                <button id="addGoogleBtn" class="btn btn-block btn-social btn-danger rounded {% if googleUserInfo %}disabled{%endif%} google-authorize" type="button" style="height: 50px;">
-                  <i class="fa fa-google-plus fa-2x" style="line-height: 30px;vertical-align: middle;"></i>
-                  <span style="line-height: 30px;vertical-align: middle;">&nbsp;&nbsp;Connect with Google</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-          </div>
-        </div>
-    </div>
-  </div>
+      </div>
+  </div> <!-- end of main-region -->
         
         
         

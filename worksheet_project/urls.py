@@ -17,6 +17,7 @@ urlpatterns = patterns('',
     url(r'^drive/', include('google_drive.urls')),
     url(r'^worksheet/', include('worksheet_creator.urls')),
     url(r'^tour/', include('tourBuilder.urls')),
+    url(r'^paypal/', include('paypal.standard.ipn.urls')),
     
     
     (r'^media/(?P<path>.*)$', 'django.views.static.serve',
@@ -42,6 +43,7 @@ urlpatterns += patterns('worksheet_project.views',
     (r'^handGrade/(?P<projectID>(\d+))/(?P<pageNumber>(\d+))/(?P<classID>(\d+))/(?P<studentID>(\d+))/$', 'handGrade'), #studentID is classUser.id
     (r'^handGrade/(?P<projectID>(\d+))/(?P<classID>(\d+))/$', 'handGrade'),
     (r'^handGrade/(?P<projectID>(\d+))/$', 'handGrade'),
+    (r'^pay/$', 'initiatePayment'),
     
 
     (r'^test/$', 'test'),
