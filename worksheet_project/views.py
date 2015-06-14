@@ -1,4 +1,5 @@
 import datetime
+import json
 
 from django.shortcuts import render_to_response, redirect
 from django.http import HttpResponseRedirect, HttpResponse
@@ -6,6 +7,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 from django.core.context_processors import csrf
+from django.views.decorators.csrf import csrf_exempt
 from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 
@@ -14,6 +16,7 @@ from worksheet_creator.models import Project, FormInput, BackImage
 from classrooms.models import ClassUser, Classroom, HashTag, Message
 from google_login.models import GoogleUserInfo
 from tourBuilder.models import MyTour
+from classrooms.views import generateCode
 
 from paypal.standard.forms import PayPalPaymentsForm
 
@@ -924,7 +927,7 @@ def initiatePayment(request):
     
     
     
-    baseWebsite = "http://ducksoup.us"
+    baseWebsite = "http://127.0.0.1:8000"
     # What you want the button to do.
     monthly_paypal_dict = {
         "cmd": "_xclick-subscriptions",
@@ -936,17 +939,36 @@ def initiatePayment(request):
         "sra": "1",                        # reattempt payment on payment error
         "no_note": "1",                    # remove extra notes (optional)
         "item_name": "Ducksoup Subscription",
+        "invoice": request.user.first_name[0]+"-"+request.user.last_name[:4]+"-"+str(request.user.id)+"-"+str(generateCode()),
+        "page_style": "Duck_Soup_1",
+        "cpp_cart_border_color": "ffd777",
+        "cpp_header_image": "http://ducksoup.us/static/icons/paypalDuckBanner-750x90.png",
+        "cpp_headerback_color": "ffd777",
+        "cpp_headerborder_color": "ffd777",
+        "cpp_logo_image": "http://ducksoup.us/static/icons/paypalDuckBanner-180x60.png",
+        "cpp_payflow_color": "ffd777",
+        "rm": "2",
+        "cbt": "Return to Duck Soup Inc.",
         "notify_url": baseWebsite+reverse('paypal-ipn'),
-        "return_url": baseWebsite+reverse('worksheet_project.views.dashboard'),
+        "return_url": baseWebsite+reverse('worksheet_project.views.paypalReturn'),
         "cancel_return": baseWebsite+reverse('worksheet_project.views.initiatePayment'),
     }
     yearly_paypal_dict = {
         "business": settings.PAYPAL_RECEIVER_EMAIL,
         "amount": "99.99",
-        "item_name": "Ducksoup Onetime Payment",
-        "invoice": "unique-invoice-id",
+        "item_name": "Ducksoup Onetime 1 Year Payment",
+        "invoice": request.user.first_name[0]+"-"+request.user.last_name[:4]+"-"+str(request.user.id)+"-"+str(generateCode()),
+        "page_style": "Duck_Soup_1",
+        "cpp_cart_border_color": "ffd777",
+        "cpp_header_image": "http://ducksoup.us/static/icons/paypalDuckBanner-750x90.png",
+        "cpp_headerback_color": "ffd777",
+        "cpp_headerborder_color": "ffd777",
+        "cpp_logo_image": "http://ducksoup.us/static/icons/paypalDuckBanner-180x60.png",
+        "cpp_payflow_color": "ffd777",
+        "rm": "2",
+        "cbt": "Return to Duck Soup Inc.",
         "notify_url": baseWebsite+reverse('paypal-ipn'),
-        "return_url": baseWebsite+reverse('worksheet_project.views.dashboard'),
+        "return_url": baseWebsite+reverse('worksheet_project.views.paypalReturn'),
         "cancel_return": baseWebsite+reverse('worksheet_project.views.initiatePayment'),
     }
 
@@ -976,6 +998,15 @@ def initiatePayment(request):
 
 
 
+@login_required
+@csrf_exempt
+def paypalReturn(request):
+    if request.method == 'POST':
+        auth = request.POST #django user
+        
+        return HttpResponse(json.dumps(auth))
+    else:
+        return HttpResponse("no post")
 
 
 
