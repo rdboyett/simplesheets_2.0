@@ -943,9 +943,9 @@ def initiatePayment(request):
         "amount": "100.00",
         "item_name": "Ducksoup Onetime Payment",
         "invoice": "unique-invoice-id",
-        "notify_url": "http://www.example.com/your-ipn-location/",
-        "return_url": "https://www.example.com/your-return-location/",
-        "cancel_return": "https://www.example.com/your-cancel-location/",
+        "notify_url": baseWebsite+reverse('paypal-ipn'),
+        "return_url": baseWebsite+reverse('worksheet_project.views.dashboard'),
+        "cancel_return": baseWebsite+reverse('worksheet_project.views.initiatePayment'),
     }
 
     # Create the instance.
