@@ -940,7 +940,7 @@ def initiatePayment(request):
     }
     yearly_paypal_dict = {
         "business": settings.PAYPAL_RECEIVER_EMAIL,
-        "amount": "100.00",
+        "amount": "99.99",
         "item_name": "Ducksoup Onetime Payment",
         "invoice": "unique-invoice-id",
         "notify_url": baseWebsite+reverse('paypal-ipn'),
