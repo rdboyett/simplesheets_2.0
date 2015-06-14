@@ -922,6 +922,8 @@ def initiatePayment(request):
         )
         
     
+    
+    
     baseWebsite = "http://ducksoup.us"
     # What you want the button to do.
     monthly_paypal_dict = {
@@ -1021,7 +1023,15 @@ def checkIfTeacher(user, project_id):
 
 
 
+'''
+Merging long git commit messages:
 
+1-press "i"
+2-write your merge message
+3-press "esc"
+4-write ":wq" then press enter
+
+'''
 
 
 
