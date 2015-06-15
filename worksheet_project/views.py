@@ -1186,7 +1186,7 @@ def paypalReturn(request):
                 payUser.nextPaymentDate = datetime.datetime.now() + datetime.timedelta(days=31)
                 
             payUser.payer_email = post['payer_email'].strip()
-            payUser.payer_id = post['payer_email'].strip()
+            payUser.payer_id = post['payer_id'].strip()
             
             if PayPalIPN.objects.filter(invoice=post['invoice'].strip()):
                 payPalObjects = PayPalIPN.objects.filter(invoice=post['invoice'].strip())
