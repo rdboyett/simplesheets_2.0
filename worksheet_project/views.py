@@ -927,7 +927,7 @@ def initiatePayment(request):
     
     
     
-    baseWebsite = "http://127.0.0.1:8000"
+    baseWebsite = "http://ducksoup.us"
     # What you want the button to do.
     monthly_paypal_dict = {
         "cmd": "_xclick-subscriptions",
