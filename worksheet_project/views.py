@@ -17,6 +17,8 @@ from classrooms.models import ClassUser, Classroom, HashTag, Message
 from google_login.models import GoogleUserInfo
 from tourBuilder.models import MyTour
 from classrooms.views import generateCode
+from payment_tracker.models import PaymentUser
+from paypal.standard.ipn.models import PayPalIPN
 
 from paypal.standard.forms import PayPalPaymentsForm
 
@@ -88,6 +90,48 @@ def dashboard(request, *args, **kwargs):
             user = request.user,
             teacher = teacher,
         )
+        
+    if classUser.teacher and settings.PAYMENT_TRACKER_ON:
+        bPaidUp=False
+        if PaymentUser.objects.filter(user=request.user):
+            payUser = PaymentUser.objects.get(user=request.user)
+            #first check if they have a bFreeUser account
+            if not payUser.bFreeUser:
+                #next check if lastProjectDate is more than a month
+                if payUser.lastProjectDate:
+                    today = datetime.datetime.now()
+                    timediff = today - payUser.lastProjectDate
+                    if timediff.days > 30:
+                        bPaidUp = True
+                
+                #next check numberOfProjects is greater than 5
+                if payUser.numberOfProjects < 6:
+                    bPaidUp=True
+                    
+                #next check paymentType and next nextPaymentDate
+                invoiceStart = request.user.first_name[0]+"-"+request.user.last_name[:2]+"-"+str(request.user.id)
+                if PayPalIPN.objects.filter(invoice__istartswith=invoiceStart).exclude(txn_type='subscr_signup'):
+                    payPalObjects = PayPalIPN.objects.filter(invoice__istartswith=invoiceStart).exclude(txn_type='subscr_signup').order_by('-payment_date')
+                    payPalObj = payPalObjects[0]
+                    if payPalObj.item_name == "Ducksoup Subscription":
+                        today = datetime.datetime.now()
+                        timediff = today - payPalObj.payment_date
+                        if timediff.days <= 33:
+                            bPaidUp = True
+                    elif payPalObj.item_name == "Ducksoup Onetime 1 Year Payment":
+                        today = datetime.datetime.now()
+                        timediff = today - payPalObj.payment_date
+                        if timediff.days <= 365:
+                            bPaidUp = True
+            else:
+                bPaidUp = True
+        else:
+            payUser = PaymentUser.objects.create(user=request.user)
+            bPaidUp = True
+            
+        if bPaidUp:
+            payUser.bPaidUp = bPaidUp
+            payUser.save()
         
     #Get all users Class
     if classUser.classrooms.all():
@@ -412,6 +456,52 @@ def classes(request, classID=False):
             teacher = teacher,
         )
         
+        
+        
+    if classUser.teacher and settings.PAYMENT_TRACKER_ON:
+        bPaidUp=False
+        if PaymentUser.objects.filter(user=request.user):
+            payUser = PaymentUser.objects.get(user=request.user)
+            #first check if they have a bFreeUser account
+            if not payUser.bFreeUser:
+                #next check if lastProjectDate is more than a month
+                if payUser.lastProjectDate:
+                    today = datetime.datetime.now()
+                    timediff = today - payUser.lastProjectDate
+                    if timediff.days > 30:
+                        bPaidUp = True
+                
+                #next check numberOfProjects is greater than 5
+                if payUser.numberOfProjects < 6:
+                    bPaidUp=True
+                    
+                #next check paymentType and next nextPaymentDate
+                invoiceStart = request.user.first_name[0]+"-"+request.user.last_name[:2]+"-"+str(request.user.id)
+                if PayPalIPN.objects.filter(invoice__istartswith=invoiceStart).exclude(txn_type='subscr_signup'):
+                    payPalObjects = PayPalIPN.objects.filter(invoice__istartswith=invoiceStart).exclude(txn_type='subscr_signup').order_by('-payment_date')
+                    payPalObj = payPalObjects[0]
+                    if payPalObj.item_name == "Ducksoup Subscription":
+                        today = datetime.datetime.now()
+                        timediff = today - payPalObj.payment_date
+                        if timediff.days <= 33:
+                            bPaidUp = True
+                    elif payPalObj.item_name == "Ducksoup Onetime 1 Year Payment":
+                        today = datetime.datetime.now()
+                        timediff = today - payPalObj.payment_date
+                        if timediff.days <= 365:
+                            bPaidUp = True
+            else:
+                bPaidUp = True
+        else:
+            payUser = PaymentUser.objects.create(user=request.user)
+            bPaidUp = True
+            
+        if bPaidUp:
+            payUser.bPaidUp = bPaidUp
+            payUser.save()
+        
+        
+        
     #Get current Class
     if classID:
         if Classroom.objects.filter(id=classID):
@@ -611,6 +701,49 @@ def profile(request):
             user = request.user,
             teacher = teacher,
         )
+        
+    if classUser.teacher and settings.PAYMENT_TRACKER_ON:
+        bPaidUp=False
+        if PaymentUser.objects.filter(user=request.user):
+            payUser = PaymentUser.objects.get(user=request.user)
+            #first check if they have a bFreeUser account
+            if not payUser.bFreeUser:
+                #next check if lastProjectDate is more than a month
+                if payUser.lastProjectDate:
+                    today = datetime.datetime.now()
+                    timediff = today - payUser.lastProjectDate
+                    if timediff.days > 30:
+                        bPaidUp = True
+                
+                #next check numberOfProjects is greater than 5
+                if payUser.numberOfProjects < 6:
+                    bPaidUp=True
+                    
+                #next check paymentType and next nextPaymentDate
+                invoiceStart = request.user.first_name[0]+"-"+request.user.last_name[:2]+"-"+str(request.user.id)
+                if PayPalIPN.objects.filter(invoice__istartswith=invoiceStart).exclude(txn_type='subscr_signup'):
+                    payPalObjects = PayPalIPN.objects.filter(invoice__istartswith=invoiceStart).exclude(txn_type='subscr_signup').order_by('-payment_date')
+                    payPalObj = payPalObjects[0]
+                    if payPalObj.item_name == "Ducksoup Subscription":
+                        today = datetime.datetime.now()
+                        timediff = today - payPalObj.payment_date
+                        if timediff.days <= 33:
+                            bPaidUp = True
+                    elif payPalObj.item_name == "Ducksoup Onetime 1 Year Payment":
+                        today = datetime.datetime.now()
+                        timediff = today - payPalObj.payment_date
+                        if timediff.days <= 365:
+                            bPaidUp = True
+            else:
+                bPaidUp = True
+        else:
+            payUser = PaymentUser.objects.create(user=request.user)
+            bPaidUp = True
+            
+        if bPaidUp:
+            payUser.bPaidUp = bPaidUp
+            payUser.save()
+        
         
     #Get all users Class
     if classUser.classrooms.all():
@@ -929,6 +1062,7 @@ def initiatePayment(request):
     
     baseWebsite = "http://127.0.0.1:8000"
     # What you want the button to do.
+    userInfo_dict = {"userID":request.user.id, "classUserID": classUser.id, "userInfoID":userInfo.id}
     monthly_paypal_dict = {
         "cmd": "_xclick-subscriptions",
         "business": settings.PAYPAL_RECEIVER_EMAIL,
@@ -939,7 +1073,8 @@ def initiatePayment(request):
         "sra": "1",                        # reattempt payment on payment error
         "no_note": "1",                    # remove extra notes (optional)
         "item_name": "Ducksoup Subscription",
-        "invoice": request.user.first_name[0]+"-"+request.user.last_name[:4]+"-"+str(request.user.id)+"-"+str(generateCode()),
+        "invoice": request.user.first_name[0]+"-"+request.user.last_name[:2]+"-"+str(request.user.id)+"-"+str(generateCode()),
+        "custom": userInfo_dict,
         "page_style": "Duck_Soup_1",
         "cpp_cart_border_color": "ffd777",
         "cpp_header_image": "http://ducksoup.us/static/icons/paypalDuckBanner-750x90.png",
@@ -957,7 +1092,8 @@ def initiatePayment(request):
         "business": settings.PAYPAL_RECEIVER_EMAIL,
         "amount": "99.99",
         "item_name": "Ducksoup Onetime 1 Year Payment",
-        "invoice": request.user.first_name[0]+"-"+request.user.last_name[:4]+"-"+str(request.user.id)+"-"+str(generateCode()),
+        "invoice": request.user.first_name[0]+"-"+request.user.last_name[:2]+"-"+str(request.user.id)+"-"+str(generateCode()),
+        "custom": userInfo_dict,
         "page_style": "Duck_Soup_1",
         "cpp_cart_border_color": "ffd777",
         "cpp_header_image": "http://ducksoup.us/static/icons/paypalDuckBanner-750x90.png",
@@ -1002,9 +1138,52 @@ def initiatePayment(request):
 @csrf_exempt
 def paypalReturn(request):
     if request.method == 'POST':
-        auth = request.POST #django user
+        post = request.POST #django user
+        #custom #{"userID":request.user.id, "classUserID": classUser.id, "userInfoID":userInfo.id}
+        #invoice #this is unique request.user.first_name[0]+"-"+request.user.last_name[:4]+"-"+str(request.user.id)+"-"+str(generateCode()),
+        #item_name #Ducksoup Onetime 1 Year Payment for 99.99 year #Ducksoup Subscription for 9.99/mo
+        #txn_type  #web_accept means 99.99 year #subscr_signup is for 9.99/mo
+        #first_name
+        #last_name
+        #payer_email
+        #payer_id
         
-        return HttpResponse(json.dumps(auth))
+        #only for subscribe 9.99/mo
+        #subscr_id
+        #period3 #1 M
+        #amount3 #9.99
+        #subscr_date #16:12:57 Jun 14, 2015 PDT
+        
+        #only for web_accept 99.99 year
+        #txn_id
+        #payment_gross
+        #payment_fee
+        #payment_date #15:59:31 Jun 14, 2015 PDT
+        
+        if PaymentUser.objects.filter(user=request.user):
+            payUser = PaymentUser.objects.get(user=request.user)
+            payUser.paymentType = post['txn_type'].strip()
+            payUser.bPaidUp = True
+            payUser.lastPaymentDate = datetime.datetime.now()
+            
+            if payUser.paymentType == "web_accept":
+                payUser.nextPaymentDate = datetime.datetime.now() + datetime.timedelta(days=365)
+            elif payUser.paymentType == "subscr_signup":
+                payUser.nextPaymentDate = datetime.datetime.now() + datetime.timedelta(days=31)
+                
+            payUser.payer_email = post['payer_email'].strip()
+            payUser.payer_id = post['payer_email'].strip()
+            
+            if PayPalIPN.objects.filter(invoice=post['invoice'].strip()):
+                payPalObjects = PayPalIPN.objects.filter(invoice=post['invoice'].strip())
+                for payPalObj in payPalObjects:
+                    payUser.payments.add(payPalObj)
+                
+            payUser.save()
+        
+        
+        
+        return HttpResponse(json.dumps(post))
     else:
         return HttpResponse("no post")
 
