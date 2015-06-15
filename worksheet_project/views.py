@@ -1,4 +1,18 @@
 import datetime
+from datetime import tzinfo, timedelta
+
+ZERO = timedelta(0)
+
+class UTC(tzinfo):
+  def utcoffset(self, dt):
+    return ZERO
+  def tzname(self, dt):
+    return "UTC"
+  def dst(self, dt):
+    return ZERO
+
+utc = UTC()
+
 import json
 
 from django.shortcuts import render_to_response, redirect
@@ -114,12 +128,12 @@ def dashboard(request, *args, **kwargs):
                     payPalObjects = PayPalIPN.objects.filter(invoice__istartswith=invoiceStart).exclude(txn_type='subscr_signup').order_by('-payment_date')
                     payPalObj = payPalObjects[0]
                     if payPalObj.item_name == "Ducksoup Subscription":
-                        today = datetime.datetime.now()
+                        today = datetime.datetime.now(utc)
                         timediff = today - payPalObj.payment_date
                         if timediff.days <= 33:
                             bPaidUp = True
                     elif payPalObj.item_name == "Ducksoup Onetime 1 Year Payment":
-                        today = datetime.datetime.now()
+                        today = datetime.datetime.now(utc)
                         timediff = today - payPalObj.payment_date
                         if timediff.days <= 365:
                             bPaidUp = True
@@ -481,12 +495,12 @@ def classes(request, classID=False):
                     payPalObjects = PayPalIPN.objects.filter(invoice__istartswith=invoiceStart).exclude(txn_type='subscr_signup').order_by('-payment_date')
                     payPalObj = payPalObjects[0]
                     if payPalObj.item_name == "Ducksoup Subscription":
-                        today = datetime.datetime.now()
+                        today = datetime.datetime.now(utc)
                         timediff = today - payPalObj.payment_date
                         if timediff.days <= 33:
                             bPaidUp = True
                     elif payPalObj.item_name == "Ducksoup Onetime 1 Year Payment":
-                        today = datetime.datetime.now()
+                        today = datetime.datetime.now(utc)
                         timediff = today - payPalObj.payment_date
                         if timediff.days <= 365:
                             bPaidUp = True
@@ -725,12 +739,12 @@ def profile(request):
                     payPalObjects = PayPalIPN.objects.filter(invoice__istartswith=invoiceStart).exclude(txn_type='subscr_signup').order_by('-payment_date')
                     payPalObj = payPalObjects[0]
                     if payPalObj.item_name == "Ducksoup Subscription":
-                        today = datetime.datetime.now()
+                        today = datetime.datetime.now(utc)
                         timediff = today - payPalObj.payment_date
                         if timediff.days <= 33:
                             bPaidUp = True
                     elif payPalObj.item_name == "Ducksoup Onetime 1 Year Payment":
-                        today = datetime.datetime.now()
+                        today = datetime.datetime.now(utc)
                         timediff = today - payPalObj.payment_date
                         if timediff.days <= 365:
                             bPaidUp = True
