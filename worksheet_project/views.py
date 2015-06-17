@@ -35,7 +35,7 @@ from payment_tracker.models import PaymentUser
 from paypal.standard.ipn.models import PayPalIPN
 
 from paypal.standard.forms import PayPalPaymentsForm
-from paypal.standard.models import ST_PP_COMPLETED
+from paypal.standard.models import ST_PP_COMPLETED, ST_PP_PENDING
 from paypal.standard.ipn.signals import valid_ipn_received
 from django.dispatch import receiver
 
@@ -973,7 +973,7 @@ def initiatePayment(request):
         "no_note": "1",                    # remove extra notes (optional)
         "item_name": "Ducksoup Subscription",
         "invoice": request.user.first_name[0]+"-"+request.user.last_name[:2]+"-"+str(request.user.id)+"-"+str(generateCode()),
-        "custom": userInfo_dict,
+        "custom": json.dumps(userInfo_dict),
         "page_style": "Duck_Soup_1",
         "cpp_cart_border_color": "ffd777",
         "cpp_header_image": "http://ducksoup.us/static/icons/paypalDuckBanner-750x90.png",
@@ -992,7 +992,7 @@ def initiatePayment(request):
         "amount": "99.99",
         "item_name": "Ducksoup Onetime 1 Year Payment",
         "invoice": request.user.first_name[0]+"-"+request.user.last_name[:2]+"-"+str(request.user.id)+"-"+str(generateCode()),
-        "custom": userInfo_dict,
+        "custom": json.dumps(userInfo_dict),
         "page_style": "Duck_Soup_1",
         "cpp_cart_border_color": "ffd777",
         "cpp_header_image": "http://ducksoup.us/static/icons/paypalDuckBanner-750x90.png",
@@ -1099,19 +1099,15 @@ def paypalReturn(request):
 #*******************  Testings Purposes  ***********************************************
 
 def test(request):
-    '''
-    if PaymentUser.objects.filter(user=request.user):
-        payUser = PaymentUser.objects.get(user=request.user)
-        invoiceStart = request.user.first_name[0]+"-"+request.user.last_name[:2]+"-"+str(request.user.id)
-        if PayPalIPN.objects.filter(invoice__istartswith=invoiceStart).exclude(txn_type='subscr_signup'):
-            payPalObjects = PayPalIPN.objects.filter(invoice__istartswith=invoiceStart).exclude(txn_type='subscr_signup').order_by('-payment_date')
-    '''
-    payPalObjects = PayPalIPN.objects.all()
-    userID = payPalObjects[0].custom['userID']
-    
-    
-    
-    return render_to_response(userID)
+    if PayPalIPN.objects.all():
+        payObj = PayPalIPN.objects.all()
+        ipn_obj = payObj[0]
+        if ipn_obj.custom:
+            userID = json.loads(ipn_obj.custom)['userID']
+            if PaymentUser.objects.filter(user_id=userID):
+                payUser = PaymentUser.objects.get(user_id=userID)
+            
+    return HttpResponse(payUser)
 
 
 
@@ -1168,60 +1164,19 @@ def checkPaidUp(user):
             payUser = PaymentUser.objects.get(user=user)
             #first check if they have a bFreeUser account
             if not payUser.bFreeUser:
-                #next check if lastProjectDate is more than a month
-                if payUser.lastProjectDate:
+                if payUser.nextPaymentDate:
                     today = datetime.datetime.now()
-                    timediff = today - payUser.lastProjectDate
-                    if timediff.days > 30:
-                        bPaidUp = True
-                
-                #next check numberOfProjects is greater than 5
-                if payUser.numberOfProjects < 6:
-                    bPaidUp=True
-                    
-                #next check paymentType and next nextPaymentDate
-                invoiceStart = user.first_name[0]+"-"+user.last_name[:2]+"-"+str(user.id)
-                if PayPalIPN.objects.filter(invoice__istartswith=invoiceStart).exclude(txn_type='subscr_signup'):
-                    payPalObjects = PayPalIPN.objects.filter(invoice__istartswith=invoiceStart).exclude(txn_type='subscr_signup').order_by('-payment_date')
-                    
-                    payPalObj = payPalObjects[0]
-                    
-                    #update the payment_tracker
-                    payUser.paymentType = payPalObj.txn_type
-                    
-                    if payUser.paymentType == "web_accept":
-                        payUser.nextPaymentDate = datetime.datetime.now() + datetime.timedelta(days=365)
-                    elif payUser.paymentType == "subscr_signup":
-                        payUser.nextPaymentDate = datetime.datetime.now() + datetime.timedelta(days=31)
-                        
-                    payUser.payer_email = payPalObj.payer_email
-                    payUser.payer_id = payPalObj.payer_id
-                    
-                    payUser.payments.add(payPalObj)
-                        
-                    payUser.save()
-                    
-                    
-                    
-                    if payPalObj.item_name == "Ducksoup Subscription":
-                        today = datetime.datetime.now(utc)
-                        timediff = today - payPalObj.payment_date
-                        if timediff.days <= 33:
-                            bPaidUp = True
-                    elif payPalObj.item_name == "Ducksoup Onetime 1 Year Payment":
-                        today = datetime.datetime.now(utc)
-                        timediff = today - payPalObj.payment_date
-                        if timediff.days <= 365:
-                            bPaidUp = True
+                    if today >= payUser.nextPaymentDate:
+                        payUser.bPaidUp=False
+                        payUser.save()
+                    else:
+                        bPaidUp=True
             else:
                 bPaidUp = True
         else:
             payUser = PaymentUser.objects.create(user=user)
-            bPaidUp = True
             
         if bPaidUp:
-            payUser.bPaidUp = bPaidUp
-            payUser.save()
             return True
         else:
             return False
@@ -1232,20 +1187,83 @@ def checkPaidUp(user):
         
 
 @receiver(valid_ipn_received)
-def show_me_the_money(sender, **kwargs):
+def ipnProcessing(sender, **kwargs):
     ipn_obj = sender
+    if ipn_obj.custom:
+        userID = json.loads(ipn_obj.custom)['userID']
+        if PaymentUser.objects.filter(user_id=userID):
+            payUser = PaymentUser.objects.get(user_id=userID)
+            
     if ipn_obj.payment_status == ST_PP_COMPLETED:
-        # Undertake some action depending upon `ipn_obj`.
-        if ipn_obj.custom:
-            Users.objects.update(paid=True)
+        # update payment_tracker
+        if ipn_obj.item_name == "Ducksoup Subscription":
+            payUser.paymentType = "subscr_payment"
+            payUser.nextPaymentDate = datetime.datetime.now() + datetime.timedelta(days=35)
+        elif ipn_obj.item_name == "Ducksoup Onetime 1 Year Payment":
+            payUser.paymentType = "web_accept"
+            payUser.nextPaymentDate = datetime.datetime.now() + datetime.timedelta(days=370)
+            
+        # update payment date
+        payUser.lastPaymentDate = datetime.datetime.now()
+        payUser.payer_email = ipn_obj.payer_email
+        payUser.payer_id = ipn_obj.payer_id
+        payUser.bPaidUp = True
+        payUser.payments.add(ipn_obj)
+        payUser.save()
+    elif ipn_obj.payment_status == ST_PP_PENDING:
+        # update payment_tracker
+        if ipn_obj.item_name == "Ducksoup Subscription":
+            payUser.paymentType = "subscr_Pending"
+        elif ipn_obj.item_name == "Ducksoup Onetime 1 Year Payment":
+            payUser.paymentType = "web_accept_Pending"
+            
+        # Give 3 day grace period for payment to clear
+        payUser.nextPaymentDate = datetime.datetime.now() + datetime.timedelta(days=3)
+        # update payment date
+        payUser.lastPaymentDate = datetime.datetime.now()
+        payUser.payer_email = ipn_obj.payer_email
+        payUser.payer_id = ipn_obj.payer_id
+        payUser.bPaidUp = True
+        payUser.payments.add(ipn_obj)
+        payUser.save()
+    elif ipn_obj.txn_type == "subscr_signup":
+        # update payment_tracker
+        if ipn_obj.item_name == "Ducksoup Subscription":
+            payUser.paymentType = "subscr_payment"
+            payUser.nextPaymentDate = datetime.datetime.now() + datetime.timedelta(days=35)
+        elif ipn_obj.item_name == "Ducksoup Onetime 1 Year Payment":
+            payUser.paymentType = "web_accept"
+            payUser.nextPaymentDate = datetime.datetime.now() + datetime.timedelta(days=370)
+            
+        # update payment date
+        payUser.lastPaymentDate = datetime.datetime.now()
+        payUser.payer_email = ipn_obj.payer_email
+        payUser.payer_id = ipn_obj.payer_id
+        payUser.bPaidUp = True
+        payUser.payments.add(ipn_obj)
+        payUser.save()
     else:
-        #...
-
+        # update payment_tracker
+        if ipn_obj.item_name == "Ducksoup Subscription":
+            payUser.paymentType = "subscr_Cancelled"
+        elif ipn_obj.item_name == "Ducksoup Onetime 1 Year Payment":
+            payUser.paymentType = "web_accept_Cancelled"
+            
+        # Give 3 day grace period for payment to clear
+        payUser.nextPaymentDate = datetime.datetime.now()
+        # update payment date
+        payUser.lastPaymentDate = datetime.datetime.now()
+        payUser.payer_email = ipn_obj.payer_email
+        payUser.payer_id = ipn_obj.payer_id
+        payUser.bPaidUp = False
+        payUser.payments.add(ipn_obj)
+        payUser.save()
         
         
         
         
-
+        
+        
 
 
 
