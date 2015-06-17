@@ -35,6 +35,9 @@ from payment_tracker.models import PaymentUser
 from paypal.standard.ipn.models import PayPalIPN
 
 from paypal.standard.forms import PayPalPaymentsForm
+from paypal.standard.models import ST_PP_COMPLETED
+from paypal.standard.ipn.signals import valid_ipn_received
+from django.dispatch import receiver
 
 from worksheet_project import settings
 
@@ -1103,8 +1106,12 @@ def test(request):
         if PayPalIPN.objects.filter(invoice__istartswith=invoiceStart).exclude(txn_type='subscr_signup'):
             payPalObjects = PayPalIPN.objects.filter(invoice__istartswith=invoiceStart).exclude(txn_type='subscr_signup').order_by('-payment_date')
     '''
+    payPalObjects = PayPalIPN.objects.all()
+    userID = payPalObjects[0].custom['userID']
     
-    return render_to_response('test.html')
+    
+    
+    return render_to_response(userID)
 
 
 
@@ -1223,7 +1230,17 @@ def checkPaidUp(user):
         
         
         
-        
+
+@receiver(valid_ipn_received)
+def show_me_the_money(sender, **kwargs):
+    ipn_obj = sender
+    if ipn_obj.payment_status == ST_PP_COMPLETED:
+        # Undertake some action depending upon `ipn_obj`.
+        if ipn_obj.custom:
+            Users.objects.update(paid=True)
+    else:
+        #...
+
         
         
         
