@@ -434,46 +434,7 @@ def classes(request, classID=False):
         
         
     if classUser.teacher and settings.PAYMENT_TRACKER_ON:
-        bPaidUp=False
-        if PaymentUser.objects.filter(user=request.user):
-            payUser = PaymentUser.objects.get(user=request.user)
-            #first check if they have a bFreeUser account
-            if not payUser.bFreeUser:
-                #next check if lastProjectDate is more than a month
-                if payUser.lastProjectDate:
-                    today = datetime.datetime.now()
-                    timediff = today - payUser.lastProjectDate
-                    if timediff.days > 30:
-                        bPaidUp = True
-                
-                #next check numberOfProjects is greater than 5
-                if payUser.numberOfProjects < 6:
-                    bPaidUp=True
-                    
-                #next check paymentType and next nextPaymentDate
-                invoiceStart = request.user.first_name[0]+"-"+request.user.last_name[:2]+"-"+str(request.user.id)
-                if PayPalIPN.objects.filter(invoice__istartswith=invoiceStart).exclude(txn_type='subscr_signup'):
-                    payPalObjects = PayPalIPN.objects.filter(invoice__istartswith=invoiceStart).exclude(txn_type='subscr_signup').order_by('-payment_date')
-                    payPalObj = payPalObjects[0]
-                    if payPalObj.item_name == "Ducksoup Subscription":
-                        today = datetime.datetime.now(utc)
-                        timediff = today - payPalObj.payment_date
-                        if timediff.days <= 33:
-                            bPaidUp = True
-                    elif payPalObj.item_name == "Ducksoup Onetime 1 Year Payment":
-                        today = datetime.datetime.now(utc)
-                        timediff = today - payPalObj.payment_date
-                        if timediff.days <= 365:
-                            bPaidUp = True
-            else:
-                bPaidUp = True
-        else:
-            payUser = PaymentUser.objects.create(user=request.user)
-            bPaidUp = True
-            
-        if bPaidUp:
-            payUser.bPaidUp = bPaidUp
-            payUser.save()
+        bPaiUP = checkPaidUp(request.user)
         
         
         
@@ -678,47 +639,7 @@ def profile(request):
         )
         
     if classUser.teacher and settings.PAYMENT_TRACKER_ON:
-        bPaidUp=False
-        if PaymentUser.objects.filter(user=request.user):
-            payUser = PaymentUser.objects.get(user=request.user)
-            #first check if they have a bFreeUser account
-            if not payUser.bFreeUser:
-                #next check if lastProjectDate is more than a month
-                if payUser.lastProjectDate:
-                    today = datetime.datetime.now()
-                    timediff = today - payUser.lastProjectDate
-                    if timediff.days > 30:
-                        bPaidUp = True
-                
-                #next check numberOfProjects is greater than 5
-                if payUser.numberOfProjects < 6:
-                    bPaidUp=True
-                    
-                #next check paymentType and next nextPaymentDate
-                invoiceStart = request.user.first_name[0]+"-"+request.user.last_name[:2]+"-"+str(request.user.id)
-                if PayPalIPN.objects.filter(invoice__istartswith=invoiceStart).exclude(txn_type='subscr_signup'):
-                    payPalObjects = PayPalIPN.objects.filter(invoice__istartswith=invoiceStart).exclude(txn_type='subscr_signup').order_by('-payment_date')
-                    payPalObj = payPalObjects[0]
-                    if payPalObj.item_name == "Ducksoup Subscription":
-                        today = datetime.datetime.now(utc)
-                        timediff = today - payPalObj.payment_date
-                        if timediff.days <= 33:
-                            bPaidUp = True
-                    elif payPalObj.item_name == "Ducksoup Onetime 1 Year Payment":
-                        today = datetime.datetime.now(utc)
-                        timediff = today - payPalObj.payment_date
-                        if timediff.days <= 365:
-                            bPaidUp = True
-            else:
-                bPaidUp = True
-        else:
-            payUser = PaymentUser.objects.create(user=request.user)
-            bPaidUp = True
-            
-        if bPaidUp:
-            payUser.bPaidUp = bPaidUp
-            payUser.save()
-        
+        bPaiUP = checkPaidUp(request.user)
         
     #Get all users Class
     if classUser.classrooms.all():
@@ -1043,7 +964,7 @@ def initiatePayment(request):
         "business": settings.PAYPAL_RECEIVER_EMAIL,
         "a3": "9.99",                      # monthly price
         "p3": 1,                           # duration of each unit (depends on unit)
-        "t3": "M",                         # duration unit ("M for Month")
+        "t3": "D",                         # duration unit ("M for Month")
         "src": "1",                        # make payments recur
         "sra": "1",                        # reattempt payment on payment error
         "no_note": "1",                    # remove extra notes (optional)
@@ -1175,12 +1096,15 @@ def paypalReturn(request):
 #*******************  Testings Purposes  ***********************************************
 
 def test(request):
+    '''
     if PaymentUser.objects.filter(user=request.user):
         payUser = PaymentUser.objects.get(user=request.user)
         invoiceStart = request.user.first_name[0]+"-"+request.user.last_name[:2]+"-"+str(request.user.id)
         if PayPalIPN.objects.filter(invoice__istartswith=invoiceStart).exclude(txn_type='subscr_signup'):
             payPalObjects = PayPalIPN.objects.filter(invoice__istartswith=invoiceStart).exclude(txn_type='subscr_signup').order_by('-payment_date')
-    return HttpResponse(payPalObjects)
+    '''
+    
+    return render_to_response('test.html')
 
 
 
@@ -1291,4 +1215,39 @@ def checkPaidUp(user):
         if bPaidUp:
             payUser.bPaidUp = bPaidUp
             payUser.save()
+            return True
+        else:
+            return False
         
+        
+        
+        
+        
+        
+        
+        
+        
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
