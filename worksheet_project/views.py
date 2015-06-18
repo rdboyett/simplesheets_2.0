@@ -1058,7 +1058,7 @@ def paypalReturn(request):
         #payment_gross
         #payment_fee
         #payment_date #15:59:31 Jun 14, 2015 PDT
-        
+        '''
         if PaymentUser.objects.filter(user=request.user):
             payUser = PaymentUser.objects.get(user=request.user)
             payUser.paymentType = post['txn_type'].strip()
@@ -1079,7 +1079,7 @@ def paypalReturn(request):
                     payUser.payments.add(payPalObj)
                 
             payUser.save()
-        
+        '''
         
         
         return HttpResponse(json.dumps(post))
@@ -1165,7 +1165,7 @@ def checkPaidUp(user):
             #first check if they have a bFreeUser account
             if not payUser.bFreeUser:
                 if payUser.nextPaymentDate:
-                    today = datetime.datetime.now()
+                    today = datetime.datetime.now(utc)
                     if today >= payUser.nextPaymentDate:
                         payUser.bPaidUp=False
                         payUser.save()
