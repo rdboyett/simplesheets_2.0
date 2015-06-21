@@ -1032,7 +1032,7 @@ def initiatePayment(request):
     
     
     
-    baseWebsite = "http://127.0.0.1:8000"
+    baseWebsite = "http://ducksoup.us"
     # What you want the button to do.
     userInfo_dict = {"userID":request.user.id, "classUserID": classUser.id, "userInfoID":userInfo.id}
     monthly_paypal_dict = {
