@@ -52,6 +52,23 @@
 	  	</div>
 	  </div>
 
+{% if not bPaidUp %}
+<!---------------- modal ------------------------------------->
+<div id="notPaid-modal" class="modal fade" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content rounded">
+      <div class="modal-header top-rounded">
+        <h4 class="modal-title">Upgrade to DUCKPRO</h4>
+      </div>
+      <div class="modal-body centered text-center">
+	    <p style="font-size: 30px;">Sorry, free accounts can only have 5 free eSheets and one free eSheet a month.</p>
+	    <div><a href="{% url "worksheet_project.views.initiatePayment" %}" class="btn btn-danger btn-lg">GET DUCKPRO FOR ONLY $9.99/mo!</a></div>
+	    
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
     <!-- js placed at the end of the document so the pages load faster -->
     <script src="{% static "adminBoot/js/bootstrap.min.js" %}"></script>
     
@@ -71,7 +88,7 @@
     /************************** Check If project already exits ****************/
 	function createWorksheet(fileId){
 		console.log('In createWorksheet');
-	    
+	  {% if bPaidUp %}
             var csrftoken = getCookie('csrftoken');
             var uri = "{% url "worksheet_creator.views.create" %}";
             var xhr = new XMLHttpRequest();
@@ -88,6 +105,9 @@
                       alert(data.error);
                       document.location.href = '/drive/pickFile/';
                     }
+		    else if (data.redirect) {
+		      document.location.href = '{% url "google_login.views.index" %}';
+		    }
 		    else{
                       document.location.href = '/nextPage/'+ data.projectID +'/1/';
 		    }
@@ -103,10 +123,12 @@
             // Initiate a multipart/form-data upload
             xhr.setRequestHeader("X-CSRFToken", csrftoken);
             xhr.send(fd);
+	  {% endif %}
         }
     /************************** Check If project already exits ***************/
 	
         {% if fileId %}
+	  {% if bPaidUp %}
 	  var count = 0;
 	  setInterval(function(){
 	    if (count == 1) {
@@ -127,6 +149,15 @@
 	    count++;
 	  }, 3000);
           createWorksheet("{{ fileId }}");
+	  {% else %}
+	    
+	    $("#notPaid-modal").modal({
+		"backdrop" : "static",
+		"keyboard" : "false",
+	    });
+	    $("#notPaid-modal").modal("show");
+    
+	  {% endif %}
         {% else %}
           alert("Something went wrong, That's all we know.");
           document.location.href = '/drive/pickFile/';

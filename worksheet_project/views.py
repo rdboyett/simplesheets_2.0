@@ -109,7 +109,11 @@ def dashboard(request, *args, **kwargs):
         )
         
     if classUser.teacher and settings.PAYMENT_TRACKER_ON:
-        bPaiUP = checkPaidUp(request.user)
+        bPaidUp = checkPaidUp(request.user)
+    elif settings.PAYMENT_TRACKER_ON:
+        bPaidUp = False
+    else:
+        bPaidUp = True
         
     #Get all users Class
     if classUser.classrooms.all():
@@ -135,6 +139,7 @@ def dashboard(request, *args, **kwargs):
             "classUser":classUser,
             "randomNumber":['1','2','3','4','5','6'],
             "allProjects":allProjects,
+            "bPaidUp":bPaidUp,
         }
     args.update(csrf(request))
     
@@ -189,6 +194,12 @@ def showNextPage(request, projectID=False, pageNumber=False, classID=False):
     
     
     
+    if classUser.teacher and settings.PAYMENT_TRACKER_ON:
+        bPaidUp = checkPaidUp(request.user)
+    elif settings.PAYMENT_TRACKER_ON:
+        bPaidUp = False
+    else:
+        bPaidUp = True
     
     
     if newProject:
@@ -245,6 +256,7 @@ def showNextPage(request, projectID=False, pageNumber=False, classID=False):
                 'classID':classID,
                 'myTour':myTour,
                 'resetTour':tourName,
+                'bPaidUp':bPaidUp,
             }
         args.update(csrf(request))
     
@@ -293,6 +305,14 @@ def handGrade(request, projectID=False, pageNumber=False, classID=False, student
             user = request.user,
             teacher = teacher,
         )
+        
+    
+    if classUser.teacher and settings.PAYMENT_TRACKER_ON:
+        bPaidUp = checkPaidUp(request.user)
+    elif settings.PAYMENT_TRACKER_ON:
+        bPaidUp = False
+    else:
+        bPaidUp = True
         
     if not bTeacher:
         request.session['error'] = 'Sorry, you must be a teacher to view this page.'
@@ -397,6 +417,7 @@ def handGrade(request, projectID=False, pageNumber=False, classID=False, student
                   'classID':classID,
                   'myTour':myTour,
                   'resetTour':tourName,
+                  'bPaidUp':bPaidUp,
             }
         args.update(csrf(request))
     
@@ -437,7 +458,11 @@ def classes(request, classID=False):
         
         
     if classUser.teacher and settings.PAYMENT_TRACKER_ON:
-        bPaiUP = checkPaidUp(request.user)
+        bPaidUp = checkPaidUp(request.user)
+    elif settings.PAYMENT_TRACKER_ON:
+        bPaidUp = False
+    else:
+        bPaidUp = True
         
         
         
@@ -489,6 +514,7 @@ def classes(request, classID=False):
             "allClasses":allClasses,
             "googleUserInfo":googleUserInfo,
             "randomNumber":['1','2','3','4','5','6'],
+            "bPaidUp":bPaidUp,
         }
     args.update(csrf(request))
         
@@ -523,7 +549,13 @@ def monitor(request, projectID=False, classID=False):
     if not classUser.teacher:
         return redirect('/classes/')
         
-        
+    
+    if classUser.teacher and settings.PAYMENT_TRACKER_ON:
+        bPaidUp = checkPaidUp(request.user)
+    elif settings.PAYMENT_TRACKER_ON:
+        bPaidUp = False
+    else:
+        bPaidUp = True
         
     #Get current Worksheet Project
     if projectID:
@@ -601,6 +633,7 @@ def monitor(request, projectID=False, classID=False):
             "classUser":classUser,
             "currentProject":currentProject,
             'classesAndStudents':classesAndStudents,
+            'bPaidUp':bPaidUp,
         }
     args.update(csrf(request))
         
@@ -642,7 +675,11 @@ def profile(request):
         )
         
     if classUser.teacher and settings.PAYMENT_TRACKER_ON:
-        bPaiUP = checkPaidUp(request.user)
+        bPaidUp = checkPaidUp(request.user)
+    elif settings.PAYMENT_TRACKER_ON:
+        bPaidUp = False
+    else:
+        bPaidUp = True
         
     #Get all users Class
     if classUser.classrooms.all():
@@ -673,6 +710,7 @@ def profile(request):
             "classUser":classUser,
             "allClasses":allClasses,
             "myTour":myTour,
+            "bPaidUp":bPaidUp,
         }
     args.update(csrf(request))
         
@@ -704,6 +742,14 @@ def assign(request, projectID=False):
     #Check if teacher
     if not classUser.teacher:
         return redirect('/classes/')
+        
+        
+    if classUser.teacher and settings.PAYMENT_TRACKER_ON:
+        bPaidUp = checkPaidUp(request.user)
+    elif settings.PAYMENT_TRACKER_ON:
+        bPaidUp = False
+    else:
+        bPaidUp = True
         
     #Get current Worksheet Project
     if projectID:
@@ -742,6 +788,7 @@ def assign(request, projectID=False):
             "googleUserInfo":googleUserInfo,
             "assign":True,
             "randomNumber":['1','2','3','4','5','6'],
+            "bPaidUp":bPaidUp,
         }
     args.update(csrf(request))
         
@@ -772,6 +819,14 @@ def worksheet_display(request, projectID=False):
             user = request.user,
             teacher = teacher,
         )
+        
+        
+    if classUser.teacher and settings.PAYMENT_TRACKER_ON:
+        bPaidUp = checkPaidUp(request.user)
+    elif settings.PAYMENT_TRACKER_ON:
+        bPaidUp = False
+    else:
+        bPaidUp = True
         
     #Get current Worksheet Project
     if projectID:
@@ -821,7 +876,8 @@ def worksheet_display(request, projectID=False):
             "allClasses":allClasses,
             "googleUserInfo":googleUserInfo,
             "randomNumber":['1','2','3','4','5','6'],
-            "currentProject":currentProject
+            "currentProject":currentProject,
+            "bPaidUp":bPaidUp,
         }
     args.update(csrf(request))
         
@@ -849,6 +905,14 @@ def student_display(request, classID=False, studentID=False):
             user = request.user,
             teacher = teacher,
         )
+        
+        
+    if classUser.teacher and settings.PAYMENT_TRACKER_ON:
+        bPaidUp = checkPaidUp(request.user)
+    elif settings.PAYMENT_TRACKER_ON:
+        bPaidUp = False
+    else:
+        bPaidUp = True
         
     #Get all users Worksheet Projects
     if classUser.classrooms.all():
@@ -897,6 +961,7 @@ def student_display(request, classID=False, studentID=False):
             "currentClass":currentClass,
             "googleUserInfo":googleUserInfo,
             "randomNumber":['1','2','3','4','5','6'],
+            "bPaidUp":bPaidUp,
         }
     args.update(csrf(request))
         
@@ -937,6 +1002,14 @@ def initiatePayment(request):
             teacher = teacher,
         )
         
+    
+    if classUser.teacher and settings.PAYMENT_TRACKER_ON:
+        bPaidUp = checkPaidUp(request.user)
+    elif settings.PAYMENT_TRACKER_ON:
+        bPaidUp = False
+    else:
+        bPaidUp = True
+        
     #Get all users Class
     if classUser.classrooms.all():
         allClasses = classUser.classrooms.all().order_by('name')
@@ -959,7 +1032,7 @@ def initiatePayment(request):
     
     
     
-    baseWebsite = "http://ducksoup.us"
+    baseWebsite = "http://127.0.0.1:8000"
     # What you want the button to do.
     userInfo_dict = {"userID":request.user.id, "classUserID": classUser.id, "userInfoID":userInfo.id}
     monthly_paypal_dict = {
@@ -1024,6 +1097,7 @@ def initiatePayment(request):
             "classUser":classUser,
             "allClasses":allClasses,
             "myTour":myTour,
+            "bPaidUp":bPaidUp,
         }
     args.update(csrf(request))
         
@@ -1039,7 +1113,7 @@ def paypalReturn(request):
     if request.method == 'POST':
         post = request.POST #django user
         #custom #{"userID":request.user.id, "classUserID": classUser.id, "userInfoID":userInfo.id}
-        #invoice #this is unique request.user.first_name[0]+"-"+request.user.last_name[:4]+"-"+str(request.user.id)+"-"+str(generateCode()),
+        #invoice
         #item_name #Ducksoup Onetime 1 Year Payment for 99.99 year #Ducksoup Subscription for 9.99/mo
         #txn_type  #web_accept means 99.99 year #subscr_signup is for 9.99/mo
         #first_name
@@ -1058,33 +1132,87 @@ def paypalReturn(request):
         #payment_gross
         #payment_fee
         #payment_date #15:59:31 Jun 14, 2015 PDT
-        '''
+        
+        
+            
+        if UserInfo.objects.filter(user=request.user):
+            userInfo = UserInfo.objects.get(user=request.user)
+        else:
+            userInfo = False
+            
+        #if there is a google account
+        if GoogleUserInfo.objects.filter(user=request.user):
+            googleUserInfo = GoogleUserInfo.objects.get(user=request.user)
+        else:
+            googleUserInfo = False
+            
+        #check if teacher or student is set
+        if not userInfo.teacher_student:
+            teacherStudent = False
+        else:
+            teacherStudent = True
+            
+        #Get all users Classes
+        if ClassUser.objects.filter(user=request.user):
+            classUser = ClassUser.objects.get(user=request.user)
+        else:
+            if userInfo.teacher_student == 'teacher':
+                teacher = True
+            else:
+                teacher = False
+            classUser = ClassUser.objects.create(
+                user = request.user,
+                teacher = teacher,
+            )
+            
+        
+            
+        #Get all users Class
+        if classUser.classrooms.all():
+            allClasses = classUser.classrooms.all().order_by('name')
+        else:
+            allClasses = False
+        
+        
+        
         if PaymentUser.objects.filter(user=request.user):
             payUser = PaymentUser.objects.get(user=request.user)
-            payUser.paymentType = post['txn_type'].strip()
-            payUser.bPaidUp = True
-            payUser.lastPaymentDate = datetime.datetime.now()
-            
-            if payUser.paymentType == "web_accept":
-                payUser.nextPaymentDate = datetime.datetime.now() + datetime.timedelta(days=365)
-            elif payUser.paymentType == "subscr_signup":
-                payUser.nextPaymentDate = datetime.datetime.now() + datetime.timedelta(days=31)
+            # check if invoice for IPN has already been created and bPaidUp is checked. if so then do nothing
+            if not PayPalIPN.objects.filter(invoice=post['invoice'].strip()) and not payUser.bPaidUp:
+                # update payment_tracker
+                if post['item_name'].strip() == "Ducksoup Subscription":
+                    payUser.paymentType = "subscr_Pending"
+                elif post['item_name'].strip() == "Ducksoup Onetime 1 Year Payment":
+                    payUser.paymentType = "web_accept_Pending"
+                    
+                # Give 3 day grace period for payment to clear
+                payUser.nextPaymentDate = datetime.datetime.now() + datetime.timedelta(days=3)
+                # update payment date
+                payUser.lastPaymentDate = datetime.datetime.now()
+                payUser.payer_email = post['payer_email'].strip()
+                payUser.payer_id = post['payer_id'].strip()
+                payUser.bPaidUp = True
+                payUser.save()
                 
-            payUser.payer_email = post['payer_email'].strip()
-            payUser.payer_id = post['payer_id'].strip()
-            
-            if PayPalIPN.objects.filter(invoice=post['invoice'].strip()):
-                payPalObjects = PayPalIPN.objects.filter(invoice=post['invoice'].strip())
-                for payPalObj in payPalObjects:
-                    payUser.payments.add(payPalObj)
                 
-            payUser.save()
-        '''
         
+        args = {
+                "profile":True,
+                "user":request.user,
+                "userInfo":userInfo,
+                "googleUserInfo":googleUserInfo,
+                "teacherStudent":teacherStudent,
+                "classUser":classUser,
+                "allClasses":allClasses,
+                "bPaidUp":True,
+            }
+        args.update(csrf(request))
+            
+        return render_to_response('paypal_return.html', args)
+            
         
-        return HttpResponse(json.dumps(post))
     else:
-        return HttpResponse("no post")
+        return HttpResponse("sorry, this posted incorrectly.")
 
 
 
@@ -1258,6 +1386,14 @@ def ipnProcessing(sender, **kwargs):
         payUser.bPaidUp = False
         payUser.payments.add(ipn_obj)
         payUser.save()
+        if payUser.numberOfProjects:
+            if payUser.numberOfProjects > 5:
+                userInfo = UserInfo.objects.get(user_id=userID)
+                if userInfo.projects.all():
+                    allOldProjects = userInfo.projects.all()
+                    for oldProject in allOldProjects:
+                        oldProject.status = 'locked'
+                        oldProject.save()
         
         
         

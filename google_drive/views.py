@@ -25,9 +25,12 @@ from apiclient import errors
 from google_login.models import CredentialsModel, GoogleUserInfo
 from userInfo_profile.models import UserInfo
 from classrooms.models import ClassUser
-from google_drive import settings
 from tourBuilder.models import MyTour
 from worksheet_creator.models import Project
+
+
+from worksheet_project import settings
+from worksheet_project.views import checkPaidUp
 
 
 
@@ -39,8 +42,8 @@ log = logging.getLogger(__name__)
 def google_picker(request):
     userInfo = UserInfo.objects.get(user=request.user)
     
-    developerKey = settings.DEVELOPER_KEY
-    clientId = settings.CLIENT_ID
+    #developerKey = settings.DEVELOPER_KEY
+    #clientId = settings.CLIENT_ID
     
     
     if not request.user.first_name or not request.user.last_name or not userInfo.teacher_student:
@@ -59,11 +62,22 @@ def google_picker(request):
             teacher = teacher,
         )
         
+    if not classUser.teacher:
+        return redirect('worksheet_project.views.classes')
+        
     #Get all users Class
     if classUser.classrooms.all():
         allClasses = classUser.classrooms.all().order_by('name')
     else:
         allClasses = False
+    
+    
+    if classUser.teacher and settings.PAYMENT_TRACKER_ON:
+        bPaiUP = checkPaidUp(request.user)
+    elif settings.PAYMENT_TRACKER_ON:
+        bPaiUP = False
+    else:
+        bPaiUP = True
     
     if GoogleUserInfo.objects.filter(user=request.user):
         googleUser = GoogleUserInfo.objects.get(user=request.user)
@@ -100,8 +114,6 @@ def google_picker(request):
     args = {
               'worksheet':True,
               'userInfo': userInfo,
-              'developerKey': developerKey,
-              'clientId': clientId,
               "allClasses":allClasses,
               "classUser":classUser,
               "create":True,
@@ -110,6 +122,7 @@ def google_picker(request):
               "pdfFiles":pdfFiles,
               "myTour":myTour,
               "tourReset":'pic_file',
+              "bPaidUp":bPaiUP,
         }
     args.update(csrf(request))
         

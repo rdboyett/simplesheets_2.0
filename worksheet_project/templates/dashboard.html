@@ -4,10 +4,6 @@
 
 {% block title %}Dashboard{% endblock %}
 
-{% block extraBottomHead %}
-    <link href="{% static "adminBoot/css/dashboard-style.css" %}" rel="stylesheet">
-{% endblock %}
-
 {% block body %}
 
           	<div class="row mt">
@@ -81,6 +77,11 @@
               <div class="profile-01 centered">
                 <a href="{% url "worksheet_project.views.worksheet_display" worksheet.id %}"><p>{{ worksheet.title|capfirst }}</p></a>
               </div>
+              {% if worksheet.status == "locked" %}
+                  <div class="profile-03 danger centered">
+                    <p><i class="fa fa-lock"></i>&nbsp;&nbsp;Locked</p>
+                  </div>
+              {% endif %}
               <div class="centered">
                 <a href="{% url "worksheet_project.views.showNextPage" worksheet.id 1 %}"><button type="button" class="col-xs-4 btn btn-default" data-container="body"
                   data-toggle="popover" data-placement="bottom" data-trigger="hover"

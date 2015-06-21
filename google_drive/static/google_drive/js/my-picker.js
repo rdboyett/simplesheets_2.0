@@ -20,6 +20,8 @@ $('#fileTabs a').click(function (e) {
 	    console.log(responseText);
             if (responseText.error) {
                 alert(responseText.error);
+		location.reload();
+		//hello this is repost
             }else if (responseText.success) {
 		document.location.href = '/nextPage/'+ responseText.projectID +'/1/';
             }

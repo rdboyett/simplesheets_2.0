@@ -7,6 +7,20 @@ import json
 import logging
 import httplib2
 import datetime
+from datetime import tzinfo, timedelta
+
+ZERO = timedelta(0)
+
+class UTC(tzinfo):
+  def utcoffset(self, dt):
+    return ZERO
+  def tzname(self, dt):
+    return "UTC"
+  def dst(self, dt):
+    return ZERO
+
+utc = UTC()
+
 import shutil
 import re
 
@@ -56,6 +70,9 @@ from classrooms.views import generateCode
 from google_login.models import CredentialsModel
 from worksheet_creator.models import Project, BackImage
 from google_drive.views import driveUpload, createGoogleShortcut, get_service, checkOrCreateGoogleFolder
+from worksheet_project.views import checkPaidUp
+from worksheet_project import settings
+from payment_tracker.models import PaymentUser
 
 
 
@@ -64,10 +81,39 @@ def startCreate(request, fileId=False):
     if not fileId:
         return redirect("/drive/pickFile/")
     else:
+        if settings.PAYMENT_TRACKER_ON:
+            bPaidUp = checkPaidUp(request.user)
+        else:
+            bPaidUp = True
+            
+        if not bPaidUp:
+            #Check to see if you have used your 5 free worksheets
+            #if this is your 6th worksheet then lock all your other worksheets and allow to create 1 more
+            if PaymentUser.objects.filter(user=request.user):
+                payUser = PaymentUser.objects.get(user=request.user)
+                if payUser.numberOfProjects:
+                    if payUser.numberOfProjects > 5:
+                        if payUser.lastProjectDate:
+                            today = datetime.datetime.now(utc)
+                            timediff = today - payUser.lastProjectDate
+                            if timediff.days > 30:
+                                bPaidUp = True
+                        else:
+                            bPaidUp = True
+                    else:
+                        bPaidUp = True
+                else:
+                    bPaidUp = True
+            else:
+                PaymentUser.objects.create(user=request.user)
+                bPaidUp = True
+            
+            
+            
         return render_to_response('building-worksheet-wait.html', {
             "worksheet":True,
             "fileId":fileId,
-            
+            "bPaidUp":bPaidUp,
         })
 
 #worksheet/create/0B5JUxbetYkEaeHVKTEw1TFpBelE  (here is good practice link)
@@ -90,7 +136,7 @@ def create(request):
     
             if credential is None or credential.invalid == True:
                 #return HttpResponseRedirect("/login/")
-                return render_to_response('google-login-wait.html', {})
+                return HttpResponse(json.dumps({'redirect':'login'}))
             else:
                 http = httplib2.Http()
                 http = credential.authorize(http)
@@ -274,6 +320,38 @@ def create(request):
                 loadFirstPage = os.path.join('nextPage',str(newProject.id),'1')
                 loadFirstPage = '/'+display_path(loadFirstPage)+'/'
                 
+                if PaymentUser.objects.filter(user=request.user):
+                    payUser = PaymentUser.objects.get(user=request.user)
+                    if payUser.numberOfProjects:
+                        payUser.numberOfProjects += 1
+                    else:
+                        payUser.numberOfProjects = 1
+                    
+                    payUser.lastProjectDate = datetime.datetime.now()
+                    payUser.save()
+                else:
+                    payUser = PaymentUser.objects.create(
+                        user=request.user,
+                        numberOfProjects = 1,
+                        lastProjectDate = datetime.datetime.now(),
+                    )
+                
+                
+                if settings.PAYMENT_TRACKER_ON:
+                    bPaidUp = checkPaidUp(request.user)
+                else:
+                    bPaidUp = True
+                    
+                if not bPaidUp:
+                    #if payUser.numberOfProjects is > 5 lock all other worksheets
+                    if payUser.numberOfProjects > 5:
+                        if userInfo.projects.all().exclude(id=newProject.id):
+                            allOldProjects = userInfo.projects.all().exclude(id=newProject.id)
+                            for oldProject in allOldProjects:
+                                oldProject.status = 'locked'
+                                oldProject.save()
+                        
+                
                 data = {
                     'success': "success",
                     'projectID':newProject.id,
@@ -309,6 +387,38 @@ def createFromPDF(request):
     if request.method == 'POST':
         pdfFile = request.FILES["uploadFile"]
         userInfo = UserInfo.objects.get(user=request.user)
+        
+        
+        if settings.PAYMENT_TRACKER_ON:
+            bPaidUp = checkPaidUp(request.user)
+        else:
+            bPaidUp = True
+            
+        if not bPaidUp:
+            #Check to see if you have used your 5 free worksheets
+            #if this is your 6th worksheet then lock all your other worksheets and allow to create 1 more
+            if PaymentUser.objects.filter(user=request.user):
+                payUser = PaymentUser.objects.get(user=request.user)
+                if payUser.numberOfProjects:
+                    if payUser.numberOfProjects > 5:
+                        if payUser.lastProjectDate:
+                            today = datetime.datetime.now(utc)
+                            timediff = today - payUser.lastProjectDate
+                            if timediff.days > 30:
+                                bPaidUp = True
+                        else:
+                            bPaidUp = True
+                    else:
+                        bPaidUp = True
+                else:
+                    bPaidUp = True
+            else:
+                PaymentUser.objects.create(user=request.user)
+                bPaidUp = True
+            
+            if not bPaidUp:
+                return HttpResponse(json.dumps({"error":"Sorry, free accounts can only have 5 free eSheets and one free eSheet a month."}))
+        
         
         rawTitle = pdfFile.name.split('.')[0]
         title = re.sub(r'[^\w]', '', rawTitle)
@@ -406,6 +516,44 @@ def createFromPDF(request):
                         
             newProject.thumb = newThumbPath[1]
             newProject.save()
+            
+            
+            
+            
+            if PaymentUser.objects.filter(user=request.user):
+                payUser = PaymentUser.objects.get(user=request.user)
+                if payUser.numberOfProjects:
+                    payUser.numberOfProjects += 1
+                else:
+                    payUser.numberOfProjects = 1
+                    
+                payUser.lastProjectDate = datetime.datetime.now()
+                payUser.save()
+            else:
+                payUser = PaymentUser.objects.create(
+                    user=request.user,
+                    numberOfProjects = 1,
+                    lastProjectDate = datetime.datetime.now(),
+                )
+                
+                
+            if settings.PAYMENT_TRACKER_ON:
+                bPaidUp = checkPaidUp(request.user)
+            else:
+                bPaidUp = True
+                    
+            if not bPaidUp:
+                #if payUser.numberOfProjects is > 5 lock all other worksheets
+                if payUser.numberOfProjects > 5:
+                    if userInfo.projects.all().exclude(id=newProject.id):
+                        allOldProjects = userInfo.projects.all().exclude(id=newProject.id)
+                        for oldProject in allOldProjects:
+                            oldProject.status = 'locked'
+                            oldProject.save()
+                        
+            
+            
+            
                         
             data = {
                 'success': "success",

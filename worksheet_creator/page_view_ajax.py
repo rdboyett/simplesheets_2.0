@@ -40,6 +40,8 @@ from classrooms.models import Classroom, ClassUser
 from google_login.models import CredentialsModel
 from worksheet_creator import settings
 from google_drive.views import get_service, rename_google_file
+from worksheet_project.views import checkPaidUp
+from worksheet_project import settings as projectSettings
 
 #Test where the settings file is located (in home computer or on the server)
 testPath = ROOT_PATH.split(os.sep)
@@ -1479,10 +1481,19 @@ def toggleLockWorksheet(request):
                 oldProject = Project.objects.get(id=project_id)
                 for testUser in oldProject.userinfo_set.all():
                     if userInfo == testUser:
+                        if projectSettings.PAYMENT_TRACKER_ON:
+                            bPaiUp = checkPaidUp(request.user)
+                        else:
+                            bPaiUp = True
+                            
                         if oldProject.status == 'active':
                             oldProject.status = 'locked'
                         else:
-                            oldProject.status = 'active'
+                            if bPaiUp:
+                                oldProject.status = 'active'
+                            else:
+                                data = {'error':'Sorry, free accounts can only use 1 worksheet a month.'}
+                                return HttpResponse(json.dumps(data))
                             
                         oldProject.modifiedDate = datetime.datetime.now()
                         oldProject.save()

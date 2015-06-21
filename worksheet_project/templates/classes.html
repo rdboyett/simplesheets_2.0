@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load staticfiles %}
+{% load userInfo_tags %}
 
 
 {% block title %}Classes{% endblock %}
@@ -104,6 +105,17 @@
               <div class="profile-01 centered">
                 <a href="{% url "worksheet_project.views.worksheet_display" worksheet.id %}"><p>{{ worksheet.title|capfirst }}</p></a>
               </div>
+              {% if not classUser.teacher %}
+                {% with grade=classUser.user|myGrade:worksheet %}
+                <div class="profile-03 {% if grade == 'no grade' %}warning{% elif grade >= 70 %}success{% elif grade < 70 %}danger{% endif %} centered">
+                  <p>{% if grade == 'no grade' %}not finished{% else %}{{ grade|floatformat:2 }}%{% endif %}</p>
+                </div>
+                {% endwith %}
+              {% elif worksheet.status == "locked" %}
+                  <div class="profile-03 danger centered">
+                    <p><i class="fa fa-lock"></i>&nbsp;&nbsp;Locked</p>
+                  </div>
+              {% endif %}
               <div class="centered">
                 <a href="{% url "worksheet_project.views.showNextPage" worksheet.id 1 currentClass.id %}"><button type="button" class="col-xs-4 btn btn-default" data-container="body"
                   data-toggle="popover" data-placement="bottom" data-trigger="hover"
