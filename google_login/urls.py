@@ -24,5 +24,7 @@ urlpatterns += patterns('google_login.views',
     url(r'^syncGoogleAccount/$', 'syncGoogleAccount', name='syncGoogleAccount'),
     url(r'^ajaxResetPassword/$', 'ajaxResetPassword', name='ajaxResetPassword'),
     url(r'^changeUsername/$', 'changeUsername', name='changeUsername'),
+    (r'^accountVerify/(?P<verifyID>(\d+))/$', 'accountVerify'),
+    url(r'^accountVerifyCreate/$', 'accountVerifyCreate', name='accountVerifyCreate'),
     
 )

@@ -64,6 +64,15 @@
 		      <form id="submit-registration-form" class="form-login" action="{% url 'google_login.views.submitRegistration' %}" enctype='multipart/form-data' method="post" autocomplete="off">{% csrf_token %}
 		        <h2 class="form-login-heading">create account</h2>
 		        <div class="login-wrap">
+		            <div class="login-social-link centered">
+		            <p>Create an account with your social network</p>
+			      <div class="row">
+				<div class="col-xs-8 col-xs-offset-2">
+				  <a href="{% url "google_login.views.noPopAuth" %}"><div class="btn btn-danger btn-block"><i class="fa fa-google-plus fa-lg"></i>&nbsp;&nbsp; Sign in with Google</div></a>
+				</div>
+			      </div>
+		            </div>
+			    <hr>
                             <input id="teacher_or_student" type="hidden" name="teacherStudent" value="" required>
 		            <input name="username" type="text" class="form-control" placeholder="Username" autofocus minlength="6" maxlength="40" required noSpace="true">
 		            <br>
@@ -79,13 +88,6 @@
 		            <button class="btn btn-theme btn-block" type="submit"><i class="fa fa-lock"></i> Create</button>
 		            <hr>
 		            
-		            <div class="login-social-link centered">
-		            <p>or you can create an account with your social network</p>
-			      <div class="row">
-				<div class="col-xs-8 col-xs-offset-2">
-				  <a href="{% url "google_login.views.noPopAuth" %}"><div class="btn btn-danger btn-block"><i class="fa fa-google-plus fa-lg"></i>&nbsp;&nbsp; Sign in with Google</div></a>
-				</div>
-		            </div>
 		
 		        </div>
 		      </form>

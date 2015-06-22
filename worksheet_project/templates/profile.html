@@ -368,13 +368,12 @@
         <h4 class="modal-title"><span class="text-danger">DELETE</span> this account?</h4>
       </div>
       <div class="modal-body centered">
-            <form id="reset-password-form" class="form-horizontal style-form" action="{% url "google_login.views.ajaxResetPassword" %}" enctype='multipart/form-data' method="post" autocomplete="off">{% csrf_token %}
-              <input type="hidden" name="userID" value="{{ classUser.user.id }}" required >
+            <form id="delete-user-form" class="form-horizontal style-form" action="{% url "worksheet_creator.page_view_ajax.deleteUser" %}" enctype='multipart/form-data' method="post" autocomplete="off">{% csrf_token %}
 	      <div class="form-group">
                 
                       <div class="col-xs-12 col-sm-8 col-md-offset-2 text-center">
 			  <label>Can I ask why?</label>
-                          <textarea class="form-control" name="whyDelete" minlength="3" maxlength="140" required placeholder="was it something I said?..." autofocus></textarea>
+                          <textarea class="form-control" name="reason" minlength="3" maxlength="140" required placeholder="was it something I said?..." autofocus></textarea>
                       </div>
               </div>
             </form>
@@ -383,7 +382,7 @@
 	<div class="row mb">
 	  <div class="col-xs-12 text-center">
 	    <button type="button" class="btn btn-default rounded" data-dismiss="modal">close</button>
-	    <button type="submit" form="reset-password-form" class="btn btn-danger rounded mb">DELETE ACCOUNT</button>
+	    <button type="submit" form="delete-user-form" class="btn btn-danger rounded mb">DELETE ACCOUNT</button>
 	  </div>
 	</div>
 	<div class="row">

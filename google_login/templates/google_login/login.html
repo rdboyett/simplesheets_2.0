@@ -46,6 +46,15 @@
 		      <form id="google-authorization-form" class="form-login" action="{% url 'google_login.views.ajaxAuth' %}" enctype='multipart/form-data' method="post" autocomplete="off">{% csrf_token %}
 		        <h2 class="form-login-heading">sign in now</h2>
 		        <div class="login-wrap">
+		            <div class="login-social-link centered">
+		            <p>Sign in via your social network</p>
+			      <div class="row">
+				<div class="col-xs-8 col-xs-offset-2">
+				  <a href="{% url "google_login.views.noPopAuth" %}"><div class="btn btn-danger btn-block"><i class="fa fa-google-plus fa-lg"></i>&nbsp;&nbsp; Sign in with Google</div></a>
+				</div>
+			      </div>
+		            </div>
+			    <hr>
 		            <input name="username" type="text" class="form-control" placeholder="Username or Email" autofocus minlength="6" maxlength="40" required noSpace="true">
 		            <br>
 		            <input name="password" type="password" class="form-control" placeholder="Password" minlength="6" maxlength="40" required noSpace="true">
@@ -58,14 +67,6 @@
 		            <button class="btn btn-theme btn-block" href="index.html" type="submit"><i class="fa fa-lock"></i> SIGN IN</button>
 		            <hr>
 		            
-		            <div class="login-social-link centered">
-		            <p>or you can sign in via your social network</p>
-			      <div class="row">
-				<div class="col-xs-8 col-xs-offset-2">
-				  <a href="{% url "google_login.views.noPopAuth" %}"><div class="btn btn-danger btn-block"><i class="fa fa-google-plus fa-lg"></i>&nbsp;&nbsp; Sign in with Google</div></a>
-				</div>
-			      </div>
-		            </div>
 		            <div class="registration">
 		                Don't have an account yet?<br/>
 		                <a class="" href="{% url "google_login.views.createAccount" %}">

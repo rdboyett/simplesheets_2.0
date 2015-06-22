@@ -43,5 +43,6 @@ urlpatterns += patterns('worksheet_creator.page_view_ajax',
     (r'^liveMonitorAnswers/$', 'liveMonitorAnswers'),
     (r'^forceGradeWorksheet/$', 'forceGradeWorksheet'),
     (r'^teacherGradeChange/$', 'teacherGradeChange'),
+    (r'^deleteUser/$', 'deleteUser'),
     
 )

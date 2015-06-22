@@ -229,7 +229,7 @@ $.validator.addMethod("upperCase",
 	    },
 	    messages: {
 		password2: {
-		    required: "confirm",
+		    required: "confirm password",
 		    equalTo: "same password as above"
 		},
 	    }
@@ -253,6 +253,18 @@ $.validator.addMethod("upperCase",
     
     
     
+    $('#delete-user-form').ajaxForm({ 
+        success:       function(responseText){
+            if (responseText.error) {
+                alert(responseText.error);
+            }else{
+		console.log(responseText);
+		window.location.href = "/google/logout/";
+            }
+        },
+        dataType:  'json',
+        timeout:   6000 
+    }); 
     
     $("#change-username-form").validate({
             errorPlacement: function(error, element){

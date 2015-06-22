@@ -6,6 +6,10 @@ import logging
 import httplib2
 from datetime import datetime, timedelta
 
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from email.MIMEImage import MIMEImage
+
 from django.shortcuts import render_to_response, redirect
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.contrib.auth.models import User
@@ -16,7 +20,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.mail import send_mail
 from django.utils import timezone
 
-from google_login.models import CredentialsModel, GoogleUserInfo, ForgottenPassword
+from google_login.models import CredentialsModel, GoogleUserInfo, ForgottenPassword, EmailAccountCreation
 from userInfo_profile.models import UserInfo
 from classrooms.models import Classroom, ClassUser
 from google_login import settings
@@ -320,6 +324,84 @@ def createAccount(request):
 
 
 
+def accountVerify(request, verifyID=False):
+    error = False
+    if verifyID:
+	if EmailAccountCreation.objects.filter(id=verifyID):
+	    verify = EmailAccountCreation.objects.get(id=verifyID)
+	    if not verify.bUsed:
+		args = {'verify':verify,}
+		args.update(csrf(request))
+	    else:
+		error = True
+	else:
+	    error = True
+    else:
+	error = True
+	
+    if error:
+	args = {'error':True}
+        args.update(csrf(request))
+    return render_to_response('google_login/create_account_verification.html', args)
+
+
+
+def accountVerifyCreate(request):
+    if request.method == 'POST':
+	verifyID = request.POST['verifyID'].strip()
+        username = request.POST['username'].strip()
+        email = request.POST['email'].strip()
+        password1 = request.POST['password1'].strip()
+        password2 = request.POST['password2'].strip()
+	
+	
+	if bBETA_TEST_ON:
+	    if not BetaTestAllowedUsers.objects.filter(email=email):
+		return HttpResponse(json.dumps({'error':"Sorry, we are beta testing this application."}))
+	
+	bUserExist = False
+        if User.objects.filter(username=username):
+            data = {'error':'This username is already taken.'}
+	    bUserExist = True
+        elif email:
+	    if User.objects.filter(email=email):
+		data = {'error':'This email is already used with another account.'}
+		bUserExist = True
+	
+		
+	if EmailAccountCreation.objects.filter(id=verifyID) and not bUserExist and password1==password2:
+	    verify = EmailAccountCreation.objects.get(id=verifyID)
+	    if not verify.bUsed:
+		if verify.username == username and verify.email == email:
+		    user = User.objects.create_user(username, email, password1)
+		    UserInfo.objects.create(
+			user = user,
+			teacher_student = 'teacher'
+		    )
+		    
+		    user.backend = 'django.contrib.auth.backends.ModelBackend'
+		    login(request, user)
+			
+		    request.session['user_id'] = user.id
+		    request.session.set_expiry(604800)
+		    data = {'success':'success'}
+	    
+		else:
+		    data = {'error':'Your verification link does not match your entry.'}
+	    else:
+		data = {'error':'Your verification link has already been used.'}
+	else:
+	    data = {'error':'The information you entered cannot be verified.'}
+	    
+	    
+	
+
+    else:
+        data = {'error':'Did not post correctly'}
+    return HttpResponse(json.dumps(data))
+
+
+
 
 
 
@@ -431,11 +513,45 @@ def submitRegistration(request):
         elif email:
 	    if User.objects.filter(email=email):
 		data = {'error':'This email is already used with another account.'}
-        if True:
-	    if teacherStudent == "teacher":
-		user = User.objects.create_user(username, email, password)
-	    else:
-		user = User.objects.create_user(username, None, password)
+	
+	if teacherStudent == "teacher":
+	    #user = User.objects.create_user(username, email, password)
+	    #Create EmailAccountCreation
+	    accountCreator = EmailAccountCreation.objects.create(
+		username = username,
+		email = email,
+	    )
+	    
+	    args = {
+		"accountID":accountCreator.id,
+	    }
+	    
+	    #Send email confirmation
+	    subject = "Ducksoup Account Verification"
+	    sender = "Ducksoup Inc. <webmaster@ducksoup.us>"
+
+	    html_content = render_to_string('google_login/email_verification.html', args)
+	    text_content = render_to_string('google_login/email_verification.txt', args)
+	    msg = EmailMultiAlternatives(subject, text_content,
+					 sender, [email])
+	    
+	    msg.attach_alternative(html_content, "text/html")
+	    
+	    msg.mixed_subtype = 'related'
+	    '''
+	    for f in ['img1.png', 'img2.png']:
+		fp = open(os.path.join(os.path.dirname(__file__), f), 'rb')
+		msg_img = MIMEImage(fp.read())
+		fp.close()
+		msg_img.add_header('Content-ID', '<{}>'.format(f))
+		msg.attach(msg_img)
+	    '''
+	    msg.send()
+	    
+	    
+	    data = {'error':'Please check your email.  A verification email has been sent to your email address.'}
+	else:
+	    user = User.objects.create_user(username, None, password)
 	    
 	    UserInfo.objects.create(
 		user = user,
@@ -443,17 +559,22 @@ def submitRegistration(request):
 	    )
 	    
             #check to see if user is logged in
-            if user:
-                user.backend = 'django.contrib.auth.backends.ModelBackend'
-                login(request, user)
+	    if user:
+		user.backend = 'django.contrib.auth.backends.ModelBackend'
+		login(request, user)
                 
-            request.session['user_id'] = user.id
-            request.session.set_expiry(604800)
-            data = {'success':'success'}
+	    request.session['user_id'] = user.id
+	    request.session.set_expiry(604800)
+	    data = {'success':'success'}
+	
 
     else:
         data = {'error':'Did not post correctly'}
     return HttpResponse(json.dumps(data))
+
+
+
+
 
 
 

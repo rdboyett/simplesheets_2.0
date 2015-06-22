@@ -33,6 +33,12 @@ class ForgottenPassword(models.Model):
 
     def __unicode__(self):
       return u'%s %s ' % (self.id, self.dateTime)
+    
+class EmailAccountCreation(models.Model):
+    dateTime = models.DateTimeField(auto_now=True)
+    username = models.CharField(max_length=60)
+    email = models.EmailField()
+    bUsed = models.BooleanField(default=False)
 
 class CredentialsAdmin(admin.ModelAdmin):
     pass

@@ -1,0 +1,10 @@
+Welcome to Duck Soup!
+
+We are so happy that you decided to give our little site a try.  Just one more thing and you'll be on your way.  Follow the link to finish the account setup process.
+
+
+http://127.0.0.1:8000/google/accountVerify/{{ accountID }}
+
+
+Robert Boyett
+Ducksoup Inc.

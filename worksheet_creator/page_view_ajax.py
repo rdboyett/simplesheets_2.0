@@ -20,6 +20,7 @@ from django.contrib.auth.models import *
 from django.contrib.auth import logout, login
 from django.contrib.auth.decorators import login_required
 from django.core.files.base import ContentFile
+from django.core.mail import send_mail
 
 
 from apiclient.discovery import build
@@ -37,7 +38,7 @@ from apiclient import errors
 from userInfo_profile.models import UserInfo, MyAnswer, MyGrade, LiveMonitorSession
 from worksheet_creator.models import Project, BackImage, FormInput
 from classrooms.models import Classroom, ClassUser
-from google_login.models import CredentialsModel
+from google_login.models import CredentialsModel, GoogleUserInfo
 from worksheet_creator import settings
 from google_drive.views import get_service, rename_google_file
 from worksheet_project.views import checkPaidUp
@@ -569,6 +570,84 @@ def deleteProject(request):
         
     
     return HttpResponse(json.dumps(data))
+
+
+
+
+
+@login_required
+def deleteUser(request):
+    if request.method == 'POST':
+        reason = request.POST["reason"].strip()
+        
+        if UserInfo.objects.filter(user=request.user):
+            userInfo = UserInfo.objects.get(user=request.user)
+            if userInfo.projects.all():
+                oldProjects = userInfo.projects.all()
+                for oldProject in oldProjects:
+                    for image in oldProject.backgroundImages.all():
+                        imagePath = image.imagePath
+                                
+                    try:
+                        a, b = os.path.split(imagePath)
+                        fdir, folderName = os.path.split(a)
+                                
+                        #check if other projects with the same googleID are using the files
+                        if Project.objects.filter(originalFileID=oldProject.originalFileID):
+                            if Project.objects.filter(originalFileID=oldProject.originalFileID).count()<2:
+                                basePath = os.path.join(settings.ROOT_PATH,'media', request.user.first_name+request.user.last_name+str(request.user.id), str(folderName))
+                                make_sure_path_exists(basePath)
+                                shutil.rmtree(basePath)
+                    except:
+                        pass
+                            
+                    #build Service
+                    service = get_service(request.user)
+                            
+                    #put the file in trash
+                    if oldProject.uploadedFileID:
+                        file = delete_file(service, oldProject.uploadedFileID)
+                            
+                    if oldProject.backgroundImages.all():
+                        oldProject.backgroundImages.all().delete()
+                    if oldProject.backgroundImages.all():
+                        oldProject.formInputs.all().delete()
+                            
+                    userInfo.projects.remove(oldProject)
+                    oldProject.delete()
+                            
+            #userInfo.delete()
+            
+        if ClassUser.objects.filter(user=request.user):
+            classUser = ClassUser.objects.get(user=request.user)
+            if classUser.classrooms.all():
+                classUser.classrooms.all().delete()
+            #classUser.delete()
+            
+        if GoogleUserInfo.objects.filter(user=request.user):
+            #GoogleUserInfo.objects.get(user=request.user).delete()
+            pass
+        
+        message = "name: "+request.user.get_full_name()+"\nemail: "+request.user.email+"\n\nreason: "+reason
+        send_mail(str(request.user.get_full_name())+' Deleted their account', message,"webmaster@ducksoup.us",
+            ['rdboyett@gmail.com'], fail_silently=False)
+            
+        data = {
+            'success': "success",
+            }
+                        
+    else:
+        data = {
+            'error': "There was an error posting this request. Please try again.",
+        }
+        
+    
+    return HttpResponse(json.dumps(data))
+
+
+
+
+
 
 
 
@@ -1486,14 +1565,14 @@ def toggleLockWorksheet(request):
                         else:
                             bPaiUp = True
                             
-                        if oldProject.status == 'active':
-                            oldProject.status = 'locked'
-                        else:
-                            if bPaiUp:
-                                oldProject.status = 'active'
+                        if bPaiUp:
+                            if oldProject.status == 'active':
+                                oldProject.status = 'locked'
                             else:
-                                data = {'error':'Sorry, free accounts can only use 1 worksheet a month.'}
-                                return HttpResponse(json.dumps(data))
+                                oldProject.status = 'active'
+                        else:
+                            data = {'error':'Sorry, free accounts can only use 1 worksheet a month.'}
+                            return HttpResponse(json.dumps(data))
                             
                         oldProject.modifiedDate = datetime.datetime.now()
                         oldProject.save()

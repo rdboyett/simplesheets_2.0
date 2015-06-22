@@ -1,0 +1,146 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Dashboard">
+    <meta name="keyword" content="Dashboard, Bootstrap, Admin, Template, Theme, Responsive, Fluid, Retina">
+
+    <title>Duck Soup | sign in</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{% static "adminBoot/css/bootstrap.css" %}" rel="stylesheet">
+    <!--external css-->
+    <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" />
+        
+    <!-- Custom styles for this template -->
+    <link href="{% static "adminBoot/css/style.css" %}" rel="stylesheet">
+    <link href="{% static "adminBoot/css/style-responsive.css" %}" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="//ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"></script>
+    
+    
+    
+  </head>
+  
+  
+
+  <body>
+
+      <!-- **********************************************************************************************************************************************************
+      MAIN CONTENT
+      *********************************************************************************************************************************************************** -->
+
+	  <div id="login-page">
+	  	<div class="container">
+		  {% if verify %}
+		      <form id="submit-registration-form" class="form-login" action="{% url 'google_login.views.accountVerifyCreate' %}" enctype='multipart/form-data' method="post" autocomplete="off">{% csrf_token %}
+		        <h2 class="form-login-heading">verify account</h2>
+		        <div class="login-wrap">
+		            <div class="login-social-link centered">
+		            <p>Create an account with your social network</p>
+			      <div class="row">
+				<div class="col-xs-8 col-xs-offset-2">
+				  <a href="{% url "google_login.views.noPopAuth" %}"><div class="btn btn-danger btn-block"><i class="fa fa-google-plus fa-lg"></i>&nbsp;&nbsp; Sign in with Google</div></a>
+				</div>
+			      </div>
+		            </div>
+			    <hr>
+                            <input type="hidden" name="verifyID" value="{{ verify.id }}" required>
+		            <input name="username" type="text" class="form-control" placeholder="Username" autofocus minlength="6" maxlength="40" required noSpace="true" value="{{ verify.username }}">
+		            <br>
+                            <input id="email-input" type="email" name="email" placeholder="Email Optional" class="form-control placeholder-no-fix" value="{{ verify.email }}">
+                            <br>
+		            <input id="password1" name="password1" type="password" class="form-control" placeholder="Password" minlength="6" maxlength="40" required noSpace="true">
+		            <br>
+		            <input name="password2" type="password" class="form-control" placeholder="Confirm Password" required>
+		            <br>
+		            <button class="btn btn-theme btn-block" type="submit"><i class="fa fa-lock"></i> Verify</button>
+		            <hr>
+		            <div class="login-social-link centered">
+			      <div class="row">
+				<div class="col-xs-8 col-xs-offset-2">
+				  <a href="{% url "google_login.views.createAccount" %}"><div class="btn btn-danger btn-theme">Create Another Account</div></a>
+				</div>
+			      </div>
+		            </div>
+		            
+		
+		        </div>
+		      </form>
+		{% elif error %}
+		      <form id="submit-registration-form" class="form-login" action="{% url 'google_login.views.submitRegistration' %}" enctype='multipart/form-data' method="post" autocomplete="off">{% csrf_token %}
+		        <h2 class="form-login-heading">error</h2>
+		        <div class="login-wrap">
+		            <div class="login-social-link centered">
+		            <p>There was an error whith your verification link.</p>
+			      <div class="row">
+				<div class="col-xs-8 col-xs-offset-2">
+				  <a href="{% url "google_login.views.createAccount" %}"><div class="btn btn-danger btn-theme">Create An Account</div></a>
+				</div>
+			      </div>
+		            </div>
+		        </div>
+		      </form>
+		{% endif %}
+	  	
+	  	</div>
+	  </div>
+
+          
+          
+          
+          
+          
+          
+          
+    <!-- js placed at the end of the document so the pages load faster -->
+    <script src="{% static "adminBoot/js/bootstrap.min.js" %}"></script>
+    <script src="{% static "adminBoot/js/jquery.form.js" %}"></script>
+    
+    <script src="{% static "adminBoot/js/create_account_verification.js" %}"></script>
+
+    <!--BACKSTRETCH-->
+    <!-- You can use an image of whatever size. This script will stretch to fit in any screen size.-->
+    <script type="text/javascript" src="{% static "adminBoot/js/jquery.backstretch.min.js" %}"></script>
+    <script>
+        $.backstretch("{% static "adminBoot/img/login-bg2.jpg" %}", {speed: 500});
+	
+	var doesUsernameExistURL = "{% url 'google_login.views.checkUsername' %}";
+	var doesEmailExistURL = "{% url 'google_login.views.doesEmailExist' %}";
+    </script>
+
+    
+    <script>
+      $('document').ready(function(){
+	      
+	$('#google-authorize').click(function(){
+	  //popup new window to log in to oauth
+	  var myWindow = window.open("{% url "google_login.views.auth" %}","_blank","toolbar=no, location=no, menubar=no, scrollbars=yes, resizable=yes, top=100, left=0, width=500, height=600");
+	 
+	});
+	
+      });
+      
+      
+	
+	function syncAccounts(newUserID) {
+	  location.reload();
+	}
+
+      
+    </script>
+
+  </body>
+</html>
