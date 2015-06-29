@@ -926,6 +926,12 @@ PARALLAX EFFECTS...........................1474
 		background-size:100% 100%;
 		
 	}
+	.featured-badge.yellow {
+		background:url(../img/featured-badge-yellow.png) top center no-repeat;
+		color:#fff;
+		background-size:100% 100%;
+		
+	}
 	
 	
 	/****************************** BROWSER SHOTS EFFECTS *********************/
