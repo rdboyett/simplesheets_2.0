@@ -1403,7 +1403,8 @@ def ipnProcessing(sender, **kwargs):
 
 
 
-
+def verifyGoogle(request):
+    return render_to_response('googleae943400297db25e.html')
 
 
 
