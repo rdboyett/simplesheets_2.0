@@ -8,7 +8,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="">
 <meta name="author" content="">
-    <link rel="shortcut icon" href="{% static "adminBoot/img/favicon.ico" %}" type="image/x-icon">
+    <link rel="icon" type="image/x-icon" href="{% static "adminBoot/img/duck.png" %}">
 <!-- Le styles -->
 <link href="{% static "index/css/bootstrap.css" %}" rel="stylesheet">
 <link href="{% static "index/css/bootstrap-responsive.css" %}" rel="stylesheet">
@@ -50,16 +50,14 @@
     <div class="navbar navbar-static-top" id="topnavbar"> 
       <!-- navbar-fixed-top -->
       <div class="navbar-inner" id="navbartop">
-        <div class="container"> <a class="brand" href="index.html"> 
+        <div class="container"> <a class="brand" href="{% url "worksheet_project.views.index" %}"> 
 		<span><i class="fa fa-arrow-circle-down"></i> DUCK SOUP</span>
 		<!--<img src="{% static "index/img/Logo.png" %}" alt="Logo">--></a>
           <div id="main-nav" class="scroller-spy">
             <nav class="nav-collapse collapse" >
               <ul class="nav" id="nav">
                 <li class="active"><a href="#header-section">Home</a> </li>
-				<li><a href="#features-section">Service</a> </li>
-				<li><a href="#team-section">About us</a> </li>
-				<li><a href="#portfolio-section">Works</a> </li>
+				<li><a href="#features-section">What We Do</a> </li>
 				<li><a href="#price-section">Price</a> </li>
 				<li><a href="#contact-section">Contact</a> </li>
               </ul>
@@ -130,6 +128,7 @@
 							WHAT WE <span class="main-color">OFFER</span> 
 						</span>	
 					</h3>
+					<img src="{% static "googleDrive_icons/drive_outline-med.png" %}"
 				</div>
 			</header>
 		</div>
@@ -222,525 +221,7 @@
 </section> <!--/SLOGAN section-->
 	
 
-<!-- /TEAM SECTION-->			
-<section class="" id="team-section">
-		<!-- TEAM HEADER-->
-	<div class="container">
-		<div class="row">
-			<header class="" >
-				<div class=" text-center page-header">
-				
-					<h3>
-					<span class="white">
-					WHO WE ARE - 
-					<span class="main-color">OUR TEAM</span> 
-					&amp; <span class="main-color">ABOUT</span>
-					</span>
-					</h3>
-					
-				</div>
-			</header>
-		</div>
-	</div>
-	
-	<div class="container">	
-		<div class="row-fluid">
-		
 
-		
-
-
-<!-- ABOUT ITEM--><div class="span6">
-            
-		<!-- IMAGE CONTAINER-->
-            
-				<h3 class="main-color-line">About us</h3>
-				<p class="">
-					Creative, inspired innovators, we are dedicated to developing long-term, honest, effective relationships with each of our clients, giving freely of our talent, experience, and expertise. We're not just a web design agency. We're not just a graphic design firm. We're not just coders and we're not just artists. 
-				</p>
-				
-				<h3 class="main-color-line">Our vision</h3>
-				<p class="">
-					We get better design when we understand our medium. Yet even at this late cultural hour, many people don't understand web design. Among them can be found some of our most distinguished business and cultural leaders, including a few who possess a profound grasp of design - except as it relates to the web.
-				</p>
-				
-				<h3 class="main-color-line">Our experience</h3>
-				<p class="">
-					What makes future of web design? Experience. We've been producing web design  for almost a decade, and are intimately familiar with the trends, technologies, and stars that make the web beautiful. 
-				</p>
-				
-		<!--END IMAGE CONTAINER-->
-			 
-		 <!-- CAPTION -->
-			
-	
-</div><!-- / ABOUT ITEM-->
-<!-- TEAM ITEM--><div class="thumbnail span3">
-            
-		<!-- IMAGE CONTAINER-->
-            <div class="sample project-item-image-container">
-				<img src="http://lorempixel.com/260/195/people/1" alt="">
-			 </div> 
-		<!--END IMAGE CONTAINER-->
-			 
-		 <!-- CAPTION -->
-			
-	<div class="caption">
-		<div class="transit-to-top">
-				
-			
-				<p class="caption-descr"><i class="fa fa-quote-left main-color"></i>
-				AT FUTURE OF WEB DESIGN YOU'LL NOT ONLY SEE GREAT SITES, YOU'LL MEET AMAZING PEOPLE. PEOPLE LIKE YOU... <i class="fa fa-quote-right main-color"></i>
-				</p>
-				<h4 class=""><strong>Joahna Doe</strong> - <small>talented designer</small></h4>	
-	<div class="widget_nav_menu"> 
-		<ul class="social-bottom">
-            <li><span class="badge badge-warning"><a href="https://www.facebook.com/pages/Duck-Soup-Inc/1435783753413226?skip_nax_wizard=true&ref_type=logout_gear" title=""><i class="fa fa-facebook"></i></a></span></li>
-			<li><span class="badge badge-warning"><a href="https://twitter.com/ducksoupinc" title=""><i class="fa fa-twitter"></i></a></span></li>
-			<li><span class="badge badge-warning"><a href="#" title=""><i class="fa fa-github-alt"></i></a></span></li>
-			<li><span class="badge badge-warning"><a href="#" title=""><i class="fa fa-google-plus"></i></a></span></li>
-			<li><span class="badge badge-warning"><a href="#" title=""><i class="fa fa-linkedin"></i></a></span></li>
-		</ul>
-						
-	</div>
-		</div> <!--END CAPTION -->
-	</div><!-- END: THUMBNAIL -->
-</div><!-- TEAM ITEM-->
-<!-- TEAM ITEM--><div class="thumbnail span3">
-            
-		<!-- IMAGE CONTAINER-->
-            <div class="sample project-item-image-container">
-				<img src="http://lorempixel.com/260/195/technics/1" alt="">
-			 </div> 
-		<!--END IMAGE CONTAINER-->
-			 
-		 <!-- CAPTION -->
-			
-	<div class="caption">
-		<div class="transit-to-top">
-				
-				<p class="caption-descr"><i class="fa fa-quote-left main-color"></i>
-				COME BE INSPIRED BY THE EXPERIENCES AND SUCCESSES OF THE WEB DESIGNERS 
-				AMAZING PEOPLE WHO CREATE GREATE WEBSITES <i class="fa fa-quote-right main-color"></i>
-				</p>
-				<h4 class=""><strong>John Doe</strong> - <small>great programmer</small></h4>
-	<div class="widget_nav_menu"> 
-		<ul class="social-bottom">
-            <li><span class="badge badge-warning"><a href="https://www.facebook.com/pages/Duck-Soup-Inc/1435783753413226?skip_nax_wizard=true&ref_type=logout_gear" title=""><i class="fa fa-facebook"></i></a></span></li>
-			<li><span class="badge badge-warning"><a href="https://twitter.com/ducksoupinc" title=""><i class="fa fa-twitter"></i></a></span></li>
-			<li><span class="badge badge-warning"><a href="#" title=""><i class="fa fa-github-alt"></i></a></span></li>
-			<li><span class="badge badge-warning"><a href="#" title=""><i class="fa fa-google-plus"></i></a></span></li>
-			<li><span class="badge badge-warning"><a href="#" title=""><i class="fa fa-linkedin"></i></a></span></li>
-		</ul>
-						
-	</div>
-		</div> <!--END CAPTION -->
-	</div><!-- END: THUMBNAIL -->
-</div><!-- TEAM ITEM-->
-		</div><!--/ROW FLUID--> 
-		
-		<div class="row-fluid">
-			<div class="span12 ">
-			<hr/>
-			<div class="page-header">
-				
-					<h3>
-					<span class="white">
-					SOME OF OUR <span class="main-color">CLIENTS</span> 
-					</span> 
-					</h3>
-					
-				</div>
-			</div>
-		</div>
-		<!-- CLIENTS-->
-			<div class="row-fluid">
-				<div class="client-logo thumbnail client-thumb">
-					<img src="{% static "index/img/logo_client.png" %}" alt="logo" />
-				</div>
-				<div class="client-logo thumbnail client-thumb">
-					<img src="{% static "index/img/logo_client.png" %}" alt="logo" />
-				</div>
-				<div class="client-logo thumbnail client-thumb">
-					<img src="{% static "index/img/logo_client.png" %}" alt="logo" />
-				</div>
-				<div class="client-logo thumbnail client-thumb">
-					<img src="{% static "index/img/logo_client.png" %}" alt="logo" />
-				</div>
-				<div class="client-logo thumbnail client-thumb">
-					<img src="{% static "index/img/logo_client.png" %}" alt="logo" />
-				</div>
-				
-			</div>
-		<!-- CLIENTS-->
-	</div><!--/CONTAINER-->
-</section><!-- /TEAM SECTION-->	
-
-<!-- /SLOGAN section-->
-<section class="" id="slogan-section-1">
-	<div class="bg">
-	<div class="container">
-	<!-- SLOGAN-->
-			<div class="row-fluid">
-				<span class="logo"><!--LOGO-->
-					<a href="#" title="Scroll&amp;Strap">
-						<img src="{% static "index/img/yellow_banner.png" %}" alt="logo">
-					</a>
-				</span>
-					
-				<div class="span12 text-center">
-					<span class="large-slogan main-color">
-						SCROLL&amp;STRAP - responsive parallax onepager
-					</span>
-					<span class="large-slogan main-color">
-						provides modern and clear design
-					</span>
-				</div><!-- /span12-->	
-			</div><!-- /row-fluid-->
-<!-- / SLOGAN-->
-
-<!-- BUTTON GO BOTTOM -->
-			<div class="row-fluid">
-				<div class="span12 text-center">
-					<span class="goprice active" id="nav5">
-					<a href="#portfolio-section" title="">
-						<i class="fa fa-angle-double-down fa-5x"></i>
-					</a>
-				</span></div>
-			</div>
-<!-- / BUTTON GO BOTTOM -->			
-	</div><!-- /container-->
-	</div><!-- BG-->
-</section><!--/SLOGAN section-->
-
-<!-- PORTFOLIO SECTION  -->	
-<section id="portfolio-section">
-	<div class="container">
-		<div class="row">	
-<!-- PORTFOLIO  HEADER -->
-			<div class="text-center">
-				<header>
-					<div class="span12 text-center page-header">
-							
-								<h3>
-								<span class="white">
-								RECENT WORKS - <span class="main-color"> PORTFOLIO</span> &amp; <span class="main-color">PROJECTS</span>
-								</span>
-								</h3>
-								
-					</div>
-							
-								
-				</header><!-- / PORTFOLIO SECTION HEADER-->
-			</div><!-- /text center-->
-		</div><!--/ROW-->
-	</div><!--/CONTAINER-->
-
-	<div class="container">
-		
-		<!--###################-->
-		<!-- START PORTFOLIO ITEM -->
-		<!--###################-->
-		<div id="container-folio" class="row">
-		
-		
-		
-		<!-- portfolio item -->
-		<div class="span6  project-item graphics box">
-		
-		<div id="myCarousel" class="carousel slide">
-			
-			  <!-- Carousel items -->
-			  <div class="carousel-inner">
-				<div class="active item"><a rel="prettyPhoto[gallery]" href="{% static "index/img/SnapShot.png" %}" title="portfolio image">
-					<img src="{% static "index/img/SnapShot.png" %}" alt="ScrollStrap" />
-				</a>
-				
-				</div>
-				<div class="item"><a rel="prettyPhoto[gallery]" href="{% static "index/img/SnapShot2.png" %}" title="portfolio image">
-					<img src="{% static "index/img/SnapShot2.png" %}" alt="ScrollStrap" />
-				</a>
-					<div class="carousel-caption">
-						
-							<p class="">
-								<strong><span class="main-color">THIS Bootstrap</span></strong> 
-								Carousel integrated with PrettyPhoto jQuery plugin. Just click on photo for enlarge it.			
-								</p>
-						
-					</div>
-				</div>
-				<div class="item"><a rel="prettyPhoto[gallery]" href="{% static "index/img/SnapShot3.png" %}" title="portfolio image">
-					<img src="{% static "index/img/SnapShot3.png" %}" alt="ScrollStrap" />
-				</a>
-				<div class="carousel-caption">
-						
-							<p class="">
-								<strong><span class="main-color">THIS Bootstrap</span></strong> 
-								Carousel integrated with PrettyPhoto jQuery plugin. Just click on photo for enlarge it.			
-								</p>
-						
-					</div>
-				</div>
-				<div class="item"><a rel="prettyPhoto[gallery]" href="{% static "index/img/SnapShot4.png" %}" title="portfolio image">
-					<img src="{% static "index/img/SnapShot4.png" %}" alt="ScrollStrap" />
-				</a>
-				<div class="carousel-caption">
-						
-							<p class="">
-								<strong><span class="main-color">THIS Bootstrap</span></strong> 
-								Carousel integrated with PrettyPhoto jQuery plugin. Just click on photo for enlarge it.			
-								</p>
-						
-					</div>
-				</div>
-			  </div>
-			  <!-- Carousel nav -->
-			  <a class="carousel-control left" href="#myCarousel" data-slide="prev">&lsaquo;</a>
-			  <a class="carousel-control right" href="#myCarousel" data-slide="next">&rsaquo;</a>
-			</div>
-			
-		</div><!-- END: portfolio item -->
-
-		<!-- portfolio item -->
-		<div class="span6  project-item graphics box">
-			
-							
-							<h4 class="main-color-line">
-								<span class="white">
-								<strong>INTRODUCING <span class="main-color">SCROLL&amp;STRAP</span></strong>  
-								</span>
-								</h4>
-							
-								<p class="lead">
-								We work really hard for build this awesome template!
-								We hope that this project will be appreciated by you and your customers!
-								</p>
-								<p class="lead">
-								We work really hard for build this awesome template!
-								We hope that this project will be appreciated by you and your customers!
-								</p>
-								
-								
-								<p class="">								
-								
-									<a href="#" class="btn btn-warning">
-									<i class="fa fa-link"></i> 
-									Visit project site
-								</a>
-								
-								</p>
-		
-							
-		</div><!-- END: portfolio item -->
-		
-		</div><!--/ ROW FEATURED-->
-		
-		<div class="container">
-		<div class="row">	
-<!-- PORTFOLIO  HEADER -->
-			<div class="text-center">
-				<header>
-					<div class="span12 text-center page-header">
-							
-								<h3>
-								<span class="white">
-								MORE <span class="main-color">FEATURED PROJECTS</span> 
-								</span>
-								</h3>
-								
-					</div>
-							
-								
-				</header><!-- / PORTFOLIO SECTION HEADER-->
-			</div><!-- /text center-->
-		</div><!--/ROW-->
-	</div><!--/CONTAINER-->
-		<div class="row">
-		<!-- portfolio item -->
-		<div class="span3  project-item graphics box">
-			<div class="thumbnail" >
-				<!-- IMAGE CONTAINER-->
-				<a rel="prettyPhoto[gallery]" href="{% static "index/img/buttons.jpg" %}" title="portfolio image">
-					<img src="{% static "index/img/buttons.jpg" %}" alt="iPhonegraphy" /> 
-				</a>
-				<!--END IMAGE CONTAINER-->
-				<!-- CAPTION --> 
-				<div class="caption">
-					<h4 class="">15 custom buttons</h4>
-						<p class="caption-descr">
-						This project presents beautiful style graphic &amp; design. Scroll&amp;Strap provides modern features 
-						</p>	
-				</div><!--END CAPTION --> 
-			</div><!-- END: THUMBNAIL -->
-		</div><!-- END: portfolio item -->
-		
-			<!-- portfolio item -->
-		<div class="span3  project-item graphics box">
-			<div class="thumbnail" >
-				<!-- IMAGE CONTAINER-->
-				<a rel="prettyPhoto[gallery]" href="{% static "index/img/transitions.jpg" %}" title="portfolio image">
-					<img src="{% static "index/img/transitions.jpg" %}" alt="iPhonegraphy" /> 
-				</a>
-				<!--END IMAGE CONTAINER-->
-				<!-- CAPTION --> 
-				<div class="caption">
-					<h4 class="">Transitions effects</h4>
-						<p class="caption-descr">
-						This project presents beautiful style graphic &amp; design. Scroll&amp;Strap provides modern features
-						</p>	
-				</div><!--END CAPTION --> 
-			</div><!-- END: THUMBNAIL -->
-		</div><!-- END: portfolio item -->
-		
-			<!-- portfolio item -->
-		<div class="span3  project-item graphics box">
-			<div class="thumbnail" >
-				<!-- IMAGE CONTAINER-->
-				<a rel="prettyPhoto[gallery]" href="{% static "index/img/gmap.jpg" %}" title="portfolio image">
-					<img src="{% static "index/img/gmap.jpg" %}" alt="iPhonegraphy" /> 
-				</a>
-				<!--END IMAGE CONTAINER-->
-				<!-- CAPTION --> 
-				<div class="caption">
-					<h4 class="">Responsive gMap</h4>
-						<p class="caption-descr">
-						This project presents beautiful style graphic &amp; design. Scroll&amp;Strap provides modern features
-						</p>	
-				</div><!--END CAPTION --> 
-			</div><!-- END: THUMBNAIL -->
-		</div><!-- END: portfolio item -->
-		
-			<!-- portfolio item -->
-		<div class="span3  project-item graphics box">
-			<div class="thumbnail" >
-				<!-- IMAGE CONTAINER-->
-				<a rel="prettyPhoto[gallery]" href="{% static "index/img/price.jpg" %}" title="portfolio image">
-					<img src="{% static "index/img/price.jpg" %}" alt="iPhonegraphy" /> 
-				</a>
-				<!--END IMAGE CONTAINER-->
-				<!-- CAPTION --> 
-				<div class="caption">
-					<h4 class="">Pricing tables</h4>
-						<p class="caption-descr">
-						This project presents beautiful style graphic &amp; design. Scroll&amp;Strap provides modern features
-						</p>	
-				</div><!--END CAPTION --> 
-			</div><!-- END: THUMBNAIL -->
-		</div><!-- END: portfolio item -->
-		  
-		</div><!--/innner folio row-->
-	
-  
-	
-	</div><!--CONTAINER-->
-	<div class="container">
-		<div class="row">	
-<!-- VIDEO  HEADER -->
-			<div class="text-center">
-				<header>
-					<div class="span12 page-header">
-							
-								<h3>
-								<span class="white">
-								PROJECT WITH <span class="main-color"> RESPONSIVE VIDEO</span></span>
-								</h3>
-								
-					</div>
-							
-								
-				</header><!-- / VIDEO SECTION HEADER-->
-			</div><!-- /text center-->
-		</div><!--/ROW-->
-	</div><!--/CONTAINER-->
-	
-	<div class="container">
-				<div class="row-fluid">
-				<!-- SLIDER SIDE -->
-				<div class="span8">
-						<div class="vendor">
-							<div class="container-video">
-								<div class="fluid-width-video-wrapper" style="padding-top: 50%;"><iframe src="https://www.youtube.com/embed/TqE-Z89qDiE" id="fitvid862574"></iframe>
-								<!--<iframe width="560" height="315" src="https://www.youtube.com/embed/TqE-Z89qDiE" frameborder="0" allowfullscreen></iframe>-->
-								</div> 
-							</div>
-						</div>
-						<div class="well">
-						<p>
-						Description of video. Few words about your project video.
-						</p>
-						</div>
-						
-				</div>
-			<!-- END: SLIDER SIDE -->
-			<!-- PORTFOLIO ASIDE -->
-			<div class="span4">
-					<!-- TITLE -->
-			<h4 class="main-color-line">Project with responsive video </h4>
-					 
-					 <!-- PARAGRAPH -->
-					<p>
-					Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
-					</p>
-					<p class="visible-desktop">
-					Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
-					</p>
-					<!-- END PARAGRAPH -->
-					<!-- DEVIDER LINE -->
-					<div class="no-color-line-no-border3"></div>
-					<hr class="half2">
-					<!-- ACTION BUTTON -->
-					<a class="btn btn-info btn-large btn-block btn-success" href="#" title="">Lern more!</a>
-					<!-- END ACTION BUTTON -->
-			</div>
-			<!-- PORTFOLIO ASIDE -->
-			</div>
-  
-	</div>
-</section><!--/ portfolio section-->
-
-<!-- /SLOGAN section-->
-<section class="" id="slogan-section-3">
-<div class="container">
-	<div class="row-fluid">
-		<span class="logo"><!--LOGO-->
-			<a href="#" title="Scroll&amp;Strap">
-				<img src="{% static "index/img/yellow_banner.png" %}" alt="logo"/>
-			</a>
-		</span><!--/ LOGO-->
-		
-		<div class="span12 text-center">
-			<span class="large-slogan main-color">
-				Scroll&amp;Strap   
-			</span>
-			<span class="large-slogan">
-				- modern Bootstrap one page 
-			</span>
-			<span class="large-slogan">
-				template with parallax effect and smooth scrolling. 
-			</span>
-			<span class="large-slogan">
-				Scroll&amp;Strap provides modern design features!
-			</span>
-			<span class="large-slogan">
-				Ready to buy? Check out our price!
-			</span>
-		</div><!-- /span12-->
-	</div><!-- /row-fluid-->
-			
-			<!-- GOBOTTOM BUTTON-->
-			<div class="row-fluid">
-				<div class="span12 text-center">
-					<span class="goprice" id="nav4">
-					<a href="#price-section" title="">
-						<i class="fa fa-angle-double-down fa-5x"></i>
-					</a>
-					</span>
-				</div>
-			</div>
-			<!-- / GOBOTTOM BUTTON-->	
-			
-	</div><!-- /container-->
-</section><!--/SLOGAN section-->
 
 <section id="price-section">
 <!-- PRICE SECTION HEADER ############# -->
@@ -751,7 +232,7 @@
 					<div class="span12 text-center page-header">
 						<h3>
 							<span class="white">
-								<span class="main-color">PRICING</span> TABLES
+								<span class="main-color">PRICING</span> CHOICES
 							</span>
 						</h3>
 					</div>
@@ -764,45 +245,58 @@
 <!-- PRICE SECTION ############# -->
 <div class="container">
 	<div class="row-fluid">
+	    
+	    
+	    
+	    
+	    
+	    
+	    
 	    <!---------------------------------------- price table ---------------------------->
-	    <div class="span3">
-		  <div class="pricing-table">
+	    <div class="span4">
+		  <div class="pricing-table pricing-table-highlighted">
 			<div class="pricing-table-header">
-			      <span class="heading">Free</span>
-			      <span class="price-value">$<span>0</span><span class="mo"><!--/mo--></span></span>
+			      <span class="heading">Monthly</span>
+			      <span class="price-value">$<span>9</span>.99/ mo<span class="mo"><!--/mo--></span></span>
 			</div>
 			<div class="pricing-table-space"></div>
-			<div class="pricing-table-features">
-			      <p><i class="fa fa-check main-color"></i> <strong>Five</strong> Free E-sheets</p>
-			      <p><strong> One Free</strong> E-sheet A Month</p>
-			      <p><strong>Website</strong> Support</p>
+			<div class="pricing-table-text">
+			      <p><span class="attention" style="font-size: 25px;">GET STARTED</span></p>
 			</div>
-			<div class="pricing-table-sign-up">
-			      <a href="#" class="btn btn-large btn-block btn-inverse">GET STARTED!</a>
+			<div class="pricing-table-features">
+			      <p><i class="fa fa-check main-color"></i> <strong> Show Your Work</strong> Boxes</p>
+			      <p><i class="fa fa-check main-color"></i> <strong> Unlimited </strong> Classes</p>
+			      <p><i class="fa fa-check main-color"></i> <strong> Unlimited </strong> Students</p>
+			      <p><i class="fa fa-check main-color"></i> <strong> Unlimited </strong> eSheets</p>
+			      <p><i class="fa fa-check main-color"></i> <strong> BYOD</strong> Works With Any Device</p>
+			      <p><i class="fa fa-check main-color"></i> <strong> Auto-Grading</strong> Reports and Downloads</p>
+			      <p><i class="fa fa-check main-color"></i> <strong> Live</strong> Student Monitoring</p>
+			      <p><strong> Unlimited </strong> Support</p>
 			</div>
 		  </div>
 	    </div>
 	    <!---------------------------------------- end of price table ---------------------------->
 
 	    <!---------------------------------------- price table ---------------------------->
-	    <div class="span3">
+	    <div class="span4">
 		  <div class="pricing-table pricing-table-highlighted">
 			<div class="pricing-table-header">
-			      <span class="heading">Unlimited</span>
-			      <span class="price-value">$<span>20</span>/ mo<span class="mo"><!--/mo--></span></span>
+			      <span class="heading">Yearly</span>
+			      <span class="price-value">$<span>99</span>.99/ year<span class="mo"><!--/mo--></span></span>
 			</div>
 			<div class="pricing-table-space"></div>
 			<div class="pricing-table-text">
-			      <p><span class="attention" style="font-size: 25px;">RECOMMENDED</span></p>
+			      <p><span class="attention" style="font-size: 25px;">2 MONTHS FREE</span></p>
 			</div>
 			<div class="pricing-table-features">
-			      <p><i class="fa fa-check main-color"></i> <strong>All Prime</strong> Features</p>
-			      <p><i class="fa fa-check main-color"></i> <strong>Live</strong> Student Monitoring</p>
-			      <p><i class="fa fa-check main-color"></i> <strong>Show Your Work</strong> Boxes</p>
+			      <p><i class="fa fa-check main-color"></i> <strong> Show Your Work</strong> Boxes</p>
+			      <p><i class="fa fa-check main-color"></i> <strong> Unlimited </strong> Classes</p>
+			      <p><i class="fa fa-check main-color"></i> <strong> Unlimited </strong> Students</p>
+			      <p><i class="fa fa-check main-color"></i> <strong> Unlimited </strong> eSheets</p>
+			      <p><i class="fa fa-check main-color"></i> <strong> BYOD</strong> Works With Any Device</p>
+			      <p><i class="fa fa-check main-color"></i> <strong> Auto-Grading</strong> Reports and Downloads</p>
+			      <p><i class="fa fa-check main-color"></i> <strong> Live</strong> Student Monitoring</p>
 			      <p><strong> Unlimited </strong> Support</p>
-			</div>
-			<div class="pricing-table-sign-up">
-			      <a href="#" class="btn btn-large btn-block btn-warning">GET STARTED!</a>
 			</div>
 		  </div>
 	    </div>
@@ -810,41 +304,17 @@
 
 			
 	    <!---------------------------------------- price table ---------------------------->
-	    <div class="span3">
+	    <div class="span4">
 		  <div class="pricing-table">
 			<div class="pricing-table-header">
-			      <span class="heading">Prime</span>
-			      <span class="price-value">$<span>15</span>/ mo<span class="mo"><!--/mo--></span></span>
+			      <span class="heading">Free</span>
+			      <span class="price-value">$<span>0</span><span class="mo"><!--/mo--></span></span>
 			</div>
 			<div class="pricing-table-space"></div>
 			<div class="pricing-table-features">
-			      <p><i class="fa fa-check main-color"></i> <strong> Unlimited </strong> Classes</p>
-			      <p><i class="fa fa-check main-color"></i> <strong> Unlimited </strong> Students</p>
-			      <p><i class="fa fa-check main-color"></i> <strong> Unlimited </strong> E-sheets</p>
-			      <p><strong>BYOD</strong> Works With Any Device</p>
-			      <p><strong>Gradebook</strong> Reports and Downloads</p>
-			      <p><strong>Unlimited </strong> Support</p>
-			</div>
-			<div class="pricing-table-sign-up">
-			      <a href="#" class="btn btn-large btn-block btn-inverse">GET STARTED!</a>
-			</div>
-		  </div>
-	    </div>
-	    <!---------------------------------------- end of price table ---------------------------->
-	    
-	    <!---------------------------------------- price table ---------------------------->
-	    <div class="span3">
-		  <div class="pricing-table">
-			<div class="pricing-table-header">
-			      <span class="heading">School</span>
-			      <span class="price-value">Pricing Available</span>
-			</div>
-			<div class="pricing-table-space"></div>
-			<div class="pricing-table-features">
-			      <p><i class="fa fa-check main-color"></i> <strong> Pilot Programs </strong> Available</p>
-			</div>
-			<div class="pricing-table-sign-up">
-			      <a href="#" class="btn btn-large btn-block btn-inverse">Email Us!</a>
+			      <p><i class="fa fa-check main-color"></i> <strong>First Five</strong> Free E-sheets</p>
+			      <p><strong> One Free</strong> E-sheet A Month</p>
+			      <p><strong>Website</strong> Support</p>
 			</div>
 		  </div>
 	    </div>
@@ -862,10 +332,11 @@
 						<div class="well">
 							<div class="well-wrapp">
 								<p class="lead text-large text-center">
-									Buy 
-									<span class="main-color"><strong>Scroll&amp;Strap</strong>
-									</span> awesome parallax template now!  Limited time for lower price <span class="main-color"><strong>$14</strong></span>!
-							</p>
+								  
+		  <!-- PayPal Logo --><table class="mb" border="0" cellpadding="10" cellspacing="0" align="center"><tr><td align="center"></td></tr><tr><td align="center"><a href="https://www.paypal.com/webapps/mpp/paypal-popup" title="How PayPal Works" onclick="javascript:window.open('https://www.paypal.com/webapps/mpp/paypal-popup','WIPaypal','toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=yes, resizable=yes, width=1060, height=700'); return false;"><img src="https://www.paypalobjects.com/webstatic/mktg/logo/bdg_now_accepting_pp_2line_w.png" border="0" alt="Now Accepting PayPal"></a><div style="text-align:center"><a href="https://www.paypal.com/webapps/mpp/how-paypal-works" target="paypal"><font size="2" face="Arial" color="#0079CD">How PayPal Works</font></a></div></td></tr></table><!-- PayPal Logo -->
+		  <img src="https://www.paypalobjects.com/webstatic/en_US/i/buttons/cc-badges-ppppcmcvdam.png" alt="Pay with PayPal, PayPal Credit or any major credit card" />
+		  
+							        </p>
 							</div>
 						</div>
 					</div>
@@ -894,19 +365,7 @@
 					<span class="main-color">CONTACT</span> INFORMATION
 					</span>
 					</h3>
-		</div>
-		<div class="span12 text-center page-header">
-		  
-		  <form class="form-horizontal style-form">
-			<div class="form-group span4">
-			      <label class="form-control">email</label>
-			      <input class="form-control" type="email">
-			</div>
-			<div class="form-group span4">
-			      <label class="form-control">message</label>
-			      <textarea class="form-control"></textarea>
-			</div>
-		  </form>
+					<h1><a href="mailto:some@mail.com">support@ducksoup.us</a></h1>
 		</div>
 	</div>	
 	</div>
@@ -918,16 +377,16 @@
         <h4 class="main-color-line"><i class="fa fa-comments-alt main-color"></i> <span>What people say</span></h4>
         <blockquote>
 			<p>
-				He promptly completed the task at hand and communicates really well till the project reaches the finishing line.  
+				Wow! This is a real game changer!
 			</p>
-			 <span class="test-caption"> <strong>Steve Kruger UI/UX Designer at Woof Design Studio</strong></span>
+			 <span class="test-caption"> <strong>Amanda Woodard, 8th Grade Science, Teacher of the Year - Alvarado ISD.</strong></span>
 		
 		</blockquote>
 		<blockquote>
 			<p>
-				I was pleased with his creative design and will definitely be hiring him again. 
+				Every teacher will want this in their classroom.
 			</p>
-			<span class="test-caption"><strong>Steve Kruger UI/UX Designer at Woof Design Studio</strong></span>
+			<span class="test-caption"><strong>Janie Henderson, Instructional Technologist</strong></span>
 		
 		</blockquote>
       </div>
@@ -944,10 +403,10 @@
 		<hr/>
 			
 			<address>
-				<strong>SCROLL&amp;STRAP, Inc.</strong><br>
-				<i class="fa fa-map-marker"></i> 795 Folsom Ave, Suite 600
-				San Francisco, CA 94107<br/>
-				<i class="fa fa-phone-sign"></i> + 4 (123) 456-7890
+				<strong>Duck Soup, Inc.</strong><br>
+				<i class="fa fa-map-marker"></i> 501 Williams ST
+				Grandview, TX 76050<br/>
+				<i class="fa fa-phone-sign"></i>
 				<div class="foot-line"></div>
 									  
 			</address>
@@ -961,13 +420,11 @@
 		
 		<div class="span3">
         <h4 class="main-color-line text-center"><i class="fa fa-share main-color"></i> <span>Follow us</span></h4>
-			<ul class="social-bottom">
-              <li><span class="badge badge-warning"><a href="https://www.facebook.com/pages/Duck-Soup-Inc/1435783753413226?skip_nax_wizard=true&ref_type=logout_gear" title=""><i class="fa fa-facebook"></i></a></span></li>
-				<li><span class="badge badge-warning"><a href="https://twitter.com/ducksoupinc" title=""><i class="fa fa-twitter"></i></a></span></li>
-				<li><span class="badge badge-warning"><a href="#" title=""><i class="fa fa-github-alt"></i></a></span></li>
-				<li><span class="badge badge-warning"><a href="#" title=""><i class="fa fa-google-plus"></i></a></span></li>
-				<li><span class="badge badge-warning"><a href="#" title=""><i class="fa fa-linkedin"></i></a></span></li>
-			</ul>
+		<ul class="social-bottom">
+            <li><span class="badge badge-warning"><a href="http://www.facebook.com/pages/Duck-Soup-Inc/1435783753413226?skip_nax_wizard=true&ref_type=logout_gear" title="Duck Facebook"><i class="fa fa-facebook"></i></a></span></li>
+			<li><span class="badge badge-warning"><a href="http://twitter.com/ducksoupinc" title="Duck Twitter"><i class="fa fa-twitter"></i></a></span></li>
+			<li><span class="badge badge-warning"><a href="http://plus.google.com/+DucksoupUsInc/" title="Duck Google+"><i class="fa fa-google-plus"></i></a></span></li>
+		</ul>
 				
 			
 			
@@ -1044,12 +501,9 @@ jQuery(document).ready(function(){
 	//outerHeight (true/false) - Whether or not jQuery should use it's outerHeight option to determine when a section is in the viewport
 	jQuery('#header-section').parallax("50%", 0.1);
 	jQuery('#features-section').parallax("50%", 0.1);
-	jQuery('#team-section').parallax("50%", 0.1);
 	jQuery('.bg').parallax("50%", 0.3);
-	jQuery('#portfolio-section').parallax("50%", 0.3);
 	jQuery('#price-section').parallax("50%", 0.3);
 	jQuery('#contact-section').parallax("50%", 0.1);
-	jQuery('#slogan-section-1').parallax("50%", 0.3);
 	
 })
 </script>
@@ -1074,16 +528,6 @@ jQuery('#features-section .parallax-point-event').bind('inview', function (event
 </script>
 
 <script>
-jQuery('#slogan-section-1').bind('inview', function (event, visible) {
-        if (visible == true) {
-            jQuery('.large-slogan').addClass("active");
-		 }else{
-            jQuery('.large-slogan').removeClass("active"); 	
-        }
-    });
-
-</script>
-<script>
 jQuery('#slogan-section-2 .parallax-point-event').bind('inview', function (event, visible) {
         if (visible == true) {
             jQuery('.browser-shot-1').addClass("active");
@@ -1095,17 +539,6 @@ jQuery('#slogan-section-2 .parallax-point-event').bind('inview', function (event
 			jQuery('.browser-shot-2').removeClass("active");
 			jQuery('.browser-shot-3').removeClass("active");
 			
-        }
-    });
-
-</script>
-
-<script>
-jQuery('#slogan-section-3').bind('inview', function (event, visible) {
-        if (visible == true) {
-            jQuery('.goprice').addClass("active");
-		}else{
-            jQuery('.goprice').removeClass("active"); 	
         }
     });
 
