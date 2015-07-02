@@ -308,14 +308,14 @@
 	if(window.orientation == 0) // Portrait
 	{
 	  alert("This page is best viewed in landscape on your device.");
-	  $(this).unbind("orientationchange").on("orientationchange",function(){
+	}
+	$(this).unbind("orientationchange").on("orientationchange",function(){
 	    if (window.orientation != 0) {
 	      location.reload();
 	    }else{
 	      alert('Please keep your device in landscape view for this page.')
 	    }
-	  });
-	}
+	});
     </script>
     <script>
       {% if not allClasses %}
