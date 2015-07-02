@@ -44,7 +44,7 @@
     {% block extraBottomHead %}
     {% endblock %}
     
-    <link href="{% static "adminBoot/css/auto_landscape.css" %}" rel="stylesheet">
+    <!--<link href="{% static "adminBoot/css/auto_landscape.css" %}" rel="stylesheet">-->
   </head>
 
   <body>
@@ -480,6 +480,19 @@
     
     
     <!--script for this page-->
+    <script>
+      $(window).on("orientationchange",function(){
+	if(window.orientation == 0) // Portrait
+	{
+	  alert("This page is best viewed in landscape on your device.");
+	  $(this).unbind("orientationchange").on("orientationchange",function(){
+	    if (window.orientation != 0) {
+	      location.reload();
+	    }
+	  });
+	}
+      });
+    </script>
     <script>
       {% if not allClasses %}
 	setInterval(function(){
