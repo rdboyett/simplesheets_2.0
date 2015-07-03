@@ -252,6 +252,20 @@ $.validator.addMethod("upperCase",
     }); 
     
     
+    $('#help-request-form').ajaxForm({ 
+        success:       function(responseText){
+            if (responseText.error) {
+                alert(responseText.error);
+            }else if (responseText.success) {
+		$("#help-request-modal").modal("hide");
+		alert("Thank you, we are on the case and will be in touch shortly.");
+            }
+        },
+	clearForm: true,
+	resetForm: true,
+        dataType:  'json',
+        timeout:   4000 
+    }); 
     
     $('#delete-user-form').ajaxForm({ 
         success:       function(responseText){

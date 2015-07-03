@@ -1,3 +1,5 @@
+{% load tz %}
+
 <html xmlns="http://www.w3.org/1999/xhtml">
  <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -42,12 +44,7 @@
                                     <!----------- Title ------------------------------------------------------------------>
                                     <tr>
                                         <td style="color: #153643; font-family: Arial, sans-serif; font-size: 24px;">
-                                            <b>Welcome to Duck Soup!</b>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 20px 0 30px 0;">
-                                         We are so happy that you decided to give our little site a try.  Just one more thing and you'll be on your way.  Follow the link to finish the account setup process.
+                                            <b>Duck Soup Help Request</b>
                                         </td>
                                     </tr>
                                     <!---------------------------------------------------------------------------->
@@ -63,30 +60,15 @@
                                               <table border="0" cellpadding="0" cellspacing="0" width="100%">
                                                <tr>
                                                 <td style="padding: 25px 0 0 0;">
-                                                 <a href="http://ducksoup.us/google/accountVerify/{{ accountID }}">
-                                                    Verify Your Account Here!
-                                                 </a>
-                                                </td>
-                                               </tr>
-                                              </table>
-                                             </td>
-                                            </tr>
-                                        </table>
-                                         
-                                        </td>
-                                    </tr>
-                                    <!----------- 1 Column ------------------------------------------------------------------>
-                                    <tr>
-                                        <td>
-                                         
-                                         <table border="0" cellpadding="0" cellspacing="0" width="100%">
-                                            <tr>
-                                             <td width="260" valign="top">
-                                              <table border="0" cellpadding="0" cellspacing="0" width="100%">
-                                               <tr>
-                                                <td style="padding: 50px 0 0 0;">
-                                                    <h3>Robert Boyett</h3>
-                                                    <h4>Ducksoup Inc.</h4>
+
+
+Name: {{ user.first_name }} {{ user.last_name }}<br>
+Email: {{ user.email }}<br>
+Date and Time: {{date|date}} - {{time}}<br>
+<br>
+Message: <br>
+{{ message }}
+
                                                 </td>
                                                </tr>
                                               </table>

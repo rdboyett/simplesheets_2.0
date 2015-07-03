@@ -17,6 +17,7 @@ urlpatterns = patterns('',
     url(r'^drive/', include('google_drive.urls')),
     url(r'^worksheet/', include('worksheet_creator.urls')),
     url(r'^tour/', include('tourBuilder.urls')),
+    url(r'^contact/', include('contact_me.urls')),
     url(r'^paypal/', include('paypal.standard.ipn.urls')),
     
     
