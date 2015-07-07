@@ -246,6 +246,52 @@
 
 
 
+<!-- *****************    Create a New Class   ******************************************************* -->
+<div id="share-worksheet-modal" class="modal fade" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content rounded">
+      <div class="modal-header top-rounded">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">Share eSheet with others</h4>
+      </div>
+      <div class="modal-body centered">
+            <form id="share-worksheet-form" class="form-horizontal style-form" action="{% url "worksheet_creator.page_view_ajax.shareWorksheet" %}" enctype='multipart/form-data' method="post" autocomplete="off">{% csrf_token %}
+		      <input id="share-worksheet-form-input" type="hidden" name="worksheetID" value="" required>
+		      <div class="form-group">
+			<label class="col-sm-3 control-label">email address</label>
+			<div class="col-sm-9">
+			  <input class="form-control" type="email" name="email" required value="" placeholder="email..." autofocus>
+			</div>
+		      </div>
+		      <div class="form-group">
+			<div class="col-xs-8 col-xs-offset-2 col-sm-6 col-sm-offset-3">
+			  <button type="button" class="class-button btn btn-block btn-success text-center rounded" onclick="$(this).toggleClass('btn-primary').toggleClass('btn-success');$('.classCheckButton').toggleClass('fa-check-square-o').toggleClass('fa-square-o');changeSendMail();">
+			    <i class="classCheckButton fa fa-check-square-o fa-1x pull-left" style="line-height: 20px;vertical-align: middle;"></i>
+			    <span style="line-height: 20px;vertical-align: middle;">&nbsp;&nbsp;send mail</span>
+			  </button>
+			  <input id="sendMail" type="hidden" name="sendMail" value="yes">
+			  <script>
+			    function changeSendMail() {
+			      if ($('#sendMail').val()=='yes') {
+				$('#sendMail').val('no');
+			      }else{$('#sendMail').val('yes');}
+			    }
+			  </script>
+			</div>
+		      </div>
+              
+            </form>
+	    
+      </div>
+      <div class="modal-footer bottom-rounded">
+        <button type="button" class="btn btn-default rounded" data-dismiss="modal">cancel</button>
+        <button type="submit" form="share-worksheet-form" class="btn btn-primary rounded">share</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <!---------------- modal ------------------------------------->
 <div id="renameWorksheet-modal" class="modal fade" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
   <div class="modal-dialog">

@@ -39,12 +39,6 @@ class FormInput(models.Model):
       
 
 
-class SharedWithUser(models.Model):
-  user = models.ForeignKey(User)
-  dateShared = models.DateTimeField(auto_now_add=True, blank=True)
-  dateTouched = models.DateTimeField(auto_now_add=True, blank=True)
-  copyCreated = models.BooleanField(default=False)
-  
 
 class Project(models.Model):
   title = models.CharField(max_length=100)
@@ -59,7 +53,7 @@ class Project(models.Model):
   ownerID = models.IntegerField(blank=True, null=True)  #this is the django request.user.id
   modifiedDate = models.DateTimeField(auto_now_add=True, blank=True, null=True)
   shared = models.BooleanField(default=False)
-  sharedWithUsers = models.ManyToManyField(SharedWithUser, blank=True, null=True)
+  sharedWithUsers = models.ManyToManyField(User, blank=True, null=True)
   
   def __unicode__(self):
         return u'%s %s' % (self.title, self.dateTime)
@@ -70,5 +64,19 @@ class Project(models.Model):
 
 
 admin.site.register(Project)
+
+'''
+steps to remove shared with user
+
+Delete 'sharedWithUsers = models.ManyToManyField(SharedWithUser, blank=True, null=True)'
+makemigrations and migrate
+
+delete the class SharedWithUser(models.Model):
+makemigrations and migrate
+
+Add 'shareWithUsers = models.ManyToManyField(User, blank=True, null=True)'
+makemigrations and migrate
+'''
+
 
 

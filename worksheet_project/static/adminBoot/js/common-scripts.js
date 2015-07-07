@@ -286,6 +286,30 @@ jQuery.validator.addMethod("complete_url", function(val, elem) {
     
     
     
+    $('#share-worksheet-form').ajaxForm({ 
+        success:       function(responseText){
+            console.log(responseText);
+            if (responseText.error) {
+                alert(responseText.error);
+            }else {
+		//location.reload();
+		$("#share-worksheet-modal").modal('hide');
+		$.gritter.add({
+		    text: "<div class='text-center text-success' style='font-size:30px;'><i class='fa fa-check fa-lg'></i>&nbsp;&nbsp;Shared</div>",
+		    fade: true,
+		    speed: "fast",
+		    class_name: 'gritter-light'
+		});
+            }
+        },
+	clearForm: true,
+        resetForm: true,
+        dataType:  'json',
+        timeout:   4000 
+    });
+    
+    
+    
     
 
 }();
