@@ -411,7 +411,7 @@ function questionFocus(elementID) {
 
 function showSideBarMenu() {
 	$('#sidebar').animate({marginLeft: -210+"px"}, 1000, function(){resizeElements();$("#nav-accordion").attr('style','display: none;');});
-	$('#main-content').animate({marginRight: 210+"px", marginLeft: 0}, 1000);
+	$('#main-content').animate({marginRight: 220+"px", marginLeft: 0}, 1000);
 	//$('#main-content').animate({width: (wholeScreenWidth-270)+"px"}, 1000, function(){resizeElements();});
 	$('#sidebar-right').animate({marginRight: 0}, 1000);
 	$("#hide-question-sidebar-btn").show();
@@ -421,7 +421,7 @@ function showSideBarMenu() {
 
 function hideSideBarMenu() {
 	if ($('#sidebar-right').is(":visible")) {
-		$('#sidebar-right').animate({marginRight: -210+"px"}, 1000);
+		$('#sidebar-right').animate({marginRight: -220+"px"}, 1000);
 		$('#main-content').animate({marginRight: 0}, 1000, function(){resizeElements();});
 		$("#hide-question-sidebar-btn").hide();
 		$("#show-question-sidebar-btn").show();

@@ -1727,9 +1727,106 @@ def teacherGradeChange(request):
 
 
 
+@login_required
+def shareWorksheet(request):
+    if request.method == 'POST':
+        worksheetID = request.POST["worksheetID"].strip()
+        email = request.POST["email"].strip()
+        
+        
+        if User.objects.filter(email=email):
+            sharedUser = User.objects.get(email=email)
+            sharedUserInfo = UserInfo.objects.get(user=sharedUser)
+            #prevent a user from sharing with a student
+            if sharedUserInfo.teacher_student != 'teacher':
+                sharedUser = False
+                return HttpResponse(json.dumps({'error':"Sorry, you can't share eSheets with students."}))
+        else:
+            return HttpResponse(json.dumps({'error':"Sorry, we can't find that email address in our list of users."}))
+        
+        
+        #prevent a user from sharing with themselves
+        if email == request.user.email:
+            sharedUser = False
+            return HttpResponse(json.dumps({'error':"Sorry, that is your email address."}))
+        
+            
+        
+        if Project.objects.filter(id=worksheetID, ownerID=request.user.id) and sharedUser:
+            originalWorksheet = Project.objects.get(id=worksheetID, ownerID=request.user.id)
+            
+            
+            #Check that the worksheet is not already shared
+            bAlreadyShared = False
+            worksheetSharedUsersList = []
+            if originalWorksheet.sharedWithUsers.all():
+                worksheetSharedUsersList = originalWorksheet.sharedWithUsers.all()
+                if sharedUser in worksheetSharedUsersList:
+                    bAlreadyShared = True
+            
+            
+            
+            
+            
+            if not bAlreadyShared:
+                originalWorksheet.shared = True
+                originalWorksheet.modifiedDate = datetime.datetime.now()
+                originalWorksheet.sharedWithUsers.add(sharedUser)
+                originalWorksheet.sharedWithUsers.add(request.user)
+                originalWorksheet.save()
+                
+                backgroundImages = originalWorksheet.backgroundImages.all()
+                formInputs = originalWorksheet.formInputs.all()
+                    
+                #make the copy of project
+                newWorksheet = originalWorksheet
+                newWorksheet.pk = None
+                newWorksheet.ownerID = sharedUser.id
+                newWorksheet.modifiedDate = datetime.datetime.now()
+                newWorksheet.shared = True
+                newWorksheet.save()
+                
+                if backgroundImages:
+                    for image in backgroundImages:
+                        newWorksheet.backgroundImages.add(image)
+                        
+                if formInputs:
+                    for question in formInputs:
+                        newWorksheet.formInputs.add(question)
+                    
+                #add all the sharedUsers of the old sheet
+                if worksheetSharedUsersList:
+                    for oldUser in worksheetSharedUsersList:
+                        newWorksheet.sharedWithUsers.add(oldUser)
+                        
+                newWorksheet.sharedWithUsers.add(sharedUser)
+                newWorksheet.sharedWithUsers.add(request.user)
+                
+                newWorksheet.save()
+                
+                #add worksheet to sharedUserInfo
+                sharedUserInfo.projects.add(newWorksheet)
+                sharedUserInfo.save()
+            
+                data = {'success':'success'}
+                    
+            else:
+                data = {'error':"Sorry, this worksheet is already shared with that person."}
+                    
+            
+            
+            
+            
+        else:
+            data = {'error':"Sorry, you don't own this eSheet."}
 
 
-
+    else:
+        data = {
+            'error': "There was an error posting this request. Please try again.",
+        }
+            
+    return HttpResponse(json.dumps(data))
 
 
 

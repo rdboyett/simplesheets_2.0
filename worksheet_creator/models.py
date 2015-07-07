@@ -65,4 +65,18 @@ class Project(models.Model):
 
 admin.site.register(Project)
 
+'''
+steps to remove shared with user
+
+Delete 'sharedWithUsers = models.ManyToManyField(SharedWithUser, blank=True, null=True)'
+makemigrations and migrate
+
+delete the class SharedWithUser(models.Model):
+makemigrations and migrate
+
+Add 'shareWithUsers = models.ManyToManyField(User, blank=True, null=True)'
+makemigrations and migrate
+'''
+
+
 
