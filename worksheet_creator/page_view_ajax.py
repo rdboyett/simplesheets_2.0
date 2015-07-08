@@ -520,7 +520,7 @@ def deleteProject(request):
                         for image in oldProject.backgroundImages.all():
                             imagePath = image.imagePath
                                 
-                        if True:
+                        try:
                             a, b = os.path.split(imagePath)
                             fdir, folderName = os.path.split(a)
                                 
@@ -530,7 +530,7 @@ def deleteProject(request):
                                     basePath = os.path.join(settings.ROOT_PATH,'media', request.user.first_name+request.user.last_name+str(request.user.id), str(folderName))
                                     make_sure_path_exists(basePath)
                                     shutil.rmtree(basePath)
-                        else:
+                        except:
                             pass
                             
                         #build Service
