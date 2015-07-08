@@ -48,6 +48,7 @@ from worksheet_creator import settings
 from google_drive.views import get_service, rename_google_file
 from worksheet_project.views import checkPaidUp
 from worksheet_project import settings as projectSettings
+from payment_tracker.models import PaymentUser
 
 #Test where the settings file is located (in home computer or on the server)
 testPath = ROOT_PATH.split(os.sep)
@@ -1814,6 +1815,23 @@ def shareWorksheet(request):
                 sharedUserInfo.save()
             
                 data = {'success':'success'}
+                
+                
+                if PaymentUser.objects.filter(user=sharedUser):
+                    payUser = PaymentUser.objects.get(user=sharedUser)
+                    if projectSettings.PAYMENT_TRACKER_ON:
+                        bPaidUp = checkPaidUp(sharedUser)
+                    else:
+                        bPaidUp = True
+                            
+                    if not bPaidUp:
+                        #if payUser.numberOfProjects is > 5 lock all other worksheets
+                        if payUser.numberOfProjects > 5:
+                            if sharedUserInfo.projects.all().exclude(id=newWorksheet.id):
+                                allOldProjects = sharedUserInfo.projects.all().exclude(id=newWorksheet.id)
+                                for oldProject in allOldProjects:
+                                    oldProject.status = 'locked'
+                                    oldProject.save()
                 
                 #Now send email
                 if sendMail == 'yes':
