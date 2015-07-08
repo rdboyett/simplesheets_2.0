@@ -82,6 +82,8 @@
 			  <li role="presentation"><a role="menuitem" tabindex="-1" href="{% url "worksheet_project.views.handGrade" currentProject.id %}"><i class="fa fa-check-circle"></i>&nbsp;&nbsp;hand grade</a></li>
 			  
 			  
+			  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#share-worksheet-form-input').val({{ worksheet.id }});$('#share-worksheet-modal').modal('show');"><i class="fa fa-share"></i>&nbsp;&nbsp;Share</a></li>
+			
 			  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#toggle-lock-worksheet-base-form-WorksheetID').val({{ currentProject.id }});
 				$('#toggle-lock-worksheet-base-form').submit();">
 				{% if currentProject.status == "locked" %}

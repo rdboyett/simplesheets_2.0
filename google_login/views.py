@@ -530,8 +530,8 @@ def submitRegistration(request):
 	    subject = "Ducksoup Account Verification"
 	    sender = "Ducksoup Inc. <webmaster@ducksoup.us>"
 
-	    html_content = render_to_string('google_login/email_verification.html', args)
-	    text_content = render_to_string('google_login/email_verification.txt', args)
+            html_content = render_to_string('google_login/email_verification.html', args)
+            text_content = render_to_string('google_login/email_verification.txt', args)
 	    msg = EmailMultiAlternatives(subject, text_content,
 					 sender, [email])
 	    

@@ -1,0 +1,11 @@
+{% load staticfiles %}
+
+A Duck Soup eSheet Was Shared With You!
+
+{{ user.first_name|capfirst }} {{ user.last_name|capfirst }} ({{ user.email }}) shared an eSheet named "{{ worksheet.title|title }}" with you.
+
+
+http://ducksoup.us{% url "worksheet_project.views.showNextPage" worksheet.id 1 %}
+
+
+Ducksoup Inc.

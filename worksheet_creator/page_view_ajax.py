@@ -13,6 +13,11 @@ import httplib2
 import shutil
 import base64
 
+#email imports
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from email.MIMEImage import MIMEImage
+
 from django.shortcuts import render_to_response, redirect
 from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseBadRequest
 from django.core.exceptions import ObjectDoesNotExist
@@ -1732,7 +1737,7 @@ def shareWorksheet(request):
     if request.method == 'POST':
         worksheetID = request.POST["worksheetID"].strip()
         email = request.POST["email"].strip()
-        
+        sendMail = request.POST["sendMail"].strip()
         
         if User.objects.filter(email=email):
             sharedUser = User.objects.get(email=email)
@@ -1809,6 +1814,29 @@ def shareWorksheet(request):
                 sharedUserInfo.save()
             
                 data = {'success':'success'}
+                
+                #Now send email
+                if sendMail == 'yes':
+                    args = {
+                        "user":request.user,
+                        "worksheet":newWorksheet,
+                    }
+                    
+                    #Send email confirmation
+                    subject = "Ducksoup eSheet Shared With You"
+                    sender = "Ducksoup Inc. <noreply@ducksoup.us>"
+        
+                    html_content = render_to_string('email_shareInfo.html', args)
+                    text_content = render_to_string('email_shareInfo.txt', args)
+                    msg = EmailMultiAlternatives(subject, text_content,
+                                                 sender, [sharedUser.email])
+                    
+                    msg.attach_alternative(html_content, "text/html")
+                    
+                    msg.mixed_subtype = 'related'
+                    msg.send()
+                    
+                            
                     
             else:
                 data = {'error':"Sorry, this worksheet is already shared with that person."}
