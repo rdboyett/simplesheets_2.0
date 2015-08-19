@@ -56,9 +56,10 @@ class ClassUser(models.Model):
 
 
     def __unicode__(self):
-      return u'%s' % (self.user)
+      return u'%s %s' % (self.user.first_name, self.user.last_name)
     
     
+admin.site.register(ClassUser)
     
     
     
