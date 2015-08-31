@@ -719,6 +719,7 @@ def sendStudentAnswer(request):
     if request.method == 'POST':
         userInfo_id = request.POST["userInfo_id"]
         answerID = request.POST["inputNumber"]
+        projectID = request.POST["project_id"].strip()
         myAnswer = request.POST["answer"].strip()
         classID = request.POST["classID"].strip()
         
@@ -727,6 +728,13 @@ def sendStudentAnswer(request):
         
         if UserInfo.objects.filter(id=userInfo_id):
             userInfo = UserInfo.objects.get(id=userInfo_id)
+            if Project.objects.filter(id=projectID):
+                project = Project.objects.get(id=projectID)
+            else:
+                data = {
+                    'error': "There is no eSheet with ID: "+str(answerID),
+                }
+                
             if FormInput.objects.filter(id=answerID):
                 question = FormInput.objects.get(id=answerID)
             else:
@@ -742,15 +750,15 @@ def sendStudentAnswer(request):
                 data = {'answer':"incorrect"}
                 
             #record my answer
-            if MyAnswer.objects.filter(userInfo=userInfo, answer=question):
-                myAnswerObject = MyAnswer.objects.get(userInfo=userInfo, answer=question)
+            if MyAnswer.objects.filter(userInfo=userInfo, answer=question, project=project):
+                myAnswerObject = MyAnswer.objects.get(userInfo=userInfo, answer=question, project=project)
                 myAnswerObject.myAnswer = myAnswer
                 myAnswerObject.bCorrect = bCorrect
                 myAnswerObject.save()
                 
             else:
                 myAnswerObject = MyAnswer.objects.create(
-                    project = question.project_set.all()[0],
+                    project = project,  #here is the problem that needs to be fixed when it come to sharing eSheets
                     userInfo=userInfo,
                     answer = question,
                     myAnswer = myAnswer,
@@ -758,9 +766,8 @@ def sendStudentAnswer(request):
                 )
                 
             #now check for live session and update live session answers
-            currentProject = Project.objects.get(formInputs__id=answerID)
-            if LiveMonitorSession.objects.filter(project=currentProject, classroom__id=classID):
-                liveSession = LiveMonitorSession.objects.get(project=currentProject, classroom__id=classID)
+            if LiveMonitorSession.objects.filter(project=project, classroom__id=classID):
+                liveSession = LiveMonitorSession.objects.get(project=project, classroom__id=classID)
                 liveSession.answers.add(myAnswerObject)
                 liveSession.save()
                 

@@ -25,6 +25,10 @@ class PaymentUser(models.Model):
     def __unicode__(self):
       return u'%s %s' % (self.user.first_name, self.user.last_name)
     
+    def user_Email(self):
+        return self.user.email
+    def user_Name(self):
+        return u'%s %s' % (self.user.first_name, self.user.last_name)
     
     
-admin.site.register(PaymentUser)
+#admin.site.register(PaymentUser)

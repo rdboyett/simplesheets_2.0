@@ -782,6 +782,7 @@ function showGradeColors() {
 		xhr.timeout = 4000;
 		xhr.ontimeout = function () { location.reload(); }
 		fd.append('userInfo_id', userInfo_id_ajax);
+		fd.append('project_id' , project_id_ajax);
 		fd.append('inputNumber', data.answer_id);
 		fd.append('answer', answer);
 		fd.append('classID', classID_ajax);

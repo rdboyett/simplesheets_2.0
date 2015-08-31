@@ -124,7 +124,7 @@ def auth_return(request):
     gender = user_info.get('gender')
         
     emailEnding = google_email.split("@")[1]
-    userName = "@"+google_email.split("@")[0]
+    userName = "@"+google_email.split("@")[0]+emailEnding[:1]
     
     if bBETA_TEST_ON:
 	if not BetaTestAllowedUsers.objects.filter(email=google_email):
