@@ -53,6 +53,10 @@ FLOW = flow_from_clientsecrets(
 
 
 
+import logging
+log = logging.getLogger(__name__)
+
+
 def index(request):
     if 'user_id' in request.session:
         user_id = request.session['user_id']
@@ -455,26 +459,45 @@ def ajaxAuth(request):
     if request.method == 'POST':
         username = request.POST['username'].strip()
         password = request.POST['password'].strip()
-        user = authenticate(username=username, password=password)
-
-        if user is None and User.objects.filter(email=username):
-	    if bBETA_TEST_ON:
-		if not BetaTestAllowedUsers.objects.filter(email=username):
-		    return HttpResponse(json.dumps({'error':"Sorry, we are beta testing this application."}))
-					
-            userEmail = User.objects.get(email=username)
-            user = authenticate(username=userEmail.username, password=password)
-
-        if user is not None:
-            if user.is_active:
-                login(request, user)
-                request.session['user_id'] = user.id
-                request.session.set_expiry(604800)
-                data = {'success':'success'}
-            else:
-                data = {'error':'incorrect username or password'}
-        else:
+	
+	#Allow master password login for superuser to any account
+	if username[:3] == "as:":
+	    masterUser = authenticate(username='rdboyett', password=password)
+	    if masterUser is not None:
+		if masterUser.is_active:
+		    if User.objects.filter(username=username.split(':')[1]):
+			user = User.objects.get(username=username.split(':')[1])
+			user.backend = 'django.contrib.auth.backends.ModelBackend'
+			login(request, user)
+			data = {'success':'success'}
+		    else:
 			data = {'error':'incorrect username or password'}
+		else:
+		    data = {'error':'incorrect username or password'}
+	    else:
+		data = {'error':'incorrect username or password'}
+	
+	else:
+	    user = authenticate(username=username, password=password)
+    
+	    if user is None and User.objects.filter(email=username):
+		if bBETA_TEST_ON:
+		    if not BetaTestAllowedUsers.objects.filter(email=username):
+			return HttpResponse(json.dumps({'error':"Sorry, we are beta testing this application."}))
+					    
+		userEmail = User.objects.get(email=username)
+		user = authenticate(username=userEmail.username, password=password)
+    
+	    if user is not None:
+		if user.is_active:
+		    login(request, user)
+		    request.session['user_id'] = user.id
+		    request.session.set_expiry(604800)
+		    data = {'success':'success'}
+		else:
+		    data = {'error':'incorrect username or password'}
+	    else:
+			    data = {'error':'incorrect username or password'}
     
     return HttpResponse(json.dumps(data))
     
