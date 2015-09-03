@@ -73,19 +73,28 @@
 			      </div>
 		            </div>
 			    <hr>
-                            <input id="teacher_or_student" type="hidden" name="teacherStudent" value="" required>
-		            <input name="username" type="text" class="form-control" placeholder="Username" autofocus minlength="6" maxlength="40" required noSpace="true">
-		            <br>
-                            <input id="email-input" type="email" name="email" placeholder="Email Optional" class="form-control placeholder-no-fix">
-                            <br>
-		            <input name="password" type="password" class="form-control" placeholder="Password" minlength="6" maxlength="40" required noSpace="true">
-		            <label class="checkbox">
-		                <span class="pull-right">
-		                    <a data-toggle="modal" href="login.html#myModal"> Forgot Password?</a>
-		
-		                </span>
-		            </label>
-		            <button class="btn btn-theme btn-block" type="submit"><i class="fa fa-lock"></i> Create</button>
+			      <div class="row">
+				<div class="col-xs-8 col-xs-offset-2">
+				  <button id="no-google-btn" type="button" class="btn btn-primary btn-block">No Google Account?</button>
+				</div>
+			      </div>
+			    <div id="no-google-display" class="row" style="display: none;">
+			      <div class="col-xs-12">
+				<input id="teacher_or_student" type="hidden" name="teacherStudent" value="" required>
+				<input name="username" type="text" class="form-control" placeholder="Username" autofocus minlength="6" maxlength="40" required noSpace="true">
+				<br>
+				<input id="email-input" type="email" name="email" placeholder="Email Optional" class="form-control placeholder-no-fix">
+				<br>
+				<input name="password" type="password" class="form-control" placeholder="Password" minlength="6" maxlength="40" required noSpace="true">
+				<label class="checkbox">
+				    <span class="pull-right">
+					<a data-toggle="modal" href="login.html#myModal"> Forgot Password?</a>
+		    
+				    </span>
+				</label>
+				<button class="btn btn-theme btn-block" type="submit"><i class="fa fa-lock"></i> Create</button>
+			      </div>
+			    </div>
 		            <hr>
 		            
 		
@@ -193,6 +202,15 @@
 	}
 
       
+    </script>
+    <script>
+      $(document).ready(function(){
+	$('#no-google-btn').click(function(){
+	  $(this).fadeOut(600, function(){
+	    $('#no-google-display').fadeIn(600);
+	  });
+	});
+      });
     </script>
 
   </body>
