@@ -747,6 +747,8 @@ function showGradeColors() {
     /************************** Submit Answer *************************************************************************8*****/
 	function sendStudentAnswer(element, answer, data){
 		console.log('In sendStudentAnswer');
+		var answer_id = data.answer_id;
+		console.log(answer_id);
 	    if (!bGraded) {
 		var csrftoken = getCookie('csrftoken');
 		var uri = sendStudentAnswerURL;
@@ -777,7 +779,11 @@ function showGradeColors() {
 			    }
 			    */
 			}
-		    }
+		    }else if (xhr.readyState == 4 && xhr.status != 200) {
+				//there is an error
+				console.log("picked up the error");
+				bErrorSubmittingAnswers["error"+answer_id] = {"answerID":answer_id, "answer":answer};
+			}
 		};
 		xhr.timeout = 4000;
 		xhr.ontimeout = function () { location.reload(); }

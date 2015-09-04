@@ -714,6 +714,92 @@ def changeWorksheetName(request):
     return HttpResponse(json.dumps(data))
 
 
+
+@login_required
+def sendLeftoverAnswers(request):
+    if request.method == 'POST':
+        userInfo_id = request.POST["userInfo_id"]
+        projectID = request.POST["project_id"].strip()
+        classID = request.POST["classID"].strip()
+        answers = request.POST["answers"]
+        
+        answers = json.loads(answers)
+        '''
+        for key, value in answers.iteritems():
+            #log.info(value['answer'])
+        '''
+                
+        
+        
+        if UserInfo.objects.filter(id=userInfo_id):
+            userInfo = UserInfo.objects.get(id=userInfo_id)
+            if Project.objects.filter(id=projectID):
+                project = Project.objects.get(id=projectID)
+            else:
+                data = {
+                    'error': "There is no eSheet with ID: "+str(answerID),
+                }
+                
+                
+            #Loop through all answers
+            for key, value in answers.iteritems():
+                answerID = value['answerID'].strip()
+                myAnswer = value['answer'].strip().lower()
+                
+                if FormInput.objects.filter(id=answerID):
+                    question = FormInput.objects.get(id=answerID)
+                else:
+                    data = {
+                        'error': "There is no question with ID: "+str(answerID),
+                    }
+                    
+                if question.correctAnswer == myAnswer:
+                    bCorrect = True
+                else:
+                    bCorrect = False
+                    
+                #record my answer
+                if MyAnswer.objects.filter(userInfo=userInfo, answer=question, project=project):
+                    myAnswerObject = MyAnswer.objects.get(userInfo=userInfo, answer=question, project=project)
+                    myAnswerObject.myAnswer = myAnswer
+                    myAnswerObject.bCorrect = bCorrect
+                    myAnswerObject.save()
+                    
+                else:
+                    myAnswerObject = MyAnswer.objects.create(
+                        project = project,  #here is the problem that needs to be fixed when it come to sharing eSheets
+                        userInfo=userInfo,
+                        answer = question,
+                        myAnswer = myAnswer,
+                        bCorrect = bCorrect,
+                    )
+                    
+                #now check for live session and update live session answers
+                if LiveMonitorSession.objects.filter(project=project, classroom__id=classID):
+                    liveSession = LiveMonitorSession.objects.get(project=project, classroom__id=classID)
+                    liveSession.answers.add(myAnswerObject)
+                    liveSession.save()
+                
+            data = {'success':'success'}
+            
+                
+        else:
+            data = {
+                'error': "There is no user with ID: "+str(userInfo_id),
+            }
+        
+    else:
+        data = {
+            'error': "There was an error posting this request. Please try again.",
+        }
+        
+    
+    return HttpResponse(json.dumps(data))
+
+
+
+
+
 @login_required
 def sendStudentAnswer(request):
     if request.method == 'POST':
@@ -890,7 +976,11 @@ def submitGradeWorksheet(request):
                                 
                                         
                                 #calculate the points per match and points earned
-                                pointsPossiblePerKeyword = float(float(question.points)/float(keywordCounter))
+                                if keywordCounter > 0:
+                                    pointsPossiblePerKeyword = float(float(question.points)/float(keywordCounter))
+                                else:
+                                    pointsPossiblePerKeyword = 0
+                                    
                                 pointsEarned += float(float(pointsPossiblePerKeyword)*number_of_keyword_matches)
                                 myAnswer.partialCredit = float(float(pointsPossiblePerKeyword)*number_of_keyword_matches)
                                 if myAnswer.partialCredit > 0:
@@ -1126,7 +1216,11 @@ def forceGradeWorksheet(request):
                                 
                                         
                                 #calculate the points per match and points earned
-                                pointsPossiblePerKeyword = float(float(question.points)/float(keywordCounter))
+                                if keywordCounter > 0:
+                                    pointsPossiblePerKeyword = float(float(question.points)/float(keywordCounter))
+                                else:
+                                    pointsPossiblePerKeyword = 0
+                                    
                                 pointsEarned += float(float(pointsPossiblePerKeyword)*number_of_keyword_matches)
                                 myAnswer.partialCredit = float(float(pointsPossiblePerKeyword)*number_of_keyword_matches)
                                 if myAnswer.partialCredit > 0:
