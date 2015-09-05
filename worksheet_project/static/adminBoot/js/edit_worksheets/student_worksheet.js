@@ -329,9 +329,12 @@ function resizeElements() {
         var complete = checkAllAnswersFilled();
         console.log("complete: "+complete);
         if (checkAllAnswersFilled()==true) {
-            sureCheck('', '', 'Are you sure you want to grade this worksheet?', submitGradeWorksheet);
+	    if (!jQuery.isEmptyObject(bErrorSubmittingAnswers)) {
+		sendLeftoverAnswers(bErrorSubmittingAnswers, true);
+	    }
+            sureCheck('', '', 'Are you sure you want to grade this eSheet?', submitGradeWorksheet);
         }else{
-            sureCheck('', '', 'Your worksheet is not complete! Do you want to grade it anyway?', submitGradeWorksheet);
+            sureCheck('', '', 'YOUR E-SHEET IS NOT COMPLETE!!! Do you want to grade it anyway?', submitGradeWorksheet);
         }
         
     });
@@ -694,6 +697,34 @@ function showGradeColors() {
 
 
 
+	    $(window).bind('beforeunload', function(){ 
+	      if(/Firefox[\/\s](\d+)/.test(navigator.userAgent) && new Number(RegExp.$1) >= 4 && !jQuery.isEmptyObject(bErrorSubmittingAnswers)) {
+		console.log('firefox delete');
+		 var data={async:false};
+		 sendLeftoverAnswers(bErrorSubmittingAnswers, false);
+		 return  "Some of your answers didn't submit properly. We have just resent them for you.";  
+	      } 
+	      else if (!jQuery.isEmptyObject(bErrorSubmittingAnswers)) {
+		console.log('NON-firefox delete');
+		 var data={async:true};
+		 sendLeftoverAnswers(bErrorSubmittingAnswers, true);
+		return  "Some of your answers didn't submit properly. We have just resent them for you.";  
+	      }
+	    });
+	    
+	    function sendLeftoverAnswers(answers, async) {
+		$.ajax({
+		    url: sendLeftoverAnswersURL, 
+		    method: "POST",
+		    data:{ answers:JSON.stringify(answers), project_id:project_id_ajax, userInfo_id:userInfo_id_ajax, classID:classID_ajax }, 
+		    async:async,
+		    dataType: 'json'
+		})
+		.done(function(result){
+		    console.log('answers saved');
+		    bErrorSubmittingAnswers = {};
+		});
+	    }
 
 
 

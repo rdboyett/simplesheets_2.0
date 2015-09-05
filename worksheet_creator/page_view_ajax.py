@@ -803,7 +803,7 @@ def sendLeftoverAnswers(request):
 @login_required
 def sendStudentAnswer(request):
     if request.method == 'POST':
-        userInfo_id = request.POST["userInfo_id"]
+        userInfo_id = request.POST["userInfo_id-lsjfdlsdjfl"]
         answerID = request.POST["inputNumber"]
         projectID = request.POST["project_id"].strip()
         myAnswer = request.POST["answer"].strip()

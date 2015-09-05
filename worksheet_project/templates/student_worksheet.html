@@ -446,6 +446,7 @@
 	    var sendStudentAnswerURL = "{% if newProject.status == 'active' %}{% url "worksheet_creator.page_view_ajax.sendStudentAnswer" %}{% endif %}";
 	    var submitGradeWorksheetURL = "{% if newProject.status == 'active' %}{% url "worksheet_creator.page_view_ajax.submitGradeWorksheet" %}{% endif %}";
 	    var uploadWorkboxImageURL = "{% if newProject.status == 'active' %}{% url "worksheet_creator.page_view_ajax.uploadWorkboxImage" %}{% endif %}";
+	    var sendLeftoverAnswersURL = "{% url "worksheet_creator.page_view_ajax.sendLeftoverAnswers" %}";
 	    var bGraded = false;
 	    {% if myGrade %}{% if myGrade.timesGraded >= newProject.numberOfRetry %}bGraded=true;{% endif %}{% endif %}
 	    {% if not newProject.status == 'active' %}
@@ -455,41 +456,13 @@
 	    
     </script>
     
-    
-    <script src="{% static "adminBoot/js/edit_worksheets/student_worksheet.js" %}"></script>
-    
     <script>
 	$(document).ready(function(){
-	    $(window).bind('beforeunload', function(){ 
-	      if(/Firefox[\/\s](\d+)/.test(navigator.userAgent) && new Number(RegExp.$1) >= 4 && !jQuery.isEmptyObject(bErrorSubmittingAnswers)) {
-		console.log('firefox delete');
-		 var data={async:false};
-		 sendLeftoverAnswers(bErrorSubmittingAnswers, false);
-		 return  "Some of your answers didn't submit properly. We have just resent them for you.";  
-	      } 
-	      else if (!jQuery.isEmptyObject(bErrorSubmittingAnswers)) {
-		console.log('NON-firefox delete');
-		 var data={async:true};
-		 sendLeftoverAnswers(bErrorSubmittingAnswers, true);
-		return  "Some of your answers didn't submit properly. We have just resent them for you.";  
-	      }
-	    });
-	    
-	    function sendLeftoverAnswers(answers, async) {
-		$.ajax({
-		    url: "{% url "worksheet_creator.page_view_ajax.sendLeftoverAnswers" %}", 
-		    method: "POST",
-		    data:{ answers:JSON.stringify(answers), project_id:project_id_ajax, userInfo_id:userInfo_id_ajax, classID:classID_ajax }, 
-		    async:async,
-		    dataType: 'json'
-		})
-		.done(function(result){
-		    console.log('answers saved');
-		    bErrorSubmittingAnswers = {};
-		});
-	    }
 	});
     </script>
+    
+    
+    <script src="{% static "adminBoot/js/edit_worksheets/student_worksheet.js" %}"></script>
     
     
 {% endblock %}
