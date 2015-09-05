@@ -43,6 +43,10 @@ class Classroom(models.Model):
 
     def __unicode__(self):
       return u'%s' % (self.name)
+    
+    
+    class Meta:
+        ordering = ['name']
 
 class ClassUser(models.Model):
     user = models.ForeignKey(User)
@@ -58,6 +62,8 @@ class ClassUser(models.Model):
     def __unicode__(self):
       return u'%s %s' % (self.user.first_name, self.user.last_name)
     
+    class Meta:
+        ordering = ['user__last_name']
     
 admin.site.register(ClassUser)
     
