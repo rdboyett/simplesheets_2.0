@@ -273,7 +273,7 @@
                     <table class="table table-bordered table-hover table-striped table-responsive">
                       <thead>
                         <!-------------------- Start of table headers -------------------------------------------->
-                        <tr class="row" id="students-table-headers">
+                        <tr class="" id="students-table-headers">
                           <td class="col-xs-2 table-sort">
                             <div id="sort-student">
                               <span>Student</span>
@@ -296,7 +296,7 @@
                         <!------------------------ Start of Student --------------------------------------------------->
                       <tbody class="student-table">
                  {% for student in students %}
-                          <tr class="row">
+                          <tr class="">
                             <td class="col-xs-3">
                               <a href="{% url "worksheet_project.views.student_display" currentClass.id student.id %}"><strong class="text-primary">{{ student.user.last_name }}, {{ student.user.first_name }}</strong></a>
                             </td>

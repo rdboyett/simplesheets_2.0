@@ -65,11 +65,10 @@
                     <table class="table table-bordered table-hover table-striped table-responsive" data-options='{"className":"{{ class.class|title }}"}'>
                       <thead>
                         <!-------------------- Start of table headers -------------------------------------------->
-                        <tr class="row" id="students-table-headers">
+                        <tr class="" id="students-table-headers">
                           <th class="col-xs-2 table-sort">
                             <div id="sort-student">
                               <span>Student</span>
-                              <i class="pull-right glyphicon glyphicon-sort"></i>
                             </div>
                           </th>
                           {% for question in currentProject.formInputs.all %}
@@ -92,7 +91,7 @@
                       <tbody class="student-table">
                         {% if class.students %}
                           {% for student in class.students %}
-                          <tr class="row">
+                          <tr class="">
                             <td class="col-xs-3">
                               <a href="{% url "worksheet_project.views.handGrade" currentProject.id 1 class.class.id student.id %}"><strong>{{ student.user.last_name }}, {{ student.user.first_name }}</strong></a>
                             </td>
@@ -137,7 +136,7 @@
                           </tr>
                           {% endfor %}
                         {% else %}
-                          <tr class="row">
+                          <tr class="">
                                 {% with total=currentProject.formInputs.all.count|add:"2" %}
                                 <td class="text-center" colspan="{{ total }}">
                                   Sorry, no students have joined this class yet.
