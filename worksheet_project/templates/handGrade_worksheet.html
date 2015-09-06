@@ -88,7 +88,7 @@
 	{% endif %}
     </div>
 	{% if thisClass %}
-	    <a href="{% url "worksheet_project.views.student_display" thisClass.id studentClassUser.id %}" class="btn btn-success">{{ studentClassUser.user.first_name|capfirst }} {{ studentClassUser.user.last_name|capfirst|possessivePronoun }}</a>
+	    <a href="{% url "worksheet_project.views.student_display" thisClass.id studentClassUser.id %}" class="btn btn-success">{{ studentClassUser.user.first_name|capfirst }} {{ studentClassUser.user.last_name|capfirst }}</a>
 	{% endif %}
 <section id="wrapper-holder">
     <section id="wrapper">
