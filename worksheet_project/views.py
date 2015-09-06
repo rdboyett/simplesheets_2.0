@@ -345,6 +345,12 @@ def handGrade(request, projectID=False, pageNumber=False, classID=False, student
     else:
         allProjectClasses = False
         
+    if Classroom.objects.filter(id=classID):
+        thisClass = Classroom.objects.get(id=classID)
+    else:
+        thisClass = False
+        
+        
     #get student userInfo
     if not studentID and allStudents:
         studentID = allStudents[0].id
@@ -418,6 +424,7 @@ def handGrade(request, projectID=False, pageNumber=False, classID=False, student
                   'myTour':myTour,
                   'resetTour':tourName,
                   'bPaidUp':bPaidUp,
+                  'thisClass':thisClass,
             }
         args.update(csrf(request))
     

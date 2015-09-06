@@ -47,7 +47,9 @@
 		<ul class="dropdown-menu" role="menu">
 		    {% if allStudents %}
 			{% for currentStudent in allStudents %}
-		    <li><a href="{% url "worksheet_project.views.handGrade" newProject.id 1 classID currentStudent.id %}">{{ currentStudent.user.last_name|capfirst }}, {{ currentStudent.user.first_name|capfirst }}</a></li>
+		    <li><a href="{% url "worksheet_project.views.handGrade" newProject.id 1 classID currentStudent.id %}" class="{% ifequal currentStudent studentClassUser %}active{% endifequal %}">
+			{{ currentStudent.user.last_name|capfirst }}, {{ currentStudent.user.first_name|capfirst }}</a>
+		    </li>
 			{% endfor %}
 		    {% else %}
 		    <li>Sorry, there are no students.</li>
@@ -62,7 +64,7 @@
 		<ul class="dropdown-menu" role="menu">
 		    {% if allProjectClasses %}
 			{% for currentClass in allProjectClasses %}
-		    <li><a href="{% url "worksheet_project.views.handGrade" newProject.id currentClass.id %}">{{ currentClass.name }}</a></li>
+		    <li><a href="{% url "worksheet_project.views.handGrade" newProject.id currentClass.id %}" class="{% ifequal currentClass thisClass %}active{% endifequal %}">{{ currentClass.name }}</a></li>
 			{% endfor %}
 		    {% else %}
 		    <li>Sorry, there are no students.</li>
@@ -85,6 +87,9 @@
 	</div>
 	{% endif %}
     </div>
+	{% if thisClass %}
+	    <a href="{% url "worksheet_project.views.student_display" thisClass.id studentClassUser.id %}" class="btn btn-success">{{ studentClassUser.user.first_name|capfirst }} {{ studentClassUser.user.last_name|capfirst|possessivePronoun }}</a>
+	{% endif %}
 <section id="wrapper-holder">
     <section id="wrapper">
 	{% for backImage in newProject.backgroundImages.all %}
