@@ -335,6 +335,12 @@ function resizeElements() {
     $("#hide-question-sidebar-btn").click(function(){
 	hideSideBarMenu();
     });
+    $("#show-question-sidebar-btn").on('swipeleft', function(){
+	showSideBarMenu();
+    });
+    $("#hide-question-sidebar-btn").on('swiperight', function(){
+	hideSideBarMenu();
+    });
     
     var zoomStatus = 1;
     
