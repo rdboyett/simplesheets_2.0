@@ -250,6 +250,48 @@ function resizeElements() {
     });
 
 
+
+    function setStartingAverage() {/* Set all the cells in columns with THEHEADING in the heading to red */
+
+	// Find the heading with the text THEHEADING
+	//columnTh = $("table th:contains('THEHEADING')");
+	
+	// Get the index & increment by 1 to match nth-child indexing
+	columnIndex = 5;
+	
+	var serverAverage = $('#averageBlock').html();
+	
+	// Set all the elements with that index in a tr red
+	//$('table tr td:nth-child(' + columnIndex + ')').css("color", "#F00");
+	var totalQuestions = 0;
+	var totalScore = 0;
+	$('table tr').each(function (i) {
+		var cell = $(this).find('td:nth-child(' + columnIndex + ')');
+		
+		if (cell.html()) {
+			totalScore = totalScore + parseFloat(cell.html());
+			totalQuestions++;
+		}
+	});
+	var average = parseFloat(parseFloat(totalScore)/parseFloat(totalQuestions)*100).toFixed(2);
+	var newAverage = parseFloat(parseFloat(average) + parseFloat(extraCredit)).toFixed(2);
+	var endingPoints = parseFloat(totalScore).toFixed(2);
+	console.log("total score: "+parseFloat(totalScore));
+	console.log("total questions: "+totalQuestions);
+	console.log("average: " + average);
+	$("#pointsEarnedBlock").html(endingPoints);
+	$('#averageBlock').html(newAverage+"%");
+	$("#changeGrade-form input[name='newAverage']").val(newAverage);
+	if (parseFloat(serverAverage)!=parseFloat(newAverage)) {
+		$("#aboveAverage span").html(newAverage);
+		$("#aboveAverage").fadeIn(600);
+	}
+	// Set the heading red too!
+	//columnTh.css("color", "#F00"); 
+    }
+    
+
+
     $(".gradeChangeBtn").click(function(){
 	var data = $(this).data('options');
 	var answerID = data.answerID,
@@ -293,6 +335,7 @@ function resizeElements() {
     });
     
     
+    setStartingAverage();
     
     
     
@@ -833,6 +876,7 @@ function showGradeColors() {
 	    xhr.timeout = 4000;
 	    xhr.ontimeout = function () { location.reload(); }
             fd.append('userInfo_id', userInfo_id_ajax);
+	    fd.append('project_id' , project_id_ajax);
             fd.append('inputNumber', data.answer_id);
             fd.append('answer', answer);
             fd.append('classID', classID_ajax);

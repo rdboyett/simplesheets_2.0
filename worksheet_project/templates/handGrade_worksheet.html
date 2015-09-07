@@ -456,18 +456,32 @@
                 <td id="averageBlock" class="warning numeric text-center text-danger" colspan="2">{{ myGrade.average|floatformat:2 }}%</td>
 		<input type="hidden" name="newAverage" value="{{ myGrade.average }}">
             </tr>
+	    <tr>
+		<td id="aboveAverage" colspan="6" class="text-danger" style="display: none;"><h3>The above average of <span>0.00</span>% does not match the average of {{ myGrade.average|floatformat:2 }}%
+		in our database.  Click "Apply Grade" to update our database.</h3></td>
+	    </tr>
         </tbody>
     </table>
 </form>
 {% else %}
-    <p>Sorry, the student has not submitted this e-sheet for grading You may force turn in if you would like.</p>
+    <p>Sorry, the student has not submitted this e-sheet for grading. You may force turn-in if you would like.</p>
 {% endif %}
 	    
 	    
       </div>
       <div class="modal-footer bottom-rounded">
+{% if myAnswers and myGrade %}
         <button type="button" class="btn btn-default rounded" data-dismiss="modal">close</button>
         <button type="submit" form="changeGrade-form" class="btn btn-primary rounded">apply grade</button>
+{% else %}
+    <form id="changeGrade-form" action="{% url "worksheet_creator.page_view_ajax.forceGradeWorksheet" %}" enctype='multipart/form-data' method="post" autocomplete="off">{% csrf_token %}
+	<input type="hidden" name="project_id" value="{{ newProject.id }}">
+	<input type="hidden" name="user_id" value="{{ studentClassUser.user.id }}">
+	<input type="hidden" name="class_id" value="{{ thisClass.id }}">
+        <button type="button" class="btn btn-default rounded" data-dismiss="modal">close</button>
+        <button type="submit" class="btn btn-danger rounded">force turn-in</button>
+    </form>
+{% endif %}
       </div>
     </div>
   </div>

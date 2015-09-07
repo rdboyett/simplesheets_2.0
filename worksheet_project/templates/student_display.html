@@ -64,7 +64,9 @@
           <div class="col-lg-4 col-md-4 col-sm-4 mb">
             <div class="content-panel pn">
               <div id="profile-01" class="bg{{ randomNumber|random }}">
+                {% if worksheet.thumb %}
                 <img src="{{ worksheet.thumb }}" alt="e-sheet">
+		{% endif %}
               </div>
               <div class="profile-01 centered">
                 <a href="{% url "worksheet_project.views.worksheet_display" worksheet.id %}"><p>{{ worksheet.title|capfirst }}</p></a>
