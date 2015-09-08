@@ -172,7 +172,7 @@
               <a href="{% url "worksheet_project.views.showNextPage" currentProject.id 1 %}"
                  class="btn btn-primary pull-right" style="margin-bottom: 5px;margin-top: -10px;">Add Questions</a>
               {% else %}
-              <a href="{% url "worksheet_project.views.showNextPage" currentProject.id 1 %}"
+              <a href="{% url "worksheet_project.views.showNextPage" currentProject.id 1 currentProject|getStudentsClass:classUser %}"
                  class="btn btn-primary pull-right
                  {% if myGrade %}{% if myGrade.timesGraded >= currentProject.numberOfRetry %}
                      disabled
