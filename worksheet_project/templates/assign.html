@@ -207,9 +207,9 @@
   <script>
     var sendAssignmentsURL="{% url "worksheet_creator.ajax.assignWorksheets" %}";
   </script>
-  {% if currentProject %}
-    <script>var currentProject = true; </script>
-  {% endif %}
+  
+    <script>var currentProject = {% if currentProject %}true{% else %}false{% endif %}; </script>
+    
   <script src="{% static "page_view/js/spin.js" %}"></script>
-  <script src="{% static "adminBoot/js/assign.js" %}"></script>
+  <script src="{% static "adminBoot/js/assign.js" %}?version=1"></script>
 {% endblock %}

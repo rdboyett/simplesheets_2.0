@@ -266,5 +266,5 @@
     var liveMonitorAnswersURL = "{% url "worksheet_creator.page_view_ajax.liveMonitorAnswers" %}"
     var liveMonitorData = { projectID: {{ currentProject.id }}, classID: {% for class in classesAndStudents %}{{ class.class.id }}{%endfor%} }
   </script>
-  <script type="text/javascript" src="{% static "adminBoot/js/monitor/live_monitor.js" %}"></script>
+  <script type="text/javascript" src="{% static "adminBoot/js/monitor/live_monitor.js" %}?version=1"></script>
 {% endblock %}
