@@ -20,7 +20,7 @@
             <div class="content-panel pn">
               <div id="profile-01" class="bg{{ randomNumber|random }}">
                 {% if worksheet.thumb %}
-                <img src="{{ worksheet.thumb }}" alt="e-sheet">
+                <img src="{{ worksheet.thumb }}" alt="eSheet">
 		{% endif %}
 		
 		{% if classUser.teacher %}
@@ -33,8 +33,13 @@
 			  $('#renameWorksheet-modal').modal('show');"><i class="fa fa-repeat"></i>&nbsp;&nbsp;rename</a></li>
 			  
 			  
-			  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#forceTurnIn-baseForm-WorksheetID').val({{ worksheet.id }});$('#forceTurnIn-baseForm').submit();">
+			  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#forceTurnIn-baseForm-WorksheetID').val({{ worksheet.id }});$('#forceTurnIn-modal').modal('show');">
 				<i class="fa fa-inbox"></i>&nbsp;&nbsp;force all to turn-in</a>
+			  </li>
+			  
+			  
+			  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#forceTurnIn-baseForm-WorksheetID').val({{ worksheet.id }});$('#forceTurnIn-baseForm-regrade').val('true');$('#forceTurnIn-baseForm').submit();">
+				<i class="fa fa-retweet"></i>&nbsp;&nbsp;regrade all students</a>
 			  </li>
 			  
 			  <!--
@@ -62,9 +67,9 @@
 			  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#toggle-lock-worksheet-base-form-WorksheetID').val({{ worksheet.id }});
 				$('#toggle-lock-worksheet-base-form').submit();">
 				{% if worksheet.status == "locked" %}
-					<i class="fa fa-unlock"></i>&nbsp;&nbsp;unlock this e-sheet
+					<i class="fa fa-unlock"></i>&nbsp;&nbsp;unlock this eSheet
 				{%else%}
-					<i class="fa fa-lock"></i>&nbsp;&nbsp;lock this e-sheet
+					<i class="fa fa-lock"></i>&nbsp;&nbsp;lock this eSheet
 				{%endif%}
 			  </a></li>
 			  

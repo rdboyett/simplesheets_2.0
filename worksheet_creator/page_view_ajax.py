@@ -1090,6 +1090,15 @@ def forceGradeWorksheet(request):
         except:
             class_id = False
             
+        try:
+            bRegrade = request.POST["regrade"].strip()
+            if bRegrade == 'true':
+                regrade = True
+            else:
+                regrade = False
+        except:
+            regrade = False
+            
         
         if not user_id and not class_id:  #then get all students that have this project
             if ClassUser.objects.filter(user=request.user, teacher=True): #check that this is a teacher that is requesting
@@ -1272,7 +1281,8 @@ def forceGradeWorksheet(request):
                 myGrade.pointsPossible = pointsPossible
                 myGrade.pointsEarned = pointsEarned
                 myGrade.average = average
-                myGrade.timesGraded = project.numberOfRetry
+                if not regrade:
+                    myGrade.timesGraded = project.numberOfRetry
                 myGrade.highestGrade = True
                 myGrade.extraCredit = 0
                 myGrade.save()
