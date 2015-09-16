@@ -453,6 +453,11 @@
 		alert('Sorry, this eSheet has been locked by the teacher.  You cannot make any changes.');
 	    {% endif %}
 	    
+	    {% ifnotequal pageNumber totalPages %}
+	    var morePages = true;
+	    {% else %}
+	    var morePages = false;
+	    {% endifnotequal %}
 	    
     </script>
     
@@ -462,7 +467,7 @@
     </script>
     
     
-    <script src="{% static "adminBoot/js/edit_worksheets/student_worksheet.js" %}?version=1"></script>
+    <script src="{% static "adminBoot/js/edit_worksheets/student_worksheet.js" %}?version=2"></script>
     
     
 {% endblock %}

@@ -339,8 +339,10 @@ function resizeElements() {
 		sendLeftoverAnswers(bErrorSubmittingAnswers, true);
 	    }
             sureCheck('', '', 'Are you sure you want to grade this eSheet?', submitGradeWorksheet);
+        }else if (complete=='morePages'){
+            sureCheck('', '', '<h2 class="text-danger">YOUR eSHEET HAS ANOTHER PAGE!!!</h2> Do you want to grade it anyway?', submitGradeWorksheet);
         }else{
-            sureCheck('', '', 'YOUR E-SHEET IS NOT COMPLETE!!! Do you want to grade it anyway?', submitGradeWorksheet);
+            sureCheck('', '', '<h2 class="text-danger">YOUR eSHEET IS NOT COMPLETE!!!</h2> Do you want to grade it anyway?', submitGradeWorksheet);
         }
         
     });
@@ -487,6 +489,9 @@ function closePopups() {
 
 function checkAllAnswersFilled() {
     var answer = true;
+    if (morePages == true) {
+	answer = 'morePages';
+    }
     console.log('inputs');
     $("#default_form input").each(function(){
         var val = $(this).val();
