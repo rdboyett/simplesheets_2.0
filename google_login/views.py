@@ -134,13 +134,13 @@ def auth_return(request):
 	if not BetaTestAllowedUsers.objects.filter(email=google_email):
 	    return redirect("worksheet_project.views.index")
     
-    if User.objects.filter(username=userName):
-        # Make sure that the e-mail is unique.
-        user = User.objects.get(username=userName)
-        #userInfo = UserInfo.objects.get(user=user)
-    elif User.objects.filter(email=google_email):
+    if User.objects.filter(email=google_email):
         user = User.objects.get(email=google_email)
     else:
+	#check for duplicate usernames and iterate to unique
+	if User.objects.filter(username=userName):
+	    countUsernames = User.objects.filter(username=userName).count()
+	    userName = userName+str(countUsernames)
         user = User.objects.create(
             username = userName,
             first_name = firstName,
