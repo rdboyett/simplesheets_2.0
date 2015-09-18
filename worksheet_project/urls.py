@@ -47,6 +47,8 @@ urlpatterns += patterns('worksheet_project.views',
     (r'^pay/$', 'initiatePayment'),
     (r'^paypalReturn/$', 'paypalReturn'),
     (r'^googleae943400297db25e.html/$', 'verifyGoogle'),
+    (r'^teacherConvert/$', 'teacherConvert'),
+    (r'^userSearch/$', 'userSearch'),
     
 
     (r'^test/$', 'test'),

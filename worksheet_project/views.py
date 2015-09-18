@@ -1418,12 +1418,138 @@ def verifyGoogle(request):
 
 
 
+@login_required
+def teacherConvert(request):
+    if request.user.email != 'rdboyett@gmail.com':
+        return redirect('/dashboard/')
+    else:
+        if UserInfo.objects.filter(user=request.user):
+            userInfo = UserInfo.objects.get(user=request.user)
+        else:
+            userInfo = UserInfo.objects.create(
+                user = request.user
+            )
+            return HttpResponseRedirect("/edit-profile/")
+        
+        #Check if it's a new user
+        if not request.user.first_name or not request.user.last_name or not userInfo.teacher_student:
+            return HttpResponseRedirect("/edit-profile/")
+        
+        if GoogleUserInfo.objects.filter(user=request.user):
+            googleUserInfo = GoogleUserInfo.objects.get(user=request.user)
+        else:
+            googleUserInfo = False
+            
+        
+        if userInfo.projects.all():
+            allProjects = userInfo.projects.all().order_by('status','-modifiedDate', 'title')
+        else:
+            allProjects = False
+        
+        #Get all users Classes
+        if ClassUser.objects.filter(user=request.user):
+            classUser = ClassUser.objects.get(user=request.user)
+        else:
+            if userInfo.teacher_student == 'teacher':
+                teacher = True
+            else:
+                teacher = False
+            classUser = ClassUser.objects.create(
+                user = request.user,
+                teacher = teacher,
+            )
+            
+        if classUser.teacher and settings.PAYMENT_TRACKER_ON:
+            bPaidUp = checkPaidUp(request.user)
+        elif settings.PAYMENT_TRACKER_ON:
+            bPaidUp = False
+        else:
+            bPaidUp = True
+            
+        #Get all users Class
+        if classUser.classrooms.all():
+            allClasses = classUser.classrooms.all().order_by('name')
+        else:
+            allClasses = False
+        
+        
+        if 'error' in request.session:
+            error = request.session['error']
+            if classUser.teacher:
+                del request.session['error']
+        else:
+            error = False
+        
+        
+        args = {
+                "error":error,
+                "dashboard":True,
+                "userInfo":userInfo,
+                "googleUserInfo":googleUserInfo,
+                "allClasses":allClasses,
+                "classUser":classUser,
+                "randomNumber":['1','2','3','4','5','6'],
+                "allProjects":allProjects,
+                "bPaidUp":bPaidUp,
+            }
+        args.update(csrf(request))
+        
+        
+        return render_to_response('teacher_convert.html', args)
 
 
 
+@login_required
+def userSearch(request):
+    if request.method == 'POST':
+        username = request.POST["username"].strip().lower()
+        name = request.POST["name"].strip().lower()
+        email = request.POST["email"].strip().lower()
+        
+        names = name.split()
+        if len(names)==1:
+            firstName = names[0]
+            lastName = False
+        elif len(names)>1:
+            firstName = names[0]
+            lastName = names[1]
+        else:
+            firstName = False
+            lastName = False
+            
+        userList = False
+        if username != "":
+            if ClassUser.objects.filter(user__username__istartswith=username):
+                userList = ClassUser.objects.filter(user__username__istartswith=username)
+            else:
+                userList = False
+                
+        if email != "" and not userList:
+            if ClassUser.objects.filter(user__email=email):
+                userList = ClassUser.objects.filter(user__email=email)
+            else:
+                userList = False
+        
+        if firstName and lastName and not userList:
+            if ClassUser.objects.filter(user__first_name__istartswith=firstName, user__last_name__istartswith=lastName):
+                userList = ClassUser.objects.filter(user__first_name__istartswith=firstName, user__last_name__istartswith=lastName)
+            elif ClassUser.objects.filter(user__first_name__istartswith=lastName, user__last_name__istartswith=firstName):
+                userList = ClassUser.objects.filter(user__first_name__istartswith=lastName, user__last_name__istartswith=firstName)
+            else:
+                userList = False
+        elif firstName and not userList:
+            if ClassUser.objects.filter(user__first_name__istartswith=firstName):
+                userList = ClassUser.objects.filter(user__first_name__istartswith=firstName)
+            elif ClassUser.objects.filter(user__last_name__istartswith=firstName):
+                userList = ClassUser.objects.filter(user__last_name__istartswith=firstName)
+            else:
+                userList = False
+            
 
-
-
+        
+        return render_to_response('userSearchList.html', {"userList":userList})
+    else:
+        return HttpResponse('Sorry, it did not post correctly')
 
 
 

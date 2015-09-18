@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+
+{% block title %}Dashboard{% endblock %}
+
+{% block body %}
+
+	<div class="row mt">
+          	<div class="col-md-6">
+			
+<h3>Search for User</h3>
+<form id="userSearch-form" class="" action="{% url "worksheet_project.views.userSearch" %}" enctype='multipart/form-data' method="post" autocomplete="off">{% csrf_token %}
+  <div class="form-group">
+    <input type="text" class="form-control" name="username" placeholder="username">
+  </div>
+  <h3>OR</h3>
+  <div class="form-group">
+    <input type="text" class="form-control" name="name" placeholder="name">
+  </div>
+  <h3>OR</h3>
+  <div class="form-group">
+    <input type="email" class="form-control" name="email" placeholder="email">
+  </div>
+  <button type="submit" class="btn btn-primary">Search</button>
+</form>
+				
+          	</div>
+        </div>
+	<div class="row mt">
+          	<div id="searchReturn" class="col-xs-12">
+			
+          	</div>
+        </div>
+
+{% endblock %}
+
+
+{% block extraScript %}
+    <script src="{% static "adminBoot/js/teacher_content.js" %}?version=1"></script>
+    
+      {% ifnotequal classUser.user.email 'rdboyett@gmail.com' %}
+	<script>
+		window.location.href = "/dashboard/";
+	</script>
+      {% endifnotequal %}
+
+
+{% endblock %}
+
+
+
+
+

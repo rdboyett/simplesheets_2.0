@@ -1,0 +1,44 @@
+{% if userList %}
+    <table id="userSearchResults" class="table table-hover" style="background-color: #FFF;">
+        <thead>
+            <tr>
+                <td>
+                    Name:
+                </td>
+                <td>
+                    Username:
+                </td>
+                <td>
+                    Email:
+                </td>
+                <td>
+                    teacher/student:
+                </td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for classUser in userList %}
+            <tr class="classUser" style="cursor: pointer;" data-options='{"classUserID":{{ classUser.id }}}'>
+                <td>
+                    {{ classUser.user.first_name|capfirst }} {{ classUser.user.last_name|capfirst }}
+                </td>
+                <td>
+                    {{ classUser.user.username }}
+                </td>
+                <td>
+                    {{ classUser.user.email }}
+                </td>
+                <td>
+                    {% if classUser.teacher %}
+                        teacher
+                    {% else %}
+                        student
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    Sorry, no users found.
+{% endif %}
