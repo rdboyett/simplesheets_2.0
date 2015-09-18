@@ -25,7 +25,8 @@ def myAnswers(user, project):
                 myAnswerTable = []
                 for question in questions:
                     if question in myQuestions:
-                        myAnswerTable.append(MyAnswer.objects.get(userInfo=userInfo, answer=question, project=project))
+                        myAnswers = MyAnswer.objects.filter(userInfo=userInfo, answer=question, project=project)
+                        myAnswerTable.append(myAnswers[0])
                     else:
                         myAnswerTable.append({'empty':question})
                         
