@@ -310,9 +310,96 @@ jQuery.validator.addMethod("complete_url", function(val, elem) {
     
     
     
+    $("#toggleWorksheetListGrid").click(function(){
+	if ($('#worksheetListView').is(':visible')){
+	    $('#worksheetListView').fadeOut(300,function(){
+		$('#worksheetGridView').fadeIn(300);
+		$('#toggleWorksheetListGrid .fa-stack-1x').removeClass('fa-th').addClass('fa-list');
+		setCookie('worksheetListGridView', 'grid', 30);
+	    });
+	}else{
+	    $('#worksheetGridView').fadeOut(300,function(){
+		$('#worksheetListView').fadeIn(300);
+		$('#toggleWorksheetListGrid .fa-stack-1x').removeClass('fa-list').addClass('fa-th');
+		setCookie('worksheetListGridView', 'list', 30);
+	    });
+	}
+    });
     
+    function resizeWorksheetList() {
+	var width = $(document).width();
+	if (width<769) {
+	    if ($('#worksheetListView').is(':visible')){
+		//do nothing
+	    }else{
+		$('#worksheetGridView').fadeOut(300,function(){
+		    $('#worksheetListView').fadeIn(300);
+		    $('#toggleWorksheetListGrid .fa-stack-1x').removeClass('fa-th').addClass('fa-list');
+		});
+	    }
+	}else{
+	    setListGridDisplay();
+	}
+    }
+    
+    $(window).resize(function(){resizeWorksheetList();});
+    
+    function setListGridDisplay() {
+	var worksheetListGridView = getCookieWorksheet('worksheetListGridView');
+	//console.log(worksheetListGridView);
+	if ((worksheetListGridView == "" || worksheetListGridView == 'grid') && $(document).width()>768) {
+	    if ($('#worksheetListView').is(':visible')){
+		$('#worksheetListView').fadeOut(300,function(){
+		    $('#worksheetGridView').fadeIn(300);
+		    $('#toggleWorksheetListGrid .fa-stack-1x').removeClass('fa-th').addClass('fa-list');
+		});
+	    }else{
+		$('#worksheetGridView').fadeIn(300);
+		$('#toggleWorksheetListGrid .fa-stack-1x').removeClass('fa-th').addClass('fa-list');
+	    }
+	}else if (worksheetListGridView == 'list' || $(document).width()<769){
+	    if ($('#worksheetGridView').is(':visible')){
+		$('#worksheetGridView').fadeOut(300,function(){
+		    $('#worksheetListView').fadeIn(300);
+		    $('#toggleWorksheetListGrid .fa-stack-1x').removeClass('fa-list').addClass('fa-th');
+		});
+	    }else{
+		$('#worksheetListView').fadeIn(300);
+		$('#toggleWorksheetListGrid .fa-stack-1x').removeClass('fa-list').addClass('fa-th');
+	    }
+	}
+    }
+    
+    setListGridDisplay();
 
 }();
+
+
+
+
+function setCookie(cname, cvalue, exdays) {
+    var d = new Date();
+    d.setTime(d.getTime() + (exdays*24*60*60*1000));
+    var expires = "expires="+d.toUTCString();
+    document.cookie = cname + "=" + cvalue + "; " + expires;
+}
+
+
+
+function getCookieWorksheet(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i=0; i<ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0)==' ') c = c.substring(1);
+        if (c.indexOf(name) == 0) return c.substring(name.length,c.length);
+    }
+    return "";
+}
+
+
+
+
 
 
 

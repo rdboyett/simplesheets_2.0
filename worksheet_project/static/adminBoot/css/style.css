@@ -3147,10 +3147,15 @@ fieldset[disabled] .btn-schoology.active {
 
 
 
+.ellipsis {
+        white-space: nowrap;
+        overflow: hidden;
+        display: block;
+}
 
-
-
-
+.ellipsis.multiline {
+        white-space: normal;
+}
 
 
 
