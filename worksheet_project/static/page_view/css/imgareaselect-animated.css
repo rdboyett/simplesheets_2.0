@@ -23,13 +23,20 @@
     filter: alpha(opacity=50);
 	opacity: 0.5;
 }
-
+/*
 .imgareaselect-handle {
     background-color: #fff;
 	border: solid 1px #000;
     filter: alpha(opacity=50);
 	opacity: 0.5;
 }
+*/
+
+
+.imgareaselect-handle {
+	background-image: url("../images/selectImageHandle.png");
+}
+
 
 .imgareaselect-outer {
 	background-color: #000;

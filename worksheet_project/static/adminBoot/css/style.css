@@ -2952,9 +2952,9 @@ border-bottom: 3px solid #fff;
 
 
 .imgareaselect-handle {
-background-color: #428bca !important;
-width: 15px !important;
-height: 15px !important;
+/*background-color: #428bca !important;*/
+width: 9px !important;
+height: 9px !important;
 }
 
 .status-label {

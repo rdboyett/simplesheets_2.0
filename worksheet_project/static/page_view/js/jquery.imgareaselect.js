@@ -34,6 +34,7 @@ $.imgAreaSelect = function (img, options) {
         $border = div().add(div()).add(div()).add(div()),
         $outer = div().add(div()).add(div()).add(div()),
         $handles = $([]),
+        $actionBtn = div(),
 
         $areaOpera,
 
@@ -180,7 +181,11 @@ $.imgAreaSelect = function (img, options) {
             width: imgWidth - selection.x2, height: imgHeight });
         $($outer[3]).css({ left: left + selection.x1, top: top + selection.y2,
             width: w, height: imgHeight - selection.y2 });
-
+        
+        var actionBtnW = w - $actionBtn.outerWidth();
+        //var actionBtnH = h - $actionBtn.outerHeight();
+        $actionBtn.css({ left: actionBtnW, top: h });
+        
         w -= $handles.outerWidth();
         h -= $handles.outerHeight();
 
@@ -194,6 +199,8 @@ $.imgAreaSelect = function (img, options) {
             $handles.slice(1,3).css({ left: w });
             $handles.slice(2,4).css({ top: h });
         }
+        
+        
 
         if (resetKeyPress !== false) {
             if ($.imgAreaSelect.onKeyPress != docKeyPress)
@@ -566,7 +573,7 @@ $.imgAreaSelect = function (img, options) {
             });
 
             if (!parseInt($handles.css('width')) >= 0)
-                $handles.width(5).height(5);
+                $handles.width(9).height(9);
 
             if (o = options.borderWidth)
                 $handles.css({ borderWidth: o, borderStyle: 'solid' });
@@ -605,7 +612,15 @@ $.imgAreaSelect = function (img, options) {
         if (o = options.borderColor2)
             $($border[1]).css({ borderStyle: 'dashed', borderColor: o });
 
-        $box.append($area.add($border).add($areaOpera)).append($handles);
+        $actionBtn.html('<div class="row"><div class="col-xs-12"><div id="createSelection" class="btn btn-success btn-xs pull-right" style="margin-top:5px;"><i class="fa fa-check"></i>  create</div><div id="cancelSelection" class="btn btn-default btn-xs pull-right" style="margin-right:5px;margin-top:5px;"><i class="fa fa-ban text-danger"></i>  cancel</div></div></div>');
+        $actionBtn.addClass('actionBtns');
+        $actionBtn.width(200);
+        $actionBtn.css({ position: 'absolute' });
+        
+            
+        $box.append($area.add($border).add($areaOpera)).append($handles).append($actionBtn);
+        
+        //$box.append('<div class="actionBtns">test this here</div>');
 
         if (msie) {
             if (o = ($outer.css('filter')||'').match(/opacity=(\d+)/))
@@ -690,7 +705,7 @@ $.imgAreaSelect = function (img, options) {
             position: 'absolute', zIndex: zIndex + 2 || 2 });
 
     $box.add($outer).css({ visibility: 'hidden', position: position,
-        overflow: 'hidden', zIndex: zIndex || '0' });
+        overflow: 'visible', zIndex: zIndex || '0' });
     $box.css({ zIndex: zIndex + 2 || 2 });
     $area.add($border).css({ position: 'absolute', fontSize: 0 });
 

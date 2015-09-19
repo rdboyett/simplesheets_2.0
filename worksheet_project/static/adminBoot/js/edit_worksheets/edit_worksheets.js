@@ -121,6 +121,14 @@ function makeImageAreaSelection() {
             }
         //alert('left: ' + leftPercentage + '%, top: '+ topPercentage+ '%, width: ' + widthPercentage + '%, height: ' + heightPercentage + '%...');
     });
+    
+    
+    $( document ).unbind('click').on('click','#createSelection',function() {
+            if ($('#enter_area').is(":visible")) {
+                //alert('selection is visible');
+                runSelection();
+            }
+    });
 }
     
     function runSelection() {
@@ -142,7 +150,7 @@ function makeImageAreaSelection() {
         
     }
     
-    
+    $(document).on('click','#cancelSelection',function(){ias.cancelSelection();});
     
     
     //Dajaxice.myproject.teacherTools.setQuickLink(setQuickLink_callback, {'list_id':listId, 'link_id':parseInt(linkID), 'user_id':parseInt(userID), 'sort_number':parseInt(sortNumber)});
@@ -1041,6 +1049,11 @@ function resizeInput(answer_id) {
     });
     
     
+    $( document ).unbind('click').on('click','#createSelection',function() {
+            if (ias.getSelection().width>0) {
+                resizeQuestionElement(ias.getSelection(), answer_id);
+            }
+    });
     //  Create its own reset for resetting selection
     
     $(document).unbind('keydown').keydown(function (e) {
