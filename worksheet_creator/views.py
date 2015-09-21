@@ -163,6 +163,7 @@ def create(request):
                   resp, content = drive_service._http.request(download_url)
                   if resp.status == 200:
                     rawTitle = file['title']
+                    rawTitle = rawTitle.replace(":", "-")
                     if len(rawTitle)>90:
                         rawTitle = rawTitle[:90]
                     title = re.sub(r'[^\w]', '', rawTitle)

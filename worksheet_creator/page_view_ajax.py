@@ -41,7 +41,7 @@ from apiclient import errors
 
 
 from userInfo_profile.models import UserInfo, MyAnswer, MyGrade, LiveMonitorSession
-from worksheet_creator.models import Project, BackImage, FormInput
+from worksheet_creator.models import Project, BackImage, FormInput, Folder
 from classrooms.models import Classroom, ClassUser
 from google_login.models import CredentialsModel, GoogleUserInfo
 from worksheet_creator import settings
@@ -1988,13 +1988,90 @@ def shareWorksheet(request):
 
 
 
+@login_required
+def createFolder(request):
+    if request.method == 'POST':
+        folderName = request.POST["folder_name"].strip()
+        parendID = request.POST["parent_id"].strip()
+        
+        newFolder = Folder.objects.create(
+            name = folderName,
+            user = request.user,
+            parentID = parendID,
+        )
+        
+        data = {'success':'success'}
+
+    else:
+        data = {
+            'error': "There was an error posting this request. Please try again.",
+        }
+            
+    return HttpResponse(json.dumps(data))
+
+
+
+@login_required
+def renameFolder(request):
+    if request.method == 'POST':
+        folderName = request.POST["folder_name"].strip()
+        folderID = request.POST["folder_id"].strip()
+        
+        if Folder.objects.filter(id=folderID):
+            folder = Folder.objects.get(id=folderID)
+            folder.name = folderName
+            folder.modifiedDate = datetime.datetime.now()
+            folder.save()
+            data = {'success':'success'}
+        else:
+            data = {'error':"Sorry, we can't find that folder. That's Weird!"}
+            
+
+    else:
+        data = {
+            'error': "There was an error posting this request. Please try again.",
+        }
+            
+    return HttpResponse(json.dumps(data))
 
 
 
 
+@login_required
+def deleteFolder(request):
+    if request.method == 'POST':
+        folderID = request.POST["folder_id"].strip()
+        
+        if Folder.objects.filter(id=folderID):
+            folder = Folder.objects.get(id=folderID)
+            #Get all projects in the folder and reset their parentID's to 0
+            if Project.objects.filter(parentID=folder.id):
+                resetProjects = Project.objects.filter(parentID=folder.id)
+                for project in resetProjects:
+                    project.parentID = 0
+                    project.save()
+            
+            
+            #Get all the folders in this folder and reset their parentID's to 0
+            if Folder.objects.filter(parentID=folder.id):
+                resetFolders = Folder.objects.filter(parentID=folder.id)
+                for childFolder in resetFolders:
+                    childFolder.parentID = 0
+                    childFolder.save()
+                    
+            folder.delete()
+            
+            data = {'success':'success'}
+        else:
+            data = {'error':"Sorry, we can't find that folder. That's Weird!"}
+            
 
-
-
+    else:
+        data = {
+            'error': "There was an error posting this request. Please try again.",
+        }
+            
+    return HttpResponse(json.dumps(data))
 
 
 

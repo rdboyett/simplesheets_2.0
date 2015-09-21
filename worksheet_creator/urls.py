@@ -46,6 +46,10 @@ urlpatterns += patterns('worksheet_creator.page_view_ajax',
     (r'^deleteUser/$', 'deleteUser'),
     (r'^shareWorksheet/$', 'shareWorksheet'),
     (r'^sendLeftoverAnswers/$', 'sendLeftoverAnswers'),
+    (r'^createFolder/$', 'createFolder'),
+    (r'^renameFolder/$', 'renameFolder'),
+    (r'^deleteFolder/$', 'deleteFolder'),
+    
     
 )
 

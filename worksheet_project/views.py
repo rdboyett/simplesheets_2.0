@@ -26,7 +26,7 @@ from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 
 from userInfo_profile.models import UserInfo, MyAnswer, MyGrade, LiveMonitorSession
-from worksheet_creator.models import Project, FormInput, BackImage
+from worksheet_creator.models import Project, FormInput, BackImage, Folder
 from classrooms.models import ClassUser, Classroom, HashTag, Message
 from google_login.models import GoogleUserInfo
 from tourBuilder.models import MyTour
@@ -91,9 +91,18 @@ def dashboard(request, *args, **kwargs):
         
     
     if userInfo.projects.all():
-        allProjects = userInfo.projects.all().order_by('status','-modifiedDate', 'title')
+        #parentID=0 is for projects that are not in any folders
+        allProjects = userInfo.projects.filter(parentID=0).order_by('status','-modifiedDate', 'title')
     else:
         allProjects = False
+    
+    
+    if Folder.objects.filter(user=request.user):
+        #parentID=0 is for folders that are not in any folders
+        allFolders = Folder.objects.filter(user=request.user, parentID=0).order_by('-modifiedDate', 'name')
+    else:
+        allFolders = False
+    
     
     #Get all users Classes
     if ClassUser.objects.filter(user=request.user):
@@ -140,6 +149,7 @@ def dashboard(request, *args, **kwargs):
             "randomNumber":['1','2','3','4','5','6'],
             "allProjects":allProjects,
             "bPaidUp":bPaidUp,
+            "allFolders":allFolders,
         }
     args.update(csrf(request))
     
@@ -1220,6 +1230,68 @@ def paypalReturn(request):
         
     else:
         return HttpResponse("sorry, this posted incorrectly.")
+
+
+
+
+
+@login_required
+def getFolder(request):
+    if request.method == "GET":
+        folderID = request.GET['q'].strip()
+        
+        if Folder.objects.filter(id=folderID, user=request.user):
+            folder = Folder.objects.get(id=folderID)
+        
+            if Project.objects.filter(parentID=folder.id):
+                #parentID=0 is for projects that are not in any folders
+                allProjects = Project.objects.filter(parentID=folder.id).order_by('status','-modifiedDate', 'title')
+            else:
+                allProjects = False
+            
+            
+            if Folder.objects.filter(parentID=folder.id):
+                #parentID=0 is for folders that are not in any folders
+                allFolders = Folder.objects.filter(user=request.user, parentID=folder.id).order_by('-modifiedDate', 'name')
+            else:
+                allFolders = False
+            
+            
+            args = {
+                    "currentFolder":folder,
+                    "randomNumber":['1','2','3','4','5','6'],
+                    "allProjects":allProjects,
+                    "allFolders":allFolders,
+                }
+            args.update(csrf(request))
+        
+        return render_to_response('folder_display.html',args)
+    else:
+        return HttpResponse('sorry');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

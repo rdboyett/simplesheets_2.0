@@ -50,6 +50,10 @@ urlpatterns += patterns('worksheet_project.views',
     (r'^teacherConvert/$', 'teacherConvert'),
     (r'^userSearch/$', 'userSearch'),
     
+    
+    #ajax loads
+    (r'^getFolder/$', 'getFolder'),
+    
 
     (r'^test/$', 'test'),
 )

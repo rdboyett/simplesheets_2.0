@@ -187,6 +187,16 @@
                         <span class="" style="color: #424a5d;">{% if classUser.teacher %} new class{%else%} join a class{%endif%}</span>
                   </a>
                 </li>
+		
+                {% if classUser.teacher %}
+                <li id="newFolderBtn" class="sub-menu">
+                  <a class="btn btn-warning" href="#" data-toggle="modal" data-target="#newFolder-modal">
+                        <i class="fa fa-folder" style="color: #424a5d;"></i>
+                        <span style="color: #424a5d;">  new folder</span>
+                  </a>
+                </li>
+                {%endif%}
+		
 
               </ul>
               <!-- sidebar menu end-->
@@ -255,7 +265,102 @@
 
 
 
-<!-- *****************    Create a New Class   ******************************************************* -->
+
+
+
+<!-- *****************    Create a New Folder   ******************************************************* -->
+<div id="newFolder-modal" class="modal fade" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content rounded">
+      <div class="modal-header top-rounded">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">new folder</h4>
+      </div>
+      <div class="modal-body centered">
+            <form id="newFolder-form" class="form-horizontal style-form" action="{% url "worksheet_creator.page_view_ajax.createFolder" %}" enctype='multipart/form-data' method="post" autocomplete="off">{% csrf_token %}
+		      <input type="hidden" name="parent_id" value="0" required>
+		      <div class="form-group">
+			<label class="col-sm-3 control-label">Folder Name</label>
+			<div class="col-sm-9">
+			  <input class="form-control" type="text" name="folder_name" minlength="3" maxlength="60" required value="" placeholder="Folder Name..." autofocus>
+			  <span class="register-check register-check-error"></span>
+			</div>
+		      </div>
+              
+            </form>
+	    
+      </div>
+      <div class="modal-footer bottom-rounded">
+        <button type="button" class="btn btn-default rounded" data-dismiss="modal">close</button>
+        <button type="submit" form="newFolder-form" class="btn btn-primary rounded">create</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- *****************    Rename a Folder   ******************************************************* -->
+<div id="renameFolder-modal" class="modal fade" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content rounded">
+      <div class="modal-header top-rounded">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">rename folder</h4>
+      </div>
+      <div class="modal-body centered">
+            <form id="renameFolder-form" class="form-horizontal style-form" action="{% url "worksheet_creator.page_view_ajax.renameFolder" %}" enctype='multipart/form-data' method="post" autocomplete="off">{% csrf_token %}
+		      <input id="renameFolderFormFolderID" type="hidden" name="folder_id" value="" required>
+		      <div class="form-group">
+			<label class="col-sm-3 control-label">New Folder Name</label>
+			<div class="col-sm-9">
+			  <input id="renameFolderFormFolderName" class="form-control" type="text" name="folder_name" minlength="3" maxlength="60" required value="" placeholder="Folder Name..." autofocus>
+			  <span class="register-check register-check-error"></span>
+			</div>
+		      </div>
+              
+            </form>
+	    
+      </div>
+      <div class="modal-footer bottom-rounded">
+        <button type="button" class="btn btn-default rounded" data-dismiss="modal">close</button>
+        <button type="submit" form="renameFolder-form" class="btn btn-primary rounded">create</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- *****************    Delete a Folder   ******************************************************* -->
+<div id="deleteFolder-modal" class="modal fade" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content rounded">
+      <div class="modal-header top-rounded">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">delete this folder?</h4>
+      </div>
+      <div class="modal-body centered">
+            <form id="deleteFolder-form" class="form-horizontal style-form" action="{% url "worksheet_creator.page_view_ajax.deleteFolder" %}" enctype='multipart/form-data' method="post" autocomplete="off">{% csrf_token %}
+		      <input id="deleteFolderFormFolderID" type="hidden" name="folder_id" value="" required>
+	      <h4>Are you sure you want to <span class="text-danger">DELETE</span> this folder?</h4>
+            </form>
+	    
+      </div>
+      <div class="modal-footer bottom-rounded">
+        <button type="button" class="btn btn-default rounded" data-dismiss="modal">no</button>
+        <button type="submit" form="deleteFolder-form" class="btn btn-danger rounded">DELETE</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+<!-- *****************    Share a Class   ******************************************************* -->
 <div id="share-worksheet-modal" class="modal fade" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content rounded">
@@ -299,6 +404,8 @@
     </div>
   </div>
 </div>
+
+
 
 
 <!---------------- modal ------------------------------------->

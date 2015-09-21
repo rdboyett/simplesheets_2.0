@@ -1,15 +1,16 @@
-{% extends "base.html" %}
 {% load staticfiles %}
 
-
-{% block title %}Dashboard{% endblock %}
-
-{% block body %}
-
-          		
 					<! -- ROW OF PANELS -->
 					<!-- Product Panel -->
 					<div class="row mt">
+
+{% if currentFolder %}
+    <div class="col-xs-12" style="margin-bottom: 10px;">
+      <a id="class-title" data-toggle="modal" data-target="#class-settings">
+        <h1><i class="fa fa-angle-double-right"></i>  {{ currentFolder.name|capfirst }}</h1>
+      </a>
+    </div>
+{% endif %}
 						
 {% if allFolders %}
 
@@ -17,15 +18,14 @@
           {% for folder in allFolders %}
 	<div class="panel panel-default col-xs-12 col-sm-4" style="padding: 0;background-color: transparent; margin-bottom: 5px">
 		<div class="panel-body text-centered" style="padding: 0;margin: 0px 3px;background-color: #FFF;">
-			
-			<div data-options='{"getFolderURL":"{% url "worksheet_project.views.getFolder" %}?q={{folder.id}}"}'
-			     class="getFolder worksheetThumbListBg col-xs-2 col-sm-3 col-md-2 text-center" style="cursor:pointer;background-color:#424a5d;
+			<a href="{% url "worksheet_project.views.worksheet_display" folder.id %}">
+			<div class="worksheetThumbListBg col-xs-2 col-sm-3 col-md-2 text-center" style="background-color:#424a5d;
 			 height: 50px;overflow: hidden;margin-right: 10px;
 			border-top-left-radius: 4px; border-bottom-left-radius: 4px;padding-top: 12px;">
 				<i class="fa fa-folder fa-2x" style="color:#ffd777;"></i>
-			</div>
+			</div></a>
 			
-			<a href="{% url "worksheet_project.views.getFolder" %}?q={{folder.id}}">
+			<a href="{% url "worksheet_project.views.showNextPage" folder.id 1 %}">
 			<div class="worksheetListTitle ellipsis col-xs-8 col-sm-6 col-md-8" style="margin-top: 6px;">
 				<h4 data-container="body"
 				  data-toggle="popover" data-placement="bottom" data-trigger="hover"
@@ -347,65 +347,8 @@
 </div> <!--------------------------- End of Worksheet Grid View ----------------------------->
           
 {% else %}
-  <h5 class="col-xs-12">Sorry, there are no assignments yet.</h5>
+  <h5 class="col-xs-12">Sorry, there nothing is this folder.</h5>
 {% endif %}
 					</div><! --  ROW OF PANELS -->
           		
 					
-{% endblock %}
-
-{% block modal %}
-		          <!-- Modal -->
-		          <div id="error-modal" aria-hidden="true" aria-labelledby="myModalLabel" role="dialog" tabindex="-1" id="myModal" class="modal fade">
-		              <div class="modal-dialog">
-		                  <div class="modal-content">
-		                      <div class="modal-header">
-					  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-		                          <h4 class="modal-title">There was a problem!...I think?...</h4>
-		                      </div>
-		                      <div class="modal-body">
-					<div class="row">
-					  <div class="col-xs-12 text-center">
-							<h4>{{ error|capfirst }}</h4>
-					  </div>
-					</div>
-		                      </div>
-		                  </div>
-		              </div>
-		          </div>
-		          <!-- modal -->
-			  
-			  
-			  
-			  
-			  
-			  
-			  
-{% endblock %}
-
-
-{% block extraScript %}
-    <script src="{% static "adminBoot/js/dashboard.js" %}?version=1"></script>
-    
-      {% if not classUser.teacher %}
-	<script>
-		window.location.href = "/classes/";
-	</script>
-      {% endif %}
-
-    {% if error %}
-    <script>
-      $(document).ready(function(){
-	
-	$("#error-modal").modal("show");
-	
-      });
-    </script>
-    {% endif %}
-
-{% endblock %}
-
-
-
-
-

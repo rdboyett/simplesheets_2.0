@@ -310,6 +310,56 @@ jQuery.validator.addMethod("complete_url", function(val, elem) {
     
     
     
+    
+    $('#newFolder-form').ajaxForm({ 
+        success:       function(responseText){
+            console.log(responseText);
+            if (responseText.error) {
+                alert(responseText.error);
+            }else {
+		location.reload();
+            }
+        },
+	clearForm: true,
+        resetForm: true,
+        dataType:  'json',
+        timeout:   4000 
+    });
+    
+    
+    $('#renameFolder-form').ajaxForm({ 
+        success:       function(responseText){
+            console.log(responseText);
+            if (responseText.error) {
+                alert(responseText.error);
+            }else {
+		location.reload();
+            }
+        },
+	clearForm: true,
+        resetForm: true,
+        dataType:  'json',
+        timeout:   4000 
+    });
+    
+    
+    $('#deleteFolder-form').ajaxForm({ 
+        success:       function(responseText){
+            console.log(responseText);
+            if (responseText.error) {
+                alert(responseText.error);
+            }else {
+		location.reload();
+            }
+        },
+	clearForm: true,
+        resetForm: true,
+        dataType:  'json',
+        timeout:   4000 
+    });
+    
+    
+    
     $("#toggleWorksheetListGrid").click(function(){
 	if ($('#worksheetListView').is(':visible')){
 	    $('#worksheetListView').fadeOut(300,function(){
@@ -371,6 +421,52 @@ jQuery.validator.addMethod("complete_url", function(val, elem) {
     }
     
     setListGridDisplay();
+    
+    
+    
+    //Load folders async
+    // Assign handlers immediately after making the request,
+    // and remember the jqxhr object for this request
+    function getFolderData(getFolderURL) {
+	console.log(history.length);
+	if (typeof (history.pushState) != "undefined") {
+	    var jqxhr = $.get( getFolderURL, function() {
+		console.log( "success" );
+		    history.pushState("", "", getFolderURL);
+	    })
+		.done(function( html ) {
+		  console.log( html );
+		  $("#main-content .wrapper").html(html);
+		})
+		.fail(function() {
+		  console.log( "error" );
+		})
+		.always(function() {
+		  console.log( "finished" );
+		});
+	     
+	    // Perform other work here ...
+	     
+	    // Set another completion function for the request above
+	    jqxhr.always(function() {
+		console.log( "second finished" );
+	    });
+	}else {
+	window.location.href = getFolderURL;
+	}
+    } 
+    
+    $(".getFolder").click(function(){
+	var getFolderURL = $(this).data('options').getFolderURL;
+	console.log(getFolderURL);
+	getFolderData(getFolderURL);
+    });
+    
+    window.onpopstate = function(event){
+	console.log("location: " + document.location + ", state: " + JSON.stringify(event.state));
+	location.reload();
+    };
+    
 
 }();
 

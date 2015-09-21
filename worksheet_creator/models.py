@@ -54,6 +54,7 @@ class Project(models.Model):
   modifiedDate = models.DateTimeField(auto_now_add=True, blank=True, null=True)
   shared = models.BooleanField(default=False)
   sharedWithUsers = models.ManyToManyField(User, blank=True, null=True)
+  parentID = models.IntegerField(default=0)
   
   def __unicode__(self):
         return u'%s %s' % (self.title, self.dateTime)
@@ -62,6 +63,17 @@ class Project(models.Model):
       ordering = ['modifiedDate', 'title']
 
 
+class Folder(models.Model):
+  name = models.CharField(max_length=100)
+  user = models.ForeignKey(User)
+  parentID = models.IntegerField(default=0)
+  hasFolderChildren = models.BooleanField(default=False)
+  worksheets = models.ManyToManyField(Project, blank=True, null=True)
+  modifiedDate = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+  
+  
+  
+  
 
 admin.site.register(Project)
 
