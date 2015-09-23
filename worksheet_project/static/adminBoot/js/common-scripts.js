@@ -427,12 +427,14 @@ jQuery.validator.addMethod("complete_url", function(val, elem) {
     //Load folders async
     // Assign handlers immediately after making the request,
     // and remember the jqxhr object for this request
-    function getFolderData(getFolderURL) {
+    function getFolderData(getFolderURL, folderID) {
 	console.log(history.length);
 	if (typeof (history.pushState) != "undefined") {
 	    var jqxhr = $.get( getFolderURL, function() {
 		console.log( "success" );
-		    history.pushState("", "", getFolderURL);
+		$("#iconDiv").fadeIn(100);
+		history.pushState("", "", '/getFolder/'+folderID);
+		$("#newFolder-form input[name='parent_id']").val(folderID);
 	    })
 		.done(function( html ) {
 		  console.log( html );
@@ -450,16 +452,18 @@ jQuery.validator.addMethod("complete_url", function(val, elem) {
 	    // Set another completion function for the request above
 	    jqxhr.always(function() {
 		console.log( "second finished" );
+		$("#iconDiv").fadeOut(100);
 	    });
 	}else {
 	window.location.href = getFolderURL;
 	}
     } 
     
-    $(".getFolder").click(function(){
+    $(document).on("click",".getFolder",function(){
 	var getFolderURL = $(this).data('options').getFolderURL;
+	var folderID = $(this).data('options').folderID;
 	console.log(getFolderURL);
-	getFolderData(getFolderURL);
+	getFolderData(getFolderURL, folderID);
     });
     
     window.onpopstate = function(event){
@@ -468,7 +472,32 @@ jQuery.validator.addMethod("complete_url", function(val, elem) {
     };
     
 
-}();
+    
+    function waiterSpinner(element) {
+	// send element $("#elementID")
+	console.log('waiterSpinner');
+	var iconDiv = $('<div/>');
+	iconDiv.attr('id','iconDiv');
+	iconDiv.append('<i class="fa fa-circle-o-notch faa-spin animated fa-3x" style="margin-top:80px;"></i>');
+	iconDiv.addClass('text-center').css({
+	    'display':'none',
+	    'position':'absolute',
+	    'top':'0',
+	    'left':'0',
+	    'right':'0',
+	    'bottom':'0',
+	    'color':'#68dff0',
+	    'zIndex':'10',
+	});
+	element.append(iconDiv);
+    }
+    waiterSpinner($("#main-content"));
+    
+    
+    
+    
+    
+}();  //End of $(document).ready();
 
 
 

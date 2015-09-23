@@ -278,7 +278,7 @@
       </div>
       <div class="modal-body centered">
             <form id="newFolder-form" class="form-horizontal style-form" action="{% url "worksheet_creator.page_view_ajax.createFolder" %}" enctype='multipart/form-data' method="post" autocomplete="off">{% csrf_token %}
-		      <input type="hidden" name="parent_id" value="0" required>
+		      <input type="hidden" name="parent_id" value="{% if currentFolder %}{{ currentFolder.id }}{%else%}0{% endif %}" required>
 		      <div class="form-group">
 			<label class="col-sm-3 control-label">Folder Name</label>
 			<div class="col-sm-9">

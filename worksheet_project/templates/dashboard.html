@@ -18,7 +18,7 @@
 	<div class="panel panel-default col-xs-12 col-sm-4" style="padding: 0;background-color: transparent; margin-bottom: 5px">
 		<div class="panel-body text-centered" style="padding: 0;margin: 0px 3px;background-color: #FFF;">
 			
-			<div data-options='{"getFolderURL":"{% url "worksheet_project.views.getFolder" %}?q={{folder.id}}"}'
+			<div data-options='{"getFolderURL":"{% url "worksheet_project.views.getFolder" %}?q={{folder.id}}", "folderID":{{ folder.id }}}'
 			     class="getFolder worksheetThumbListBg col-xs-2 col-sm-3 col-md-2 text-center" style="cursor:pointer;background-color:#424a5d;
 			 height: 50px;overflow: hidden;margin-right: 10px;
 			border-top-left-radius: 4px; border-bottom-left-radius: 4px;padding-top: 12px;">
@@ -48,6 +48,10 @@
 					  
 					  
 					  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#deleteFolderFormFolderID').val({{ folder.id }});$('#deleteFolder-modal').modal('show');"><i class="fa fa-trash"></i>&nbsp;&nbsp;Delete</a></li>
+					  
+					  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#deleteFolderFormFolderID').val({{ folder.id }});$('#deleteFolder-modal').modal('show');"><i class="fa fa-folder"></i>&nbsp;&nbsp;Move to...</a></li>
+					  
+					  
 					</ul>
 				</div>
 				{%endif%}

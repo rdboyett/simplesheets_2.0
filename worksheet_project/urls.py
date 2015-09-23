@@ -53,6 +53,7 @@ urlpatterns += patterns('worksheet_project.views',
     
     #ajax loads
     (r'^getFolder/$', 'getFolder'),
+    (r'^getFolder/(?P<folderID>(\d+))/$', 'getFolder'),
     
 
     (r'^test/$', 'test'),

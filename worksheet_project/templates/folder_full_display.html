@@ -1,4 +1,10 @@
+{% extends "base.html" %}
 {% load staticfiles %}
+
+
+{% block title %}Dashboard{% endblock %}
+
+{% block body %}
 
 					<! -- ROW OF PANELS -->
 					<!-- Product Panel -->
@@ -352,4 +358,107 @@
 {% endif %}
 					</div><! --  ROW OF PANELS -->
           		
+					
+{% endblock %}
+
+{% block modal %}
+		          <!-- Modal -->
+		          <div id="error-modal" aria-hidden="true" aria-labelledby="myModalLabel" role="dialog" tabindex="-1" id="myModal" class="modal fade">
+		              <div class="modal-dialog">
+		                  <div class="modal-content">
+		                      <div class="modal-header">
+					  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		                          <h4 class="modal-title">There was a problem!...I think?...</h4>
+		                      </div>
+		                      <div class="modal-body">
+					<div class="row">
+					  <div class="col-xs-12 text-center">
+							<h4>{{ error|capfirst }}</h4>
+					  </div>
+					</div>
+		                      </div>
+		                  </div>
+		              </div>
+		          </div>
+		          <!-- modal -->
+			  
+			  
+			  
+			  
+			  
+			  
+			  
+{% endblock %}
+
+
+{% block extraScript %}
+    <script src="{% static "adminBoot/js/dashboard.js" %}?version=1"></script>
+    
+      {% if not classUser.teacher %}
+	<script>
+		window.location.href = "/classes/";
+	</script>
+      {% endif %}
+
+    {% if error %}
+    <script>
+      $(document).ready(function(){
+	
+	$("#error-modal").modal("show");
+	
+      });
+    </script>
+    {% endif %}
+
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 					

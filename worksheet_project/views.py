@@ -1236,8 +1236,8 @@ def paypalReturn(request):
 
 
 @login_required
-def getFolder(request):
-    if request.method == "GET":
+def getFolder(request, folderID=False):
+    if request.method == "GET" and not folderID:
         folderID = request.GET['q'].strip()
         
         if Folder.objects.filter(id=folderID, user=request.user):
@@ -1255,19 +1255,113 @@ def getFolder(request):
                 allFolders = Folder.objects.filter(user=request.user, parentID=folder.id).order_by('-modifiedDate', 'name')
             else:
                 allFolders = False
+        else:
+            folder = False
+            allProjects = False
+            allFolders = False
             
             
-            args = {
-                    "currentFolder":folder,
-                    "randomNumber":['1','2','3','4','5','6'],
-                    "allProjects":allProjects,
-                    "allFolders":allFolders,
-                }
-            args.update(csrf(request))
+        args = {
+                "currentFolder":folder,
+                "randomNumber":['1','2','3','4','5','6'],
+                "allProjects":allProjects,
+                "allFolders":allFolders,
+            }
+        args.update(csrf(request))
         
         return render_to_response('folder_display.html',args)
     else:
-        return HttpResponse('sorry');
+        if UserInfo.objects.filter(user=request.user):
+            userInfo = UserInfo.objects.get(user=request.user)
+        else:
+            userInfo = UserInfo.objects.create(
+                user = request.user
+            )
+            return HttpResponseRedirect("/edit-profile/")
+        
+        #Check if it's a new user
+        if not request.user.first_name or not request.user.last_name or not userInfo.teacher_student:
+            return HttpResponseRedirect("/edit-profile/")
+        
+        if GoogleUserInfo.objects.filter(user=request.user):
+            googleUserInfo = GoogleUserInfo.objects.get(user=request.user)
+        else:
+            googleUserInfo = False
+            
+        
+        if Folder.objects.filter(id=folderID, user=request.user):
+            folder = Folder.objects.get(id=folderID)
+        
+            if Project.objects.filter(parentID=folder.id):
+                #parentID=0 is for projects that are not in any folders
+                allProjects = Project.objects.filter(parentID=folder.id).order_by('status','-modifiedDate', 'title')
+            else:
+                allProjects = False
+            
+            
+            if Folder.objects.filter(parentID=folder.id):
+                #parentID=0 is for folders that are not in any folders
+                allFolders = Folder.objects.filter(user=request.user, parentID=folder.id).order_by('-modifiedDate', 'name')
+            else:
+                allFolders = False
+        else:
+            folder = False
+            allProjects = False
+            allFolders = False
+        
+        
+        #Get all users Classes
+        if ClassUser.objects.filter(user=request.user):
+            classUser = ClassUser.objects.get(user=request.user)
+        else:
+            if userInfo.teacher_student == 'teacher':
+                teacher = True
+            else:
+                teacher = False
+            classUser = ClassUser.objects.create(
+                user = request.user,
+                teacher = teacher,
+            )
+            
+        if classUser.teacher and settings.PAYMENT_TRACKER_ON:
+            bPaidUp = checkPaidUp(request.user)
+        elif settings.PAYMENT_TRACKER_ON:
+            bPaidUp = False
+        else:
+            bPaidUp = True
+            
+        #Get all users Class
+        if classUser.classrooms.all():
+            allClasses = classUser.classrooms.all().order_by('name')
+        else:
+            allClasses = False
+        
+        
+        if 'error' in request.session:
+            error = request.session['error']
+            if classUser.teacher:
+                del request.session['error']
+        else:
+            error = False
+        
+        
+        args = {
+                "error":error,
+                "dashboard":True,
+                "userInfo":userInfo,
+                "googleUserInfo":googleUserInfo,
+                "allClasses":allClasses,
+                "classUser":classUser,
+                "currentFolder":folder,
+                "randomNumber":['1','2','3','4','5','6'],
+                "allProjects":allProjects,
+                "allFolders":allFolders,
+                "bPaidUp":bPaidUp,
+            }
+        args.update(csrf(request))
+        
+        
+        return render_to_response('folder_full_display.html', args)
 
 
 
