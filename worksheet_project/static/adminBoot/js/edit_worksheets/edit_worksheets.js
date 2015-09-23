@@ -948,7 +948,12 @@ function updateMulitipleChoice(choiceID) {
 	var newChoice = $("#"+choiceID).val();
 	//console.log('keyword ID: '+keywordID+' OptionID number: '+optionIDNumber+' Ney Keyword: '+newKeyword);
 	//Dajaxice.myproject.googleapi.updateChoice(updateChoice_callback, {'inputNumber': parseInt(inputNumber_id), 'optionIDNumber': parseInt(optionIDNumber), 'newChoice': newChoice});
-        updateChoice(parseInt(inputNumber_id), parseInt(optionIDNumber), newChoice);
+        if (newChoice.length>45){
+		alert('Woops, you can only use 45 characters for an answer.')
+	}else{
+		updateChoice(parseInt(inputNumber_id), parseInt(optionIDNumber), newChoice);
+	}
+	
         
 	$('#input'+inputNumber_id).data(choiceID, newChoice);
 	
@@ -1419,7 +1424,7 @@ $.ajaxSetup({
             xhr.onreadystatechange = function() {
                 if (xhr.readyState == 4 && xhr.status == 200) {
                     // Handle response.
-		    //console.log(xhr.responseText);
+		    console.log(xhr.responseText);
 		    var data = JSON.parse(xhr.responseText)
 		    console.log("Return from updateChoice: "+data);
 		    if (data.error) {alert(data.error);}
