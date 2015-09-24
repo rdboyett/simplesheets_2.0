@@ -72,6 +72,7 @@ from worksheet_creator.models import Project, BackImage
 from google_drive.views import driveUpload, createGoogleShortcut, get_service, checkOrCreateGoogleFolder
 from worksheet_project.views import checkPaidUp
 from worksheet_project import settings
+from worksheet_creator.settings import DOMAIN
 from payment_tracker.models import PaymentUser
 
 
@@ -188,7 +189,7 @@ def create(request):
                         number_of_pages = reader.getNumPages()
                         for page_num in xrange(number_of_pages):
                             counter += 1
-                        if counter > 5:
+                        if counter > 5 and DOMAIN=='ducksoup.us':
                             bTooManyPages = True
                             pdfFile.close()
                             os.remove(pdfPath)
