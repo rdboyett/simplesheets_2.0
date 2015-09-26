@@ -125,7 +125,10 @@ def profileUpdate(request):
         fullName = fullName.title()
         
         firstName = fullName.split(' ',1)[0]
-        lastName = fullName.split(' ',1)[1]
+        try:
+            lastName = fullName.split(' ',1)[1]
+        except:
+            return HttpResponse(json.dumps({'error':'Oops, we need your full name.'}))
         
         data = {
             'fullName': fullName,
