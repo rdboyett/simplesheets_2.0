@@ -762,7 +762,7 @@ function changeQuestionType() {
 	//$('#'+elementID).attr('id','noShow');
 	
 	//Now, create the textarea
-	html = "<textarea id='"+ elementID +"' class='answers highlight img-rounded' readonly='readonly' data-options=''></textarea><div id='drawing"+ elementID +"' class='work-button img-rounded'>Drawing Area will be activated for student use...</div>"
+	html = "<textarea id='"+ elementID +"' class='answers highlight img-rounded' readonly='readonly' data-options=''></textarea><div id='drawing"+ elementID +"' class='work-button img-rounded'>Drawing Area will be activated for student use. If you don't want this to be auto-graded, assign a point value of zero to the right.</div>"
 	
 	$( "#default_form" ).append( html );
         $('#'+elementID).attr('style',testStyle+"resize: none;");

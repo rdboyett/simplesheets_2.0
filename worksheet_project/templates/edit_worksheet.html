@@ -64,7 +64,7 @@
 			    "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}'
 			    style="resize: none;position: absolute;z-index: 1;left: {{ input.left }}%;top: {{ input.top }}%;width: {{ input.width }}%;
 			    height: {{ input.height }}%"></textarea><div id="drawinginput{{ input.id }}" class="work-button img-rounded"
-			    style="position: absolute;z-index: 1;left: {{ input.left }}%;top: {{ input.top }}%;width: {{ input.width }}%; text-align: center;">Drawing Area will be activated for student use...</div>
+			    style="position: absolute;z-index: 1;left: {{ input.left }}%;top: {{ input.top }}%;width: {{ input.width }}%; text-align: center;">Drawing Area will be activated for student use. If you don't want this to be auto-graded, assign a point value of zero to the right.</div>
 			<script>
 			    {% if input.option1 %}
 			    $('#input{{ input.id }}').data('keyword1', '{{ input.option1 }}');
@@ -346,7 +346,7 @@
     </script>
     
     
-    <script src="{% static "adminBoot/js/edit_worksheets/edit_worksheets.js" %}?version=2"></script>
+    <script src="{% static "adminBoot/js/edit_worksheets/edit_worksheets.js" %}?version=3"></script>
     
     
   
