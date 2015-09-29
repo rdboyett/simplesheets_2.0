@@ -204,7 +204,15 @@ jQuery.validator.addMethod("complete_url", function(val, elem) {
                 }
             },
             dataType:  'json',
-            timeout:   4000 
+            timeout:   4000,
+	    error: function(jqXHR, textStatus, errorThrown) {
+		if(textStatus==="timeout") {
+		   location.reload();
+		}else{
+		    alert("Sorry, something went wrong...That's all we know.");
+		    location.reload();
+		}
+	    }
         });
     
     
