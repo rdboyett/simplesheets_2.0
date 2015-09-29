@@ -189,7 +189,7 @@ def create(request):
                         number_of_pages = reader.getNumPages()
                         for page_num in xrange(number_of_pages):
                             counter += 1
-                        if counter > 5 and DOMAIN=='ducksoup.us':
+                        if counter > 15 and DOMAIN=='ducksoup.us':
                             bTooManyPages = True
                             pdfFile.close()
                             os.remove(pdfPath)

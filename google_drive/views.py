@@ -79,6 +79,13 @@ def google_picker(request):
     else:
         bPaiUP = True
     
+    
+    if GoogleUserInfo.objects.filter(user=request.user):
+        googleUserInfo = GoogleUserInfo.objects.get(user=request.user)
+    else:
+        googleUserInfo = False
+    
+    
     if GoogleUserInfo.objects.filter(user=request.user):
         googleUser = GoogleUserInfo.objects.get(user=request.user)
         today = datetime.date.today()
@@ -118,6 +125,7 @@ def google_picker(request):
               "classUser":classUser,
               "create":True,
               "googleUser":googleUser,
+              "googleUserInfo":googleUserInfo,
               "docFiles":docFiles,
               "pdfFiles":pdfFiles,
               "myTour":myTour,
