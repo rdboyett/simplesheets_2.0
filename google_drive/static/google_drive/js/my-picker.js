@@ -51,8 +51,15 @@ $('#fileTabs a').click(function (e) {
     
     $("#selectBtn").click(function(){
 	var fileID = $("#googleFileID").val();
-	if (fileID != "" && fileID != null) {
+	console.log('fileID: -'+fileID+'-');
+	if (fileID == "" || fileID == null) {
+	    console.log('getting new fileID');
+	    fileID = $(".googleFileSelect.selected").find('.googleFileID').html();
+	}
+	if (fileID != "" || fileID != null) {
 	    checkProjectExists(fileID);
+	}else{
+	    console.log('clicked but fildID does not exit');
 	}
     });
     

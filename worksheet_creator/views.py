@@ -180,10 +180,18 @@ def create(request):
                     f = open(pdfPath, 'wb')
                     f.write(content)
                     f.close()
-                    
-                    try:
+                    '''
+                    if True:
                         #count the number of pages and delete if too many:---------------------------------------------------
                         pdfFile = open(pdfPath, "rb")
+                        
+                        
+                        if True:
+                            reader = PdfFileReader(pdfFile)
+                        else:
+                            return HttpResponse(json.dumps({"error":"Sorry, there was a problem with the pdf file."}))
+        
+                        
                         reader = PdfFileReader(pdfFile)
                         counter = 0
                         number_of_pages = reader.getNumPages()
@@ -195,10 +203,69 @@ def create(request):
                             os.remove(pdfPath)
                         else:
                             bTooManyPages = False
-                    except:
-                        return HttpResponse(json.dumps({"error":"You can only use 5 pages or less.  If this keeps happening, try printing the document as a pdf and reload the new document."}))
+                    else:
+                        return HttpResponse(json.dumps({"error":"You can only use 15 pages or less.  If this keeps happening, try printing the document as a pdf and reload the new document."}))
+                    '''
                     
                     
+                    if True:
+                        #count the number of pages and delete if too many:---------------------------------------------------
+                        counter = 0
+                                    
+                        pdfFile = open(pdfPath, "rb")
+                                    
+                        try:
+                            reader = PdfFileReader(pdfFile)
+                            number_of_pages = reader.getNumPages()
+                            for page_num in xrange(number_of_pages):
+                                counter += 1
+                        except:
+                            rxcountpages = re.compile(r"/Type\s*/Page([^s]|$)", re.MULTILINE|re.DOTALL)
+                            pages = open(pdfPath,"rb").read()
+                            counter =  len(rxcountpages.findall(pages))
+                            number_of_pages = counter
+                            log.info('number of pages: '+str(number_of_pages))
+                        
+                        if counter > 15 and DOMAIN=='ducksoup.us':
+                            bTooManyPages = True
+                            pdfFile.close()
+                            os.remove(pdfPath)
+                        else:
+                            bTooManyPages = False
+                    else:
+                        return HttpResponse(json.dumps({"error":"You can only use 15 pages or less.  If this keeps happening, try printing the document as a pdf and reload the new document."}))
+                  
+                    
+                    
+                    
+                    '''
+        
+        try:
+            #count the number of pages and delete if too many:---------------------------------------------------
+            counter = 0
+                        
+            pdfFile = open(pdfPath, "rb")
+                        
+            try:
+                reader = PdfFileReader(pdfFile)
+                number_of_pages = reader.getNumPages()
+                for page_num in xrange(number_of_pages):
+                    counter += 1
+            except:
+                rxcountpages = re.compile(r"/Type\s*/Page([^s]|$)", re.MULTILINE|re.DOTALL)
+                pages = pdfFile.read()
+                counter =  len(rxcountpages.findall(pages))
+                number_of_pages = counter
+            
+            if counter > 15 and DOMAIN=='ducksoup.us':
+                bTooManyPages = True
+                pdfFile.close()
+                os.remove(pdfPath)
+            else:
+                bTooManyPages = False
+        except:
+            return HttpResponse(json.dumps({"error":"You can only use 15 pages or less.  If this keeps happening, try printing the document as a pdf and reload the new document."}))
+                    '''
                     
                     if not bTooManyPages:
                         try:
@@ -436,6 +503,34 @@ def createFromPDF(request):
         
         
         #count the number of pages and delete if too many:---------------------------------------------------
+        if True:
+            #count the number of pages and delete if too many:---------------------------------------------------
+            counter = 0
+                        
+            pdfFile = open(pdfPath, "rb")
+                        
+            try:
+                reader = PdfFileReader(pdfFile)
+                number_of_pages = reader.getNumPages()
+                for page_num in xrange(number_of_pages):
+                    counter += 1
+            except:
+                rxcountpages = re.compile(r"/Type\s*/Page([^s]|$)", re.MULTILINE|re.DOTALL)
+                pages = file(pdfPath,"rb").read()
+                counter =  len(rxcountpages.findall(pages))
+                number_of_pages = counter
+                log.info('number of pages: '+str(number_of_pages))
+            
+            if counter > 15 and DOMAIN=='ducksoup.us':
+                bTooManyPages = True
+                pdfFile.close()
+                os.remove(pdfPath)
+            else:
+                bTooManyPages = False
+        else:
+            return HttpResponse(json.dumps({"error":"You can only use 15 pages or less.  If this keeps happening, try printing the document as a pdf and reload the new document."}))
+                 
+        '''
         pdfFile = open(pdfPath, "rb")
         try:
             reader = PdfFileReader(pdfFile)
@@ -446,13 +541,13 @@ def createFromPDF(request):
         number_of_pages = reader.getNumPages()
         for page_num in xrange(number_of_pages):
             counter += 1
-        if counter > 5:
+        if counter > 15 and DOMAIN=='ducksoup.us':
             bTooManyPages = True
             pdfFile.close()
             os.remove(pdfPath)
         else:
             bTooManyPages = False
-                    
+        '''
                     
                     
         if not bTooManyPages:
@@ -564,7 +659,7 @@ def createFromPDF(request):
             return HttpResponse(json.dumps(data))
                         
         else:
-            return HttpResponse(json.dumps({"error":"Sorry you are limited to 5 pages for your worksheet."}))
+            return HttpResponse(json.dumps({"error":"Sorry you are limited to 15 pages for your worksheet."}))
         
     else:
         data = {
