@@ -711,6 +711,7 @@ function changeQuestionType() {
 	$('#work'+elementID).remove();
 	$('#mathwork'+elementID).remove();
 	$('#drawing'+elementID).remove();
+	$('#editorBtn-'+elementID).remove();
 	//$('#'+elementID).css("display","none");
 	//$('#'+elementID).attr('id','noShow');
 	
@@ -759,6 +760,7 @@ function changeQuestionType() {
 	$('#work'+elementID).remove();
 	$('#mathwork'+elementID).remove();
 	$('#drawing'+elementID).remove();
+	$('#editorBtn-'+elementID).remove();
 	
 	//Now, create the textarea
 	$( "#default_form" ).append( "<select id='"+ elementID +"' class='answers highlight img-rounded' data-options=''><option id='option0' value='none'>Select One...</option></select>" );
@@ -800,6 +802,7 @@ function changeQuestionType() {
 	$('#'+elementID).remove();
 	$('#drawing'+elementID).remove();
 	$('#mathwork'+elementID).remove();
+	$('#editorBtn-'+elementID).remove();
 	
 	//Now, create the textarea
         var html = '<div id="work'+ elementID +'" class="highlight img-rounded" data-options="">'+
@@ -855,11 +858,13 @@ function changeQuestionType() {
 	$('#'+elementID).remove();
 	$('#drawing'+elementID).remove();
 	$('#work'+elementID).remove();
+	$('#editorBtn-'+elementID).remove();
 	
 	//Now, create the textarea
         var html = '<div id="mathwork'+ elementID +'" class="highlight img-rounded" data-options="">'+
                         '<div class="work-button img-rounded" style="position:relative;top:40%;left:0;font-size: 20px;text-align: center;">Work Area will be activated for student use...<span style="font-size: 12px;">place MATH answer here.</span>'+
                         '<span id="'+ elementID +'" class="answers highlight" data-options=""></span>'+
+			'<span id="editorBtn-'+ elementID +'" class="editor-btn btn btn-success btn-xs" style="display: none;position: absolute;z-index: 1;left: 100%;top: 100%;margin: -20px 0 0 -45px;">editor</span>'+
                         '</div>'+
                     '</div>'
         
@@ -912,9 +917,18 @@ function changeQuestionType() {
 	$('#drawing'+elementID).remove();
 	$('#work'+elementID).remove();
 	$('#mathwork'+elementID).remove();
+	$('#editorBtn-'+elementID).remove();
+	
+	
+	var styleList = testStyle.split(' ');
+	var editorLeft = parseFloat(styleList[3].split('%')[0])+parseFloat(styleList[7].split('%')[0]);
+	var editorTop = parseFloat(styleList[5].split('%')[0])+parseFloat(styleList[9].split('%')[0]);
+	var editorStyle = '"display: none; position: absolute; left: '+editorLeft+'%; top: '+editorTop+'%; z-index: 1; margin-left: -45px;"';
+	
 	
 	//Now, create the textarea
-        var html = '<span id="'+ elementID +'" class="answers" data-options=""></span>'
+        var html = '<span id="'+ elementID +'" class="answers" data-options=""></span>'+
+		   '<span id="editorBtn-'+ elementID +'" class="editor-btn btn btn-success btn-xs" style="display: none; position: absolute; left: '+editorLeft+'%; top: '+editorTop+'%; z-index: 1; margin: -9px 0 0 -55px;">editor</span>'
         
         
         
@@ -923,6 +937,9 @@ function changeQuestionType() {
         $('#'+elementID).attr('style',testStyle);
 	$('#'+elementID).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"mathChem", "points":"'+data.points+'", "help_text":"'+data.help_text+'", "help_link":"'+data.help_link+'"}');
 	$('#'+elementID).mathquill('editable');
+	console.log(testStyle);
+	console.log(editorStyle);
+	console.log(editorTop);
 	
 		for (var j=1; j<6; j++) {
 		    if (choice[j-1]) {
@@ -961,6 +978,7 @@ function changeQuestionType() {
 	$('#work'+elementID).remove();
 	$('#mathwork'+elementID).remove();
 	$('#drawing'+elementID).remove();
+	$('#editorBtn-'+elementID).remove();
 	//$('#'+elementID).css("display","none");
 	//$('#'+elementID).attr('id','noShow');
 	
@@ -1013,6 +1031,7 @@ function changeQuestionType() {
 	$('#work'+elementID).remove();
 	$('#mathwork'+elementID).remove();
 	$('#drawing'+elementID).remove();
+	$('#editorBtn-'+elementID).remove();
 	//$('#'+elementID).css("display","none");
 	//$('#'+elementID).attr('id','noShow');
 	
