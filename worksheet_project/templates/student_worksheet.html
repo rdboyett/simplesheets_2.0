@@ -35,15 +35,19 @@
 
 {% block body %}
     <div class="row">
-	<div class="col-sm-4">
+	<div class="col-sm-5">
 	    <button id="gradeWorksheet" class="btn btn-primary
 	    {% if myGrade %}{% if myGrade.timesGraded >= newProject.numberOfRetry %} disabled{% endif %}{% endif %}
 	    ">grade eSheet</button>
 	    <button id="zoom-out-btn" class="btn btn-primary"><span class="fa fa-search-minus"></span></button>
 	    <button id="zoom-in-btn" class="btn btn-primary"><span class="fa fa-search-plus"></button>
+	    
+	</div>
+	<div class="col-md-2 text-center">
+	    <div class="g-sharetoclassroom" data-size="50" data-title="{{ newProject.title|title }}" data-url="{{ siteURL }}nextPage/{{ newProject.id }}/{{ pageNumber }}/" ></div>
 	</div>
 	{% if myGrade %}
-	<div class="col-sm-4">
+	<div class="col-sm-12">
 	    <div class="panel panel-default">
 		<div class="panel-body text-center">
 		  Your current grade is {{ myGrade.average|floatformat:2 }}%.

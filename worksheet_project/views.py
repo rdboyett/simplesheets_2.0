@@ -238,7 +238,14 @@ def showNextPage(request, projectID=False, pageNumber=False, classID=False):
                 nTimesRan = 0,
             )
             
+        if not classID and not bTeacher:
+            if Classroom.objects.filter(worksheets=newProject, classuser=classUser):
+                classID = Classroom.objects.filter(worksheets=newProject, classuser=classUser)[0].id
+            else:
+                return redirect('/dashboard/');
+            
         args = {
+                "siteURL":settings.SITE_URL,
                 "worksheet":True,
                   'user':request.user,
                 "userInfo":userInfo,
