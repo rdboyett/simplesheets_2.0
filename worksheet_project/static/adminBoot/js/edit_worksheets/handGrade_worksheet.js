@@ -368,6 +368,64 @@ function resizeElements() {
     });
     
     
+    $("#default_form").on('blur', '.answers.mathquill-editable', function () {
+        var elementID = $(this).attr('id');
+        var elt = document.getElementById(elementID);
+        //console.log(elt.nodeName);
+        var data = $(this).data('options');
+	$(this).next('.editor-btn').fadeOut(300);
+        
+        
+        if ($("#"+elementID).attr('type')=='checkbox') {
+            var newCorrectAnswer = document.getElementById(elementID).checked;
+            if (document.getElementById(elementID).checked == true) {
+                $('#showCheckbox').prop("checked", true);
+            }
+            else{$('#showCheckbox').prop("checked", false);}
+        }else if (data.input_type=='mathwork' || data.input_type=='mathChem') {
+	    var newCorrectAnswer = $('#'+elementID).mathquill('latex');
+	    newCorrectAnswer = newCorrectAnswer.replace(/\\/g, "\\\\");
+	}else{
+            var newCorrectAnswer = $('#'+elementID).val();
+        }
+	
+	console.log(newCorrectAnswer);
+        
+        
+        sendStudentAnswer($(this), newCorrectAnswer, data);
+        if (elt.nodeName != 'SELECT') {
+            updateCorrectAnswer_function(elementID);
+        }
+    });
+    $("#default_form").on('focus', '.answers.mathquill-editable', function () {
+	$(this).next('.editor-btn').fadeIn(300);
+    });
+    
+    $("#default_form").on('click','.editor-btn', function(){
+	$("#mathChemEditor-modal .modal-body").html("");
+	var latex = $(this).prev().mathquill('latex');
+	$("#mathChemEditorInputID").val($(this).prev().attr('id'));
+	console.log('from edit: '+latex);
+	$("#mathChemEditor-modal").modal('show');
+	
+	setTimeout(function(){ 
+		$("<div>"+latex+"</div>").mathquill('editable').appendTo("#mathChemEditor-modal .modal-body").mathquill('redraw').find('textarea').focus();
+	}, 500);
+    });
+    
+    $("#mathChemEditor-modal").on('click','#updateMathChem-btn', function(){
+	var latex = $("#mathChemEditor-modal .modal-body div").mathquill('latex');
+	var inputID = $("#mathChemEditorInputID").val();
+	console.log('from edit: '+latex);
+	$("#"+inputID).html(latex).mathquill('editable').mathquill('redraw');
+	$("#"+inputID+" textarea").focus();
+	$("#mathChemEditor-modal").modal('hide');
+	$("#tryTyping").html('');
+    });
+    
+    
+
+    
 
     
     
@@ -942,6 +1000,36 @@ function showGradeColors() {
 	}
 	
 
+	
+	// Math Chem editor
+	$('#editor-tabs a').click(function (e) {
+		e.preventDefault()
+		$(this).tab('show')
+	})
+        
+	    
+	$("#mathTab button, #chemTab button").each(function(){
+	    $(this).popover();
+	});
+        
+        
+	$("#mathTab button, #chemTab button").click(function(){
+		var latex = $(this).data('mathquill');
+		var tryTyping = $(this).data('trytyping');
+		
+		console.log(tryTyping);
+		$("#mathChemEditor-modal .modal-body div").mathquill('write',latex);
+		if ($("#mathChemEditor-modal .modal-body div .empty:first").length){
+			$("#mathChemEditor-modal .modal-body div .empty:first").mousedown().mouseup();
+		}else{
+			$("#mathChemEditor-modal .modal-body div textarea").focus();
+		}
+		$("#tryTyping").fadeOut(300, function(){
+			$("#tryTyping").html("Or try typing: <span class='text-danger'>"+tryTyping+"</span>").fadeIn(300);
+		});
+	});
+	
+	
         
 }); 
 

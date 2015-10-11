@@ -263,12 +263,13 @@ def updateCorrectAnswer(request):
         newCorrectAnswer = request.POST["newCorrectAnswer"]
     
     
-        newCorrectAnswer = newCorrectAnswer.strip()
-        newCorrectAnswer = newCorrectAnswer.lower()
         
         if FormInput.objects.filter(id=int(inputNumber)):
             formInput = FormInput.objects.get(id=int(inputNumber))
-            formInput.correctAnswer = newCorrectAnswer.strip()
+            if formInput.inputType == 'mathChem' or formInput.inputType == "mathwork":
+                formInput.correctAnswer = newCorrectAnswer.strip()
+            else:
+                formInput.correctAnswer = newCorrectAnswer.strip().lower()
             formInput.save()
 
 
@@ -1414,7 +1415,7 @@ def updateInputType(request):
             if FormInput.objects.filter(id=inputNumber):
                 workInput = FormInput.objects.get(id=inputNumber)
                 
-                if newInputType == 'work' or newInputType == 'drawing':
+                if newInputType == 'work' or newInputType == 'drawing' or newInputType == 'mathwork':
                     workInput.inputType = str(newInputType)
                     try:
                         if BackImage.objects.filter(project__id=project_id, pageNumber=pageNumber):

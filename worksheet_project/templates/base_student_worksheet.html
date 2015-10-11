@@ -38,6 +38,9 @@
     <![endif]-->
     
     
+    <!-----------  Math Quill CSS ------------------------>
+    <link rel="stylesheet" type="text/css" href="{% static "mathquill/mathquill.css" %}?version=1">
+    
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <script src="//ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"></script>
     
@@ -219,6 +222,190 @@
   
   
   
+<!---------------- Math and Chem Editor Modal ------------------------------------->
+<div id="mathChemEditor-modal" class="modal fade" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content rounded">
+      <div class="modal-header top-rounded">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">Math and Chemistry Editor</h4>
+      </div>
+      <input id="mathChemEditorInputID" type="hidden" value="">
+      <div class="modal-body centered">
+	
+	    
+      </div>
+      <div>
+	<ul id="editor-tabs" class="nav nav-tabs" role="tablist">
+	  <li role="presentation" class="active"><a href="#mathTab" aria-controls="math" role="tab" data-toggle="tab">Math</a></li>
+	  <li role="presentation"><a href="#chemTab" aria-controls="chemistry" role="tab" data-toggle="tab">Chemistry</a></li>
+	  <li id="tryTyping"></li>
+	</ul>
+      
+	<!-- Tab panes -->
+	<div class="tab-content">
+	  <div role="tabpanel" class="tab-pane active" id="mathTab">
+	    <!--- math contents --->
+	    <ul>
+	      <li>
+		<button type="button" class="math20 times btn btn-default" data-mathquill="\times" data-trytyping="\times" data-container="body"
+		  data-toggle="popover" data-placement="bottom" data-trigger="hover"
+		  data-content="multiply"></button>
+	      </li>
+	      <li>
+		<button type="button" class="math20 divide btn btn-default" data-mathquill="\div" data-tryTyping="\div" data-container="body"
+		  data-toggle="popover" data-placement="bottom" data-trigger="hover"
+		  data-content="divide"></button>
+	      </li>
+	      <li>
+		<button type="button" class="math20 plusMinus btn btn-default" data-mathquill="\pm" data-tryTyping="\pm" data-container="body"
+		  data-toggle="popover" data-placement="bottom" data-trigger="hover"
+		  data-content="plus-minus"></button>
+	      </li>
+	      <li>
+		<button type="button" class="math20 cdot btn btn-default" data-mathquill="\cdot" data-tryTyping="\cdot" data-container="body"
+		  data-toggle="popover" data-placement="bottom" data-trigger="hover"
+		  data-content="multiply"></button>
+	      </li>
+	      <li>
+		<button type="button" class="math3545 fracA btn btn-default" data-mathquill="\frac{}{}" data-tryTyping="\frac or a/b" data-container="body"
+		  data-toggle="popover" data-placement="bottom" data-trigger="hover"
+		  data-content="fraction"></button>
+	      </li>
+	      <li>
+		<button type="button" class="math3528 sqrt btn btn-default" data-mathquill="\sqrt{}" data-tryTyping="\sqrt" data-container="body"
+		  data-toggle="popover" data-placement="bottom" data-trigger="hover"
+		  data-content="square root"></button>
+	      </li>
+	      <li>
+		<button type="button" class="math3528 nroot btn btn-default" data-mathquill="\nthroot[]{}" data-tryTyping="\nthroot" data-container="body"
+		  data-toggle="popover" data-placement="bottom" data-trigger="hover"
+		  data-content="nth-root"></button>
+	      </li>
+	      <li>
+		<button type="button" class="math3528 abUP btn btn-default" data-mathquill="^{}" data-tryTyping="^a" data-container="body"
+		  data-toggle="popover" data-placement="bottom" data-trigger="hover"
+		  data-content="exponent"></button>
+	      </li>
+	      <li>
+		<button type="button" class="math3528 abDown btn btn-default" data-mathquill="_{}" data-tryTyping="_a" data-container="body"
+		  data-toggle="popover" data-placement="bottom" data-trigger="hover"
+		  data-content="subscript"></button>
+	      </li>
+	      <li>
+		<button type="button" class="math3528 log btn btn-default" data-mathquill="\log_{}{}" data-tryTyping="\log_" data-container="body"
+		  data-toggle="popover" data-placement="bottom" data-trigger="hover"
+		  data-content="logarithm"></button>
+	      </li>
+	      <li>
+		<button type="button" class="logic20 neq btn btn-default" data-mathquill="\neq" data-tryTyping="\neq" data-container="body"
+		  data-toggle="popover" data-placement="bottom" data-trigger="hover"
+		  data-content="not-equal"></button>
+	      </li>
+	      <li>
+		<button type="button" class="logic20 leq btn btn-default" data-mathquill="\leq" data-tryTyping="\leq" data-container="body"
+		  data-toggle="popover" data-placement="bottom" data-trigger="hover"
+		  data-content="less than or equal to"></button>
+	      </li>
+	      <li>
+		<button type="button" class="logic20 geq btn btn-default" data-mathquill="\geq" data-tryTyping="\geq" data-container="body"
+		  data-toggle="popover" data-placement="bottom" data-trigger="hover"
+		  data-content="greater than or equal to"></button>
+	      </li>
+	      <li>
+		<button type="button" class="logic20 cong btn btn-default" data-mathquill="\cong" data-tryTyping="\cong" data-container="body"
+		  data-toggle="popover" data-placement="bottom" data-trigger="hover"
+		  data-content="congruent"></button>
+	      </li>
+	      <li>
+		<button type="button" class="math-btn btn btn-default" data-mathquill="\sin" data-tryTyping="\sin" data-container="body"
+		  data-toggle="popover" data-placement="bottom" data-trigger="hover"
+		  data-content="sine">sin</button>
+	      </li>
+	      <li>
+		<button type="button" class="math-btn btn btn-default" data-mathquill="\cos" data-tryTyping="\cos" data-container="body"
+		  data-toggle="popover" data-placement="bottom" data-trigger="hover"
+		  data-content="cosine">cos</button>
+	      </li>
+	      <li>
+		<button type="button" class="math-btn btn btn-default" data-mathquill="\tan" data-tryTyping="\tan" data-container="body"
+		  data-toggle="popover" data-placement="bottom" data-trigger="hover"
+		  data-content="tangent">tan</button>
+	      </li>
+	      <li>
+		<button type="button" class="greek20 theta btn btn-default" data-mathquill="\theta" data-tryTyping="\theta" data-container="body"
+		  data-toggle="popover" data-placement="bottom" data-trigger="hover"
+		  data-content="theta"></button>
+	      </li>
+	      <li>
+		<button type="button" class="math-btn btn btn-default" data-mathquill="\deg" data-tryTyping="\deg" data-container="body"
+		  data-toggle="popover" data-placement="bottom" data-trigger="hover"
+		  data-content="degree">deg</button>
+	      </li>
+	      <li>
+		<button type="button" class="math3545 sumA btn btn-default" data-mathquill="\sum_{}^{}" data-tryTyping="\sum" data-container="body"
+		  data-toggle="popover" data-placement="bottom" data-trigger="hover"
+		  data-content="sum"></button>
+	      </li>
+	      <li>
+		<button type="button" class="math3545 intA btn btn-default" data-mathquill="\int_{}^{}" data-tryTyping="\int" data-container="body"
+		  data-toggle="popover" data-placement="bottom" data-trigger="hover"
+		  data-content="integral"></button>
+	      </li>
+	      <li>
+		<button type="button" class="symbol20 infty btn btn-default" data-mathquill="\infty" data-tryTyping="\infty" data-container="body"
+		  data-toggle="popover" data-placement="bottom" data-trigger="hover"
+		  data-content="infinity"></button>
+	      </li>
+	      <li>
+		<a href="http://math.chapman.edu/~jipsen/mathquill/test/test.html" target="mathquill" class="math-btn btn btn-default">everything else</a>
+	      </li>
+	    </ul>
+	  </div>
+	  <div role="tabpanel" class="tab-pane" id="chemTab">
+	    <!--- chemistry contents ---->
+	    <ul>
+	      <li>
+		<button type="button" class="math3528 abUP btn btn-default" data-mathquill="^{}" data-tryTyping="^a" data-container="body"
+		  data-toggle="popover" data-placement="bottom" data-trigger="hover"
+		  data-content="exponent"></button>
+	      </li>
+	      <li>
+		<button type="button" class="math3528 abDown btn btn-default" data-mathquill="_{}" data-tryTyping="_a" data-container="body"
+		  data-toggle="popover" data-placement="bottom" data-trigger="hover"
+		  data-content="subscript"></button>
+	      </li>
+	      <li>
+		<button type="button" class="math3528 UpAndDown btn btn-default" data-mathquill="\_{}^{}" data-tryTyping="_a^b" data-container="body"
+		  data-toggle="popover" data-placement="bottom" data-trigger="hover"
+		  data-content="isotopes"></button>
+	      </li>
+	      <li>
+		<button type="button" class="arrow20 rightarrow btn btn-default" data-mathquill="\rightarrow" data-tryTyping="\rightarrow" data-container="body"
+		  data-toggle="popover" data-placement="bottom" data-trigger="hover"
+		  data-content="yeild"></button>
+	      </li>
+	      <li>
+		<button type="button" class="arrow20 equilibrium btn btn-default" data-mathquill="\rightleftarrow" data-tryTyping="\rightleftarrow" data-container="body"
+		  data-toggle="popover" data-placement="bottom" data-trigger="hover"
+		  data-content="equilibrium"></button>
+	      </li>
+	      <li>
+		<a href="http://math.chapman.edu/~jipsen/mathquill/test/test.html" target="mathquill" class="math-btn btn btn-default">everything else</a>
+	      </li>
+	    </ul>
+	  </div>
+	</div>
+      </div>
+      <div class="modal-footer bottom-rounded">
+        <button type="button" class="btn btn-default rounded" data-dismiss="modal">cancel</button>
+        <button id="updateMathChem-btn" type="button" class="btn btn-primary rounded">update</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
   
   
   
@@ -286,6 +473,8 @@
     <script src="{% static "adminBoot/js/jquery.form.js" %}"></script>
     
     
+    <!------------  Math Quill --------------------------------------->
+    <script src="{% static "mathquill/mathquill.js" %}"></script>
 
 
 

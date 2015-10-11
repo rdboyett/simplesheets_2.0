@@ -56,6 +56,49 @@
 		    </div>
 		    
 		    
+		    {% elif input.inputType == 'mathwork' %}
+		    <div id="mathworkinput{{ input.id }}" class="highlight img-rounded" style="position: absolute;z-index: 1;left: {{ input.left }}%;top: {{ input.top }}%;width: {{ input.width }}%; height: {{ input.height }}%" data-options='{"answer_id":"{{ input.id }}", "question_number":"{{ input.questionNumber }}", "input_type":"{{ input.inputType }}", "points":"{{ input.points }}", "help_text":{% if input.helpText %}"{{ input.helpText }}"{% else %}""{% endif %}, "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}'>
+                        <div class="work-button img-rounded" style="position:relative;top:40%;left:0;font-size: 20px;text-align: center;">Work Area will be activated for student use...<span style="font-size: 12px;">place MATH answer here.</span>
+			    <span id="input{{ input.id }}" class="answers highlight"
+				     data-options='{"answer_id":"{{ input.id }}", "question_number":"{{ input.questionNumber }}", "input_type":"{{ input.inputType }}", "points":"{{ input.points }}", "help_text":{% if input.helpText %}"{{ input.helpText }}"{% else %}""{% endif %}, "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}'
+				     style="background-color: #FFF !important;">
+				
+			    </span>
+		    <span id="editorBtn-input{{ input.id }}" class="editor-btn btn btn-success btn-xs" style="display: none;position: absolute;z-index: 1;left: 100%;top: 100%;margin: -20px 0 0 -45px;">editor</span>
+			    <script>
+				{% if input.correctAnswer %}
+				$("#input{{ input.id }}").mathquill('editable').mathquill('latex','{{ input.correctAnswer }}');
+				{% else %}
+				$("#input{{ input.id }}").mathquill('editable');
+				{% endif %}
+				
+			    </script>
+			</div>
+		    </div>
+		    
+		    
+		    
+		    {% elif input.inputType == 'mathChem' %}
+		    <span id="input{{ input.id }}" class="answers"
+			   data-options='{"answer_id":"{{ input.id }}",
+			   "question_number":"{{ input.questionNumber }}",
+			   "input_type":"{{ input.inputType }}", "points":"{{ input.points }}",
+			   "help_text":{% if input.helpText %}"{{ input.helpText }}"{% else %}""{% endif %},
+			   "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}'
+			    style="position: absolute;z-index: 1;left: {{ input.left }}%;top: {{ input.top }}%;
+			    width: {{ input.width }}%; height: {{ input.height }}%">
+		    </span>
+		    <span id="editorBtn-input{{ input.id }}" class="editor-btn btn btn-success btn-xs" style="display: none;position: absolute;z-index: 1;left: {{ input.left|add:input.width }}%;top: {{ input.top|add:input.height }}%;margin-left: -45px;">editor</span>
+			    <script>
+				{% if input.correctAnswer %}
+				$("#input{{ input.id }}").mathquill('editable').mathquill('latex','{{ input.correctAnswer }}');
+				{% else %}
+				$("#input{{ input.id }}").mathquill('editable');
+				{% endif %}
+				
+			    </script>
+		    
+		    
 		    {% elif input.inputType == 'drawing' %}
 		    
 			<textarea id="input{{ input.id }}" class="answers highlight img-rounded" readonly="readonly" data-options='{"answer_id":"{{ input.id }}",
@@ -346,7 +389,7 @@
     </script>
     
     
-    <script src="{% static "adminBoot/js/edit_worksheets/edit_worksheets.js" %}?version=3"></script>
+    <script src="{% static "adminBoot/js/edit_worksheets/edit_worksheets.js" %}?version=4"></script>
     
     
   
@@ -421,7 +464,7 @@ $(document).ready(function(){
 			    '<div class="row">'+
 				'<div class="col-xs-10 col-xs-offset-1">'+
 				    '<div class="text-center">'+
-					'<h4>Press <span class="text-danger">ENTER</span> to create the block!</h4>'+
+					'<h4>Press <span class="text-danger">ENTER</span> or click <span class="btn btn-success btn-xs"><i class="fa fa-check"></i> create</span> to create the block!</h4>'+
 					'</div>'+
 				'</div'+
 			    '</div>'+
@@ -515,7 +558,7 @@ $(document).ready(function(){
 			    '<div class="row">'+
 				'<div class="col-xs-10 col-xs-offset-1">'+
 				    '<div class="text-center">'+
-					"<h4>You can force your students to answer text or only numbers...</h4>"+
+					"<h4>You can have your students answer text or only numbers...</h4>"+
 					'</div>'+
 				'</div'+
 			    '</div>'+
@@ -528,6 +571,33 @@ $(document).ready(function(){
 			    '</div>'+
 			  '</div>',
 		  placement: 'left',
+		},
+		{
+		  element: "#sidebar-right",
+		  title: "Math or Chemistry",
+		  template: '<div class="popover" role="tooltip" style="width:300px;">'+
+			    '<div class="arrow"></div>'+
+			    '<h3 class="popover-title primary"></h3>'+
+			    '<div class="row">'+
+				'<div class="col-xs-10 col-xs-offset-1">'+
+				    '<div class="text-center">'+
+					"<h4>Have your students write equations for Math or Chemistry...</h4>"+
+					'</div>'+
+				'</div'+
+			    '</div>'+
+			    '<div class="popover-navigation">'+
+			      '<div class="btn-group">'+
+				'<button class="btn btn-sm btn-primary" data-role="prev"><i class="fa fa-angle-double-left"></i> Prev</button>'+
+				'<button class="btn btn-sm btn-primary" data-role="next">Next <i class="fa fa-angle-double-right"></i></button>'+
+				'<button class="btn btn-sm btn-primary" data-role="pause-resume" data-pause-text="Pause" data-resume-text="Resume">Pause</button>'+
+			      '</div>'+
+			    '</div>'+
+			  '</div>',
+		  placement: 'left',
+		  onShow: function(){
+		    $('#questionType').val('mathChem');
+		    $('#questionType').change();
+		  },
 		},
 		{
 		  element: "#sidebar-right",
@@ -607,6 +677,33 @@ $(document).ready(function(){
 		  placement: 'left',
 		  onShow: function(){
 		    $('#questionType').val('work');
+		    $('#questionType').change();
+		  },
+		},
+		{
+		  element: "#sidebar-right",
+		  title: "Math Equation and Show Your Work",
+		  template: '<div class="popover" role="tooltip" style="width:300px;">'+
+			    '<div class="arrow"></div>'+
+			    '<h3 class="popover-title primary"></h3>'+
+			    '<div class="row">'+
+				'<div class="col-xs-10 col-xs-offset-1">'+
+				    '<div class="text-center">'+
+					"<h4>Have your students show their work and respond with a Math or Chemistry equation...</h4>"+
+					'</div>'+
+				'</div'+
+			    '</div>'+
+			    '<div class="popover-navigation">'+
+			      '<div class="btn-group">'+
+				'<button class="btn btn-sm btn-primary" data-role="prev"><i class="fa fa-angle-double-left"></i> Prev</button>'+
+				'<button class="btn btn-sm btn-primary" data-role="next">Next <i class="fa fa-angle-double-right"></i></button>'+
+				'<button class="btn btn-sm btn-primary" data-role="pause-resume" data-pause-text="Pause" data-resume-text="Resume">Pause</button>'+
+			      '</div>'+
+			    '</div>'+
+			  '</div>',
+		  placement: 'left',
+		  onShow: function(){
+		    $('#questionType').val('mathwork');
 		    $('#questionType').change();
 		  },
 		},
@@ -715,6 +812,12 @@ $(document).ready(function(){
 		    tour.next();
 		}
 	    }
+	});
+	
+	$(document).on("click", "#createSelection", function (e) {
+		if (tour.getCurrentStep()==2) {
+		    tour.next();
+		}
 	});
 	
 	$(document).on('focus', '#default_form .answers', function(){

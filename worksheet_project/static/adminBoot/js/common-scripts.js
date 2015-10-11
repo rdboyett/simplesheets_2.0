@@ -379,7 +379,32 @@ jQuery.validator.addMethod("complete_url", function(val, elem) {
     }
     
     setListGridDisplay();
+    
+    $(".modal-content").on("resizestart", function(event, ui) {
+	if (!$(this).data('originalHeight')) {
+	    $(this).css({"min-height":ui.size.height, "min-width":ui.size.width});
+	    $(this).data("originalHeight", $(this).height());
+	    $(this).find('.modal-footer').addClass('resized');
+	}
+	
+    });
+    
+    
+    /*
+    $(".modal-content").on("resize", function(event, ui) {
 
+	$(this).css("min-height", $(this).data("resizeoriginalheight") + ui.size.height - ui.originalSize.height);
+    });
+    */
+    
+    $(".modal-content").resizable({
+	stop: function(event, ui) {
+	    ui.element.css("margin-left", -ui.size.width/2);
+	    ui.element.css("left", "50%");
+	}
+    });
+    
+    
 }();
 
 

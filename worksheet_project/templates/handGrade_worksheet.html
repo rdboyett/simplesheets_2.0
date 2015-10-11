@@ -186,6 +186,89 @@
 			    </div>
 			</div>
 			
+			
+		    {% elif input.inputType == 'mathwork' %}
+			<div id="mathworkinput{{ input.id }}" class="highlight" readonly="readonly"
+				  data-options='{
+				    "answer_id":"{{ input.id }}",
+				    "question_number":"{{ input.questionNumber }}",
+				    "input_type":"{{ input.inputType }}",
+				    "points":"{{ input.points }}",
+				    "help_text":{% if input.helpText %}"{{ input.helpText }}"{% else %}""{% endif %},
+				    "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}'
+				    
+				  style="
+				    position: absolute;
+				    z-index: 1;
+				    left: {{ input.left }}%;
+				    top: {{ input.top }}%;
+				    width: {{ input.width }}%;
+				    height: {{ input.height }}%">
+			    <img src="{{ MEDIA_URL }}{{ input.workImagePath }}" />
+			    <div class="show_work btn btn-primary"
+				 style="z-index:
+				 1;
+				 position: absolute;
+				 left: 1%;
+				 bottom: 5px;
+				 font-size: 14px;
+				 text-align: center;
+				 cursor: pointer;">Grade<br>work here</div>
+			    <div class="reset-image btn btn-primary popovers"
+				 style="z-index:
+				 1;
+				 position: absolute;
+				 left: 45%;
+				 bottom: 5px;
+				 font-size: 14px;"
+				 onclick="resetImagePath('{{ input.id }}', '{{ MEDIA_URL }}{{ input.workImagePath }}')"
+				 data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover"
+				 data-content="reset work area"><span class="fa fa-reply"></span></div>
+			    <div class="work-button"
+				 style="z-index:
+				 1;
+				 position: absolute;
+				 right: 1%;
+				 bottom: 5px;
+				 text-align: center;
+				 width: 20%;"><span style="font-size: 12px;">MATH answer here</span>
+				<span id="input{{ input.id }}" class="answers highlight mathquill-editable"
+				       data-options='{
+				       "answer_id":"{{ input.id }}",
+				       "question_number":"{{ input.questionNumber }}",
+				       "input_type":"{{ input.inputType }}",
+				       "points":"{{ input.points }}",
+				       "help_text":{% if input.helpText %}"{{ input.helpText }}"{% else %}""{% endif %},
+				       "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}'
+				       style="background-color: #FFF !important;">
+				</span>
+		    <span id="editorBtn-input{{ input.id }}" class="editor-btn btn btn-success btn-xs" style="display: none;position: absolute;z-index: 1;left: 100%;top: 100%;margin: -20px 0 0 -45px;">editor</span>
+			    </div>
+			</div>
+			
+			
+			
+		    {% elif input.inputType == 'mathChem' %}
+			<span id="input{{ input.id }}" class="answers highlight mathquill-editable"
+			       data-options='{
+				"answer_id":"{{ input.id }}",
+				"question_number":"{{ input.questionNumber }}",
+				"input_type":"{{ input.inputType }}",
+				"points":"{{ input.points }}",
+				"help_text":{% if input.helpText %}"{{ input.helpText }}"{% else %}""{% endif %},
+				"help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}'
+			       
+			       style="
+				position: absolute;
+				z-index: 1;
+				left: {{ input.left }}%;
+				top: {{ input.top }}%;
+				width: {{ input.width }}%;
+				height: {{ input.height }}%">
+			</span>
+		<span id="editorBtn-input{{ input.id }}" class="editor-btn btn btn-success btn-xs" style="display: none;position: absolute;z-index: 1;left: {{ input.left|add:input.width }}%;top: {{ input.top|add:input.height }}%;margin-left: -45px;">editor</span>
+			    
+			
 		    {% elif input.inputType == 'drawing' %}
 			<div id="drawinginput{{ input.id }}" class="highlight" readonly="readonly"
 				  data-options='{
@@ -535,6 +618,35 @@
 			    $('#input{{ input.id }}').val('{{ myAnswer.myAnswer }}');
 			    {% endif %}
 			    
+			{% elif input.inputType == 'mathwork' %}
+			    {% if myAnswer.workImagePath %}
+			    $('#mathworkinput{{ input.id }} img').attr('src', '{{ MEDIA_URL }}{{ myAnswer.workImagePath }}');
+			    {% endif %}
+			    {% if myAnswer.myAnswer %}
+				if ("{{ myAnswer.myAnswer }}"=="") {
+				    console.log('empty answer');
+				    $('#input{{ input.id }}').mathquill('editable');
+				}else{
+				    console.log('non-empty answer');
+				    $('#input{{ input.id }}').mathquill('editable').mathquill('latex','{{ myAnswer.myAnswer }}');
+				}
+			    {% else %}
+				$('#input{{ input.id }}').mathquill('editable');
+			    {% endif %}
+			    
+			{% elif input.inputType == 'mathChem' %}
+			    {% if myAnswer.myAnswer %}
+				if ("{{ myAnswer.myAnswer }}"=="") {
+				    console.log('empty answer');
+				    $('#input{{ input.id }}').mathquill('editable');
+				}else{
+				    console.log('non-empty answer');
+				    $('#input{{ input.id }}').mathquill('editable').mathquill('latex','{{ myAnswer.myAnswer }}');
+				}
+			    {% else %}
+				$('#input{{ input.id }}').mathquill('editable');
+			    {% endif %}
+			    
 			{% elif input.inputType == 'drawing' %}
 			    {% if myAnswer.workImagePath %}
 			    $('#drawinginput{{ input.id }} img').attr('src', '{{ MEDIA_URL }}{{ myAnswer.workImagePath }}')
@@ -574,7 +686,7 @@
     </script>
     
     
-    <script src="{% static "adminBoot/js/edit_worksheets/handGrade_worksheet.js" %}?version=1"></script>
+    <script src="{% static "adminBoot/js/edit_worksheets/handGrade_worksheet.js" %}?version=2"></script>
     
     
   

@@ -3019,7 +3019,7 @@ fieldset[disabled] .btn-schoology.active {
 }
 
 .correctOutline {
-    border: 3px solid green;
+    border: 3px solid green !important;
     /* default fallback */
     background: rgb(26, 117, 12) transparent;
     /* nice browsers */
@@ -3032,7 +3032,7 @@ fieldset[disabled] .btn-schoology.active {
 
 
 .incorrectOutline {
-    border: 3px solid red;
+    border: 3px solid red !important;
     /* default fallback */
     background: rgb(255, 0, 0) transparent;
     /* nice browsers */
@@ -3158,13 +3158,27 @@ fieldset[disabled] .btn-schoology.active {
 }
 
 
+.ui-resizable-se {
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    right: 0px;
+    bottom: 0;
+}
 
+.modal-content{
+    overflow: hidden;
+}
 
+.modal-footer.resized{
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+}
 
-
-
-
-
-
-
+.ui-icon-gripsmall-diagonal-se{
+    background: url("../img/ui-icons.png") no-repeat;
+    background-position: -83px -227px;
+    cursor: se-resize;
+}
 

@@ -1,5 +1,5 @@
 $('document').ready(function(){
-    
+
     
 $( window ).resize(function() {
         resizeElements();
@@ -15,17 +15,10 @@ function resizeElements() {
 	
 	//console.log(fontPixels);
 	
-        $("#default_form input").css({
-                'font-size': fontPixels+'px',
-                'line-height': fontPixels+'px' 
-        });
-	$("#default_form textarea").css({
-                'font-size': fontPixels+'px',
-                'line-height': fontPixels+'px' 
-        });
-	$("#default_form select").css({
-                'font-size': fontPixels+'px',
-                'line-height': fontPixels+'px' 
+	$("#default_form textarea.answers").css({
+                'font-size': 25+'px',
+                'line-height': 25+'px',
+		'color':'#000',
         });
 	if (fontPixels2 < 12) {
 	    fontPixels2 = 12
@@ -34,6 +27,48 @@ function resizeElements() {
                 'font-size': fontPixels2+'px',
                 'line-height': fontPixels2+'px' 
         });
+	
+	
+	$("#default_form input.answers").each(function(){
+		//subtract 10px for padding
+		var height = $(this).height();
+		var font = height*.85;
+		$(this).css({
+			'font-size': font+'px',
+			'line-height': height+'px' 
+		});
+	});
+	
+	$("#default_form select.answers").each(function(){
+		//subtract 10px for padding
+		var height = $(this).height();
+		var font = height*.85;
+		$(this).css({
+			'font-size': font+'px',
+			'line-height': height+'px' 
+		});
+	});
+	
+	$("#default_form .mathquill-editable").each(function(){
+		
+		//subtract 10px for padding
+		var height = $(this).height();
+		var font = height*.5;
+		if (font<12) {
+			$(this).css({
+				'font-size': 12+'px',
+				'line-height': 1,
+				'padding':5+'px',
+			});
+		}else{
+			$(this).css({
+				'font-size': font+'px',
+				'line-height': 1,
+			});
+		}
+	});
+	
+	
 }
     
     resizeElements()
@@ -262,6 +297,40 @@ function makeImageAreaSelection() {
     });
     
     
+    $("#default_form").on('blur', '.answers.mathquill-editable', function () {
+        console.log("on change mathquill answers");
+        var elementID = $(this).attr('id');
+	$(this).next('.editor-btn').fadeOut(300);
+        //$("#savedSignal").show();
+        //setTimeout(function(){$("#savedSignal").hide();},3500);
+	changeAnswer(elementID);
+    });
+    $("#default_form").on('focus', '.answers.mathquill-editable', function () {
+	$(this).next('.editor-btn').fadeIn(300);
+    });
+    
+    $("#default_form").on('click','.editor-btn', function(){
+	$("#mathChemEditor-modal .modal-body").html("");
+	var latex = $(this).prev().mathquill('latex');
+	$("#mathChemEditorInputID").val($(this).prev().attr('id'));
+	console.log('from edit: '+latex);
+	$("#mathChemEditor-modal").modal('show');
+	
+	setTimeout(function(){ 
+		$("<div>"+latex+"</div>").mathquill('editable').appendTo("#mathChemEditor-modal .modal-body").mathquill('redraw').find('textarea').focus();
+	}, 500);
+    });
+    
+    $("#mathChemEditor-modal").on('click','#updateMathChem-btn', function(){
+	var latex = $("#mathChemEditor-modal .modal-body div").mathquill('latex');
+	var inputID = $("#mathChemEditorInputID").val();
+	console.log('from edit: '+latex);
+	$("#"+inputID).html(latex).mathquill('editable').mathquill('redraw');
+	$("#"+inputID+" textarea").focus();
+	$("#mathChemEditor-modal").modal('hide');
+	$("#tryTyping").html('');
+    });
+    
     /******************Change question Type****************************/
     $( "#questionType" ).change(function() {
 	changeQuestionType();
@@ -329,7 +398,13 @@ function makeImageAreaSelection() {
     
     $(".page_title").on('click','.questionTab-holder', function(){
         var data = $(this).data('options');
-        $("#input"+data.answer_id).focus();
+	var element = $("#input"+data.answer_id);
+        
+	if (element.data('options').input_type=='mathChem' || element.data('options').input_type=='mathwork') {
+		$("#input"+data.answer_id+" textarea").focus();
+	}else{
+		element.focus();
+	}
     });
     
     $(".page_title").on('click','.resize-icon', function(){
@@ -552,7 +627,10 @@ function changeAnswer(elementID) {
                 $('#showCheckbox').prop("checked", true);
             }
             else{$('#showCheckbox').prop("checked", false);}
-        }else{
+        }else if ($("#"+elementID).data("options").input_type=='mathwork' || $("#"+elementID).data("options").input_type=='mathChem') {
+	    var newCorrectAnswer = $('#'+elementID).mathquill('latex');
+	    newCorrectAnswer = newCorrectAnswer.replace(/\\/g, "\\\\");
+	}else{
             var newCorrectAnswer = $('#'+elementID).val();
         }
         console.log("correct answer with change: "+newCorrectAnswer);
@@ -580,10 +658,16 @@ function changeQuestionType() {
 	else if (inputType == 'work') {
 	    createWork(oldInputType, 'input'+inputNumber_id);
 	}
+	else if (inputType == 'mathwork') {
+	    createMathWork(oldInputType, 'input'+inputNumber_id);
+	}
+	else if (inputType == 'mathChem') {
+	    createMathChem(oldInputType, 'input'+inputNumber_id);
+	}
 	else if (inputType == 'drawing') {
 	    createDrawing(oldInputType, 'input'+inputNumber_id);
 	}
-	else if ((inputType == 'text' || inputType == 'number' || inputType == 'checkbox') && (oldInputType == 'textarea' || oldInputType == 'select' || oldInputType == 'work' || oldInputType == 'drawing')) {
+	else if ((inputType == 'text' || inputType == 'number' || inputType == 'checkbox') && (oldInputType == 'textarea' || oldInputType == 'select' || oldInputType == 'work' || oldInputType == 'mathwork' || oldInputType == 'mathChem' || oldInputType == 'drawing')) {
 	    //Re-create the default input type
 	    createDefaultInput(oldInputType, 'input'+inputNumber_id, inputType);
 	    /*
@@ -606,9 +690,11 @@ function changeQuestionType() {
     /****************************Create Inputs Area*********************************/
     function createTextarea(oldInputType, elementID) {
 	//get the important parts of element
-	if (oldInputType=="work") {
+        if (oldInputType=="work") {
             var testStyle = $('#work'+elementID).attr('style');
-        }else{var testStyle = $('#'+elementID).attr('style');}
+        }else if (oldInputType=="mathwork") {
+            var testStyle = $('#mathwork'+elementID).attr('style');
+	}else{var testStyle = $('#'+elementID).attr('style');}
 	
 	var data = $('#'+elementID).data("options");
 	var choice = [];
@@ -623,6 +709,7 @@ function changeQuestionType() {
 	//make the old input disappear
 	$('#'+elementID).remove();
 	$('#work'+elementID).remove();
+	$('#mathwork'+elementID).remove();
 	$('#drawing'+elementID).remove();
 	//$('#'+elementID).css("display","none");
 	//$('#'+elementID).attr('id','noShow');
@@ -652,9 +739,11 @@ function changeQuestionType() {
     
     function createSelect(oldInputType, elementID) {
 	//get the important parts of element
-	if (oldInputType=="work") {
+        if (oldInputType=="work") {
             var testStyle = $('#work'+elementID).attr('style');
-        }else{var testStyle = $('#'+elementID).attr('style');}
+        }else if (oldInputType=="mathwork") {
+            var testStyle = $('#mathwork'+elementID).attr('style');
+	}else{var testStyle = $('#'+elementID).attr('style');}
         
 	var data = $('#'+elementID).data("options");
 	var choice = [];
@@ -668,6 +757,7 @@ function changeQuestionType() {
 	//make the old input disappear
 	$('#'+elementID).remove();
 	$('#work'+elementID).remove();
+	$('#mathwork'+elementID).remove();
 	$('#drawing'+elementID).remove();
 	
 	//Now, create the textarea
@@ -687,11 +777,15 @@ function changeQuestionType() {
 	$('#'+elementID).focus();
         resizeElements();
     }
+    
+    
     function createWork(oldInputType, elementID) {
 	//get the important parts of element
         if (oldInputType=="work") {
             var testStyle = $('#work'+elementID).attr('style');
-        }else{var testStyle = $('#'+elementID).attr('style');}
+        }else if (oldInputType=="mathwork") {
+            var testStyle = $('#mathwork'+elementID).attr('style');
+	}else{var testStyle = $('#'+elementID).attr('style');}
         
 	var data = $('#'+elementID).data("options");
 	var choice = [];
@@ -705,6 +799,7 @@ function changeQuestionType() {
 	//make the old input disappear
 	$('#'+elementID).remove();
 	$('#drawing'+elementID).remove();
+	$('#mathwork'+elementID).remove();
 	
 	//Now, create the textarea
         var html = '<div id="work'+ elementID +'" class="highlight img-rounded" data-options="">'+
@@ -739,11 +834,118 @@ function changeQuestionType() {
     
     
     
+    function createMathWork(oldInputType, elementID) {
+	//get the important parts of element
+        if (oldInputType=="work") {
+            var testStyle = $('#work'+elementID).attr('style');
+        }else if (oldInputType=="mathwork") {
+            var testStyle = $('#mathwork'+elementID).attr('style');
+	}else{var testStyle = $('#'+elementID).attr('style');}
+        
+	var data = $('#'+elementID).data("options");
+	var choice = [];
+	for (var i=0;i<5;i++) {
+	    choice[i] = $('#'+elementID).data("choice"+(i+1));
+	    if (!choice[i]) {
+		choice[i] = $('#'+elementID).data("keyword"+(i+1));
+	    }
+	    //console.log("Create Work Choice "+(i+1)+" = "+choice[i]);
+	}
+	//make the old input disappear
+	$('#'+elementID).remove();
+	$('#drawing'+elementID).remove();
+	$('#work'+elementID).remove();
+	
+	//Now, create the textarea
+        var html = '<div id="mathwork'+ elementID +'" class="highlight img-rounded" data-options="">'+
+                        '<div class="work-button img-rounded" style="position:relative;top:40%;left:0;font-size: 20px;text-align: center;">Work Area will be activated for student use...<span style="font-size: 12px;">place MATH answer here.</span>'+
+                        '<span id="'+ elementID +'" class="answers highlight" data-options=""></span>'+
+                        '</div>'+
+                    '</div>'
+        
+        
+        
+        
+	$( "#default_form" ).append( html );
+        $('#mathwork'+elementID).attr('style',testStyle);
+        //$('#'+elementID).attr('data-options', '{"answer_id":"'+ options.answer_id + '", "question_number":"'+ options.question_number + '"}');
+	
+        $('#mathwork'+elementID).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"mathwork", "points":"'+data.points+'", "help_text":"'+data.help_text+'", "help_link":"'+data.help_link+'"}');
+	$('#'+elementID).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"mathwork", "points":"'+data.points+'", "help_text":"'+data.help_text+'", "help_link":"'+data.help_link+'"}');
+	$('#'+elementID).css({'backgroundColor':'#FFF',});
+	$('#'+elementID).mathquill('editable');
+	
+		for (var j=1; j<6; j++) {
+		    if (choice[j-1]) {
+			$('#'+elementID).data("choice"+j, choice[j-1]);
+			$('#'+elementID).data("keyword"+j, choice[j-1]);
+			//console.log("Choice"+j+" saved as: "+choice[j-1]);
+		    }
+		}
+	$('#'+elementID).focus();
+        resizeElements();
+        //setWorkImage(data.answer_id);
+        
+    }
+    
+    
+    
+    function createMathChem(oldInputType, elementID) {
+	//get the important parts of element
+        if (oldInputType=="work") {
+            var testStyle = $('#work'+elementID).attr('style');
+        }else if (oldInputType=="mathwork") {
+            var testStyle = $('#mathwork'+elementID).attr('style');
+	}else{var testStyle = $('#'+elementID).attr('style');}
+        
+	var data = $('#'+elementID).data("options");
+	var choice = [];
+	for (var i=0;i<5;i++) {
+	    choice[i] = $('#'+elementID).data("choice"+(i+1));
+	    if (!choice[i]) {
+		choice[i] = $('#'+elementID).data("keyword"+(i+1));
+	    }
+	    //console.log("Create Work Choice "+(i+1)+" = "+choice[i]);
+	}
+	//make the old input disappear
+	$('#'+elementID).remove();
+	$('#drawing'+elementID).remove();
+	$('#work'+elementID).remove();
+	$('#mathwork'+elementID).remove();
+	
+	//Now, create the textarea
+        var html = '<span id="'+ elementID +'" class="answers" data-options=""></span>'
+        
+        
+        
+        
+	$( "#default_form" ).append( html );
+        $('#'+elementID).attr('style',testStyle);
+	$('#'+elementID).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"mathChem", "points":"'+data.points+'", "help_text":"'+data.help_text+'", "help_link":"'+data.help_link+'"}');
+	$('#'+elementID).mathquill('editable');
+	
+		for (var j=1; j<6; j++) {
+		    if (choice[j-1]) {
+			$('#'+elementID).data("choice"+j, choice[j-1]);
+			$('#'+elementID).data("keyword"+j, choice[j-1]);
+			//console.log("Choice"+j+" saved as: "+choice[j-1]);
+		    }
+		}
+	$('#'+elementID).focus();
+        resizeElements();
+        //setWorkImage(data.answer_id);
+        
+    }
+    
+    
+    
     function createDrawing(oldInputType, elementID) {
 	//get the important parts of element
-	if (oldInputType=="work") {
+        if (oldInputType=="work") {
             var testStyle = $('#work'+elementID).attr('style');
-        }else{var testStyle = $('#'+elementID).attr('style');}
+        }else if (oldInputType=="mathwork") {
+            var testStyle = $('#mathwork'+elementID).attr('style');
+	}else{var testStyle = $('#'+elementID).attr('style');}
 	
 	var data = $('#'+elementID).data("options");
 	var choice = [];
@@ -757,6 +959,7 @@ function changeQuestionType() {
 	//make the old input disappear
 	$('#'+elementID).remove();
 	$('#work'+elementID).remove();
+	$('#mathwork'+elementID).remove();
 	$('#drawing'+elementID).remove();
 	//$('#'+elementID).css("display","none");
 	//$('#'+elementID).attr('id','noShow');
@@ -788,10 +991,13 @@ function changeQuestionType() {
     
     
     function createDefaultInput(oldInputType, elementID, inputType) {
+	console.log('oldInputType: '+oldInputType);
 	//get the important parts of element
         if (oldInputType=="work") {
             var testStyle = $('#work'+elementID).attr('style');
-        }else{var testStyle = $('#'+elementID).attr('style');}
+        }else if (oldInputType=="mathwork") {
+            var testStyle = $('#mathwork'+elementID).attr('style');
+	}else{var testStyle = $('#'+elementID).attr('style');}
         
 	var data = $('#'+elementID).data("options");
 	var choice = [];
@@ -805,6 +1011,7 @@ function changeQuestionType() {
 	//make the old input disappear
 	$('#'+elementID).remove();
 	$('#work'+elementID).remove();
+	$('#mathwork'+elementID).remove();
 	$('#drawing'+elementID).remove();
 	//$('#'+elementID).css("display","none");
 	//$('#'+elementID).attr('id','noShow');
@@ -1582,6 +1789,7 @@ $.ajaxSetup({
 			$("#questionTab"+inputNumber).parent().remove();
 			$("#input"+inputNumber).remove();
 			$("#workinput"+inputNumber).remove();
+			$("#mathworkinput"+inputNumber).remove();
 		    }
                 }
             };
@@ -1718,8 +1926,41 @@ $.ajaxSetup({
 	
 	
 	
+	
+	
+	
+	
+	
+	// Math Chem editor
+	$('#editor-tabs a').click(function (e) {
+		e.preventDefault()
+		$(this).tab('show')
+	})
+        
+	    
+	$("#mathTab button, #chemTab button").each(function(){
+	    $(this).popover();
+	});
         
         
-        
+	$("#mathTab button, #chemTab button").click(function(){
+		var latex = $(this).data('mathquill');
+		var tryTyping = $(this).data('trytyping');
+		
+		console.log(tryTyping);
+		$("#mathChemEditor-modal .modal-body div").mathquill('write',latex);
+		if ($("#mathChemEditor-modal .modal-body div .empty:first").length){
+			$("#mathChemEditor-modal .modal-body div .empty:first").mousedown().mouseup();
+		}else{
+			$("#mathChemEditor-modal .modal-body div textarea").focus();
+		}
+		$("#tryTyping").fadeOut(300, function(){
+			$("#tryTyping").html("Or try typing: <span class='text-danger'>"+tryTyping+"</span>").fadeIn(300);
+		});
+	});
+	
+	
+	
+	
         
 });  /****************** End of Ajax calls ***************************/
