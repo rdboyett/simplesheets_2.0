@@ -309,6 +309,11 @@ function resizeElements() {
         }else{
             var newCorrectAnswer = $('#'+elementID).val();
         }
+	
+	if (data.input_type=='textarea') {
+		newCorrectAnswer = newCorrectAnswer.replace(/[\r\n]/g, " ");
+		console.log('paragraph: '+data.input_type);
+	}
         
         
         sendStudentAnswer($(this), newCorrectAnswer, data);
