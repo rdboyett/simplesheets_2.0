@@ -1,0 +1,109 @@
+
+
+{% load staticfiles %}
+{% load userInfo_tags %}
+
+
+
+                    <table class="table table-bordered table-hover table-striped" data-options='{"className":"{{ classroom.name|title }}"}'>
+                      <thead>
+                        <!-------------------- Start of table headers -------------------------------------------->
+                        <tr class="" id="students-table-headers">
+                          <th class="col-xs-2 table-sort">
+                            <div id="sort-student">
+                              <span>Student</span>
+                            </div>
+                          </th>
+                          <th class="col-xs-2 table-sort">
+                            <div>
+                              <span>ID #</span>
+                            </div>
+                          </th>
+                          {% for question in currentProject.formInputs.all %}
+                          <th class="text-center">
+                            <div>
+                              <span>{{ question.questionNumber }}</span>
+                            </div>
+                          </th>
+                          {% endfor%}
+                          <th class="text-center">
+                            <div>
+                              <span>Avg.</span>
+                            </div>
+                          </th>
+                        </tr>
+                      </thead>
+                        <!-- ------------------------ End of table headers -------------------------------------------->
+                        
+                        <!------------------------ Start of Student --------------------------------------------------->
+                      <tbody class="student-table">
+                        {% if students %}
+                          {% for student in students %}
+                          <tr class="">
+                            <td class="col-xs-3">
+                              <a href="{% url "worksheet_project.views.handGrade" currentProject.id 1 classroom.id student.id %}"><strong>{{ student.user.last_name }}, {{ student.user.first_name }}</strong></a>
+                            </td>
+                            <td class="col-xs-3">
+                              {% if student.studentID %}{{ student.studentID }}{% endif %}
+                            </td>
+                            {% for myAnswer in student.user|myAnswers:currentProject %}
+                              
+                              {% if myAnswer == 'no answers'%}
+                                {% with total=currentProject.formInputs.all.count %}
+                                <td class="text-center" colspan="{{ total }}">
+                                  This student hasn't started yet.
+                                </td>
+                                {% endwith %}
+                              {% elif myAnswer.empty %}
+                                <td class="text-center">
+                                  <i class="fa fa-minus fa-lg"></i>
+                                </td>
+                              {% elif myAnswer.bCorrect %}
+                                <td class="text-center">
+                                  <i class="fa fa-check fa-lg text-success"></i>
+                                </td>
+                              {% else %}
+                                <td class="text-center">
+                                  <i class="fa fa-close fa-lg text-danger"></i>
+                                </td>
+                              {% endif %}
+                              
+                            {% endfor %}
+                                  {% if student.user|myGrade:currentProject == 'no grade' %}
+                                    <td class="text-center">
+                                      <i class="fa fa-minus fa-lg"></i>
+                                    </td>
+                                  {% else %}
+                                      {% if student.user|myGrade:currentProject >= 70 %}
+                                        <td class="text-center success">
+                                          <span>{{ student.user|myGrade:currentProject|floatformat:2 }}%</span>
+                                        </td>
+                                      {% else %}
+                                        <td class="text-center danger">
+                                          <span>{{ student.user|myGrade:currentProject|floatformat:2 }}%</span>
+                                        </td>
+                                      {% endif %}
+                                  {% endif %}
+                          </tr>
+                          {% endfor %}
+                        {% else %}
+                          <tr class="">
+                                {% with total=currentProject.formInputs.all.count|add:"2" %}
+                                <td class="text-center" colspan="{{ total }}">
+                                  Sorry, no students have joined this class yet.
+                                </td>
+                                {% endwith %}
+                          </tr>
+                        {% endif %}
+                      </tbody>
+                    </table>
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    

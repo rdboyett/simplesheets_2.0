@@ -450,7 +450,7 @@
 {% if students %}
 <!---------------- modal ------------------------------------->
 <div id="manage-students" class="modal fade" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content rounded">
       <div class="modal-header top-rounded">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
@@ -475,6 +475,11 @@
                           </td>
                           <td class="text-center">
                             <div>
+                              <span>Student School ID</span>
+                            </div>
+                          </td>
+                          <td class="text-center">
+                            <div>
                               <span>Actions</span>
                             </div>
                           </td>
@@ -485,20 +490,28 @@
                         <!------------------------ Start of Student --------------------------------------------------->
                       <tbody class="student-table">
                  {% for student in students %}
-                          <tr class="">
+                          <tr class="studentID-row" data-studentid="{{ student.id }}">
                             <td class="col-xs-3">
-                              <a href="{% url "worksheet_project.views.student_display" currentClass.id student.id %}"><strong class="text-primary">{{ student.user.last_name }}, {{ student.user.first_name }}</strong></a>
+                              <div class="col-xs-10">
+                                <a style="line-height: 34px;" class="studentNameLink" href="{% url "worksheet_project.views.student_display" currentClass.id student.id %}"><strong class="text-primary">{{ student.user.last_name }}, {{ student.user.first_name }}&nbsp;&nbsp;</strong></a>
+                                <input style="display: none;" type="text" class="studentNameInput form-control" value="{{ student.user.first_name }} {{ student.user.last_name }}">
+                              </div>
+                              <i style="cursor: pointer;line-height: 34px;" class="changeStudentName fa fa-rotate-left fa-lg text-danger" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover"
+                                  data-content="change student's name"></i>
                             </td>
                             <td class="col-xs-3">
-                              <strong>{{ student.user.username }}</strong>
+                              <strong style="line-height: 34px;">{{ student.user.username }}</strong>
                             </td>
                             <td class="col-xs-3">
-                                <span class="fa-stack fa-1x" style="cursor: pointer; margin-right: 10px;" data-toggle="popover" data-placement="bottom"
+                              <input type="text" class="form-control studentID-input" name="studentID" value="{{ student.studentID }}">
+                            </td>
+                            <td class="col-xs-3">
+                                <span class="fa-stack fa-1x" style="cursor: pointer; margin-right: 10px;line-height: 34px;" data-toggle="popover" data-placement="bottom"
                                       data-trigger="hover" data-content="change password">
                                   <i class="fa fa-rotate-left fa-stack-2x text-danger"></i>
-                                  <i class="fa fa-lock fa-stack-1x text-danger"  onclick="$('#reset-password-form .userID').val({{ student.id }});$('#reset-password').modal('show');"></i>
+                                  <i style="line-height: 28px;" class="fa fa-lock fa-stack-1x text-danger"  onclick="$('#reset-password-form .userID').val({{ student.id }});$('#reset-password').modal('show');"></i>
                                 </span>
-                                <span style="cursor: pointer;" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover"
+                                <span style="cursor: pointer;line-height: 34px;" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover"
                                   data-content="remove from class">
                                   <i class="fa fa-sign-out fa-lg text-danger" onclick="$('#remove-from-class-form .userID').val({{ student.id }});$('#remove-from-class').modal('show');"></i>
                                 </span>
@@ -509,6 +522,18 @@
                     </table>
                  
         </div>
+      </div>
+      <div class="modal-footer bottom-rounded">
+        <form id="lockStudentNames-form" action="{% url "userInfo_profile.views.lockStudentNames" %}" enctype='multipart/form-data' method="post" autocomplete="off">{% csrf_token %}
+          <input type="hidden" name="classID" value="{{ currentClass.id }}">
+          <div class="col-xs-12 col-sm-8 col-md-offset-2">
+            {% if students.0.lockedChanges %}
+              <button id="lockStudentNames-btn" type="submit" class="btn btn-block btn-lg btn-success rounded"><i class="fa fa-unlock"></i>  unlock all student names and id's</button>
+            {% else %}
+              <button id="lockStudentNames-btn" type="submit" class="btn btn-block btn-lg btn-danger rounded"><i class="fa fa-lock"></i>  lock all student names and id's</button>
+            {% endif %}
+          </div>
+        </form>
       </div>
     </div>
   </div>
@@ -647,7 +672,10 @@
 
 
 {% block extraScript %}
-  <script src="{% static "adminBoot/js/classes.js" %}?version=1"></script>
+  <script>
+    var studentInfoUpdateURL="{% url "userInfo_profile.views.studentInfoUpdate" %}";
+  </script>
+  <script src="{% static "adminBoot/js/classes.js" %}?version=2"></script>
   
   
     {% if error %}

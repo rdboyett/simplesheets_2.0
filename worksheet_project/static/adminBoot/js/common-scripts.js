@@ -384,6 +384,7 @@ jQuery.validator.addMethod("complete_url", function(val, elem) {
 	if (!$(this).data('originalHeight')) {
 	    $(this).css({"min-height":ui.size.height, "min-width":ui.size.width});
 	    $(this).data("originalHeight", $(this).height());
+	    $(this).data("originalWidth", $(this).width());
 	    $(this).find('.modal-footer').addClass('resized');
 	}
 	
@@ -399,7 +400,11 @@ jQuery.validator.addMethod("complete_url", function(val, elem) {
     
     $(".modal-content").resizable({
 	stop: function(event, ui) {
-	    ui.element.css("margin-left", -ui.size.width/2);
+	    if (ui.size.width<$(this).data('originalWidth')) {
+		ui.element.css("margin-left", -$(this).data('originalWidth')/2);
+	    }else{
+		ui.element.css("margin-left", -ui.size.width/2);
+	    }
 	    ui.element.css("left", "50%");
 	}
     });

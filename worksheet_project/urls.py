@@ -51,5 +51,6 @@ urlpatterns += patterns('worksheet_project.views',
     (r'^userSearch/$', 'userSearch'),
     
 
+    (r'^ajaxMonitor/$', 'ajaxMonitor'),
     (r'^test/$', 'test'),
 )

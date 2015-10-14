@@ -605,12 +605,14 @@ def monitor(request, projectID=False, classID=False):
     #get all the users in each class and store it in an object
     if classrooms:
         for currentClass in classrooms:
+            '''
             if ClassUser.objects.filter(classrooms__id=currentClass.id, teacher=False):
                 students = ClassUser.objects.filter(classrooms__id=currentClass.id, teacher=False)
                 classesAndStudents.append({'class':currentClass, 'students':students})
             else:
                 classesAndStudents.append({'class':currentClass})
-        
+            '''
+            classesAndStudents.append({'class':currentClass})
         if not classesAndStudents:
             classesAndStudents = 'no students'
             
@@ -653,6 +655,49 @@ def monitor(request, projectID=False, classID=False):
         
 
     return render_to_response(htmlPage, args)
+
+
+
+
+@login_required
+def ajaxMonitor(request, projectID=False, classID=False):
+    if request.method == 'POST':
+        projectID = request.POST["projectID"].strip()
+        classID = request.POST["classID"].strip()
+        
+        
+        if not classID or not projectID:
+            students = False
+            currentProject = False
+            classroom = False
+        else:
+            if Project.objects.filter(id=projectID):
+                currentProject = Project.objects.get(id=projectID)
+            else:
+                currentProject = False
+                
+            if Classroom.objects.filter(id=classID):
+                classroom = Classroom.objects.get(id=classID)
+            else:
+                classroom = False
+                
+            if ClassUser.objects.filter(classrooms=classroom, teacher=False):
+                students = ClassUser.objects.filter(classrooms=classroom, teacher=False)
+            else:
+                students = False
+            
+        args = {
+                "students":students,
+                "classroom":classroom,
+                "currentProject":currentProject
+            }
+        
+        return render_to_response('ajax_html/ajaxMonitor.html', args)
+    else:
+        return HttpResponse('Sorry, something went wrong.')
+
+
+
 
 
 
