@@ -315,7 +315,7 @@ def googleDriveGradeUpload(request):
                         row.append('"'+classroom.name.title()+'"')
                         if ClassUser.objects.filter(classrooms=classroom, teacher=False):
                             students = ClassUser.objects.filter(classrooms=classroom, teacher=False).order_by('user__last_name')
-                            row.append('"Students","ID #","Average"')
+                            row.append('"Students","ID","Average"')
                             for student in students:
                                 if MyGrade.objects.filter(project=project, userInfo__user=student.user):
                                     myGrade = MyGrade.objects.get(project=project, userInfo__user=student.user)
