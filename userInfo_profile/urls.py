@@ -9,4 +9,5 @@ urlpatterns = patterns('userInfo_profile.views',
     (r'^lockStudentNames/$', 'lockStudentNames'),
     
     (r'^googleDriveGradeUpload/$', 'googleDriveGradeUpload'),
+    (r'^csvDownload/$', 'csvDownload'),
 )

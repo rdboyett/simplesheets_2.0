@@ -17,8 +17,8 @@
               <h1 class="text-primary"><i class="fa fa-angle-double-right"></i>  {% if currentProject %}{{ currentProject.title|capfirst }}{%endif%}  <i class="fa fa-gears"></i></h1>
               </a>
           </span>
-              <button class="btn btn-default pull-right" id="download-btn" style="display: none;" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover"
-                  data-content="download all classes' grades">
+              <button class="btn btn-default pull-right" id="download-btn" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover"
+                  data-content="download all classes' grades" data-options='{"projectID":{% if currentProject %}{{ currentProject.id }}{%endif%}}'>
                 <i class="fa fa-download"></i>
               </button>
               <form id="uploadGoogleDriveGrades-form" action="{% url "userInfo_profile.views.googleDriveGradeUpload" %}" enctype='multipart/form-data' method="post" autocomplete="off">{% csrf_token %}
@@ -53,14 +53,15 @@
             
           <a href="{% url "worksheet_project.views.monitor" currentProject.id class.class.id %}" class="btn btn-primary pull-right" style="margin-top: -45px;">Live View</a>
           
-          <button class="btn btn-default pull-right downloadCSV-btn" style="margin: -45px 88px 0 0;display: none;" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover"
+          <button class="btn btn-default pull-right downloadCSV-btn" data-options='{"projectID":{{ currentProject.id }}, "classID":{{class.class.id}} }' style="margin: -45px 88px 0 0;display: none;" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover"
               data-content="download grades"><i class="fa fa-download"></i>
           </button>
         
 
     </div>
                 
-    <div id="collapse{{ class.class.id }}" class="panel-body collapse">
+    <div id="collapse{{ class.class.id }}" class="panel-body collapse text-center">
+      <i class="fa fa-refresh fa-5x faa-spin animated"></i>
       <div class="accordion-inner table-responsive">
                     <table class="table table-bordered table-hover table-striped" data-options='{"className":"{{ class.class|title }}"}'>
                       <thead>
@@ -69,11 +70,6 @@
                           <th class="col-xs-2 table-sort">
                             <div id="sort-student">
                               <span>Student</span>
-                            </div>
-                          </th>
-                          <th class="col-xs-2 table-sort">
-                            <div>
-                              <span>ID #</span>
                             </div>
                           </th>
                           {% for question in currentProject.formInputs.all %}
@@ -99,9 +95,6 @@
                           <tr class="">
                             <td class="col-xs-3">
                               <a href="{% url "worksheet_project.views.handGrade" currentProject.id 1 class.class.id student.id %}"><strong>{{ student.user.last_name }}, {{ student.user.first_name }}</strong></a>
-                            </td>
-                            <td class="col-xs-3">
-                              {% if student.studentID %}{{ student.studentID }}{% endif %}
                             </td>
                             {% for myAnswer in student.user|myAnswers:currentProject %}
                               
@@ -276,8 +269,9 @@
 {% block extraScript %}
     <script>
       var currentProjectTitle = "{{ currentProject.title }}";
-      var ajaxMonitorURL = "{% url "worksheet_project.views.ajaxMonitor" %}"
+      var ajaxMonitorURL = "{% url "worksheet_project.views.ajaxMonitor" %}";
+      var csvDownloadURL = "{% url "userInfo_profile.views.csvDownload" %}";
     </script>
-    <script type="text/javascript" src="{% static "adminBoot/js/monitor/html2CSV.js" %}?version=1"></script>
-    <script type="text/javascript" src="{% static "adminBoot/js/monitor/monitor.js" %}?version=2"></script>
+    <!--<script type="text/javascript" src="{% static "adminBoot/js/monitor/html2CSV.js" %}?version=1"></script>-->
+    <script type="text/javascript" src="{% static "adminBoot/js/monitor/monitor.js" %}?version=3"></script>
 {% endblock %}

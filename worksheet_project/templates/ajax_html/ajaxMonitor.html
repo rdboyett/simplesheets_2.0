@@ -14,11 +14,6 @@
                               <span>Student</span>
                             </div>
                           </th>
-                          <th class="col-xs-2 table-sort">
-                            <div>
-                              <span>ID #</span>
-                            </div>
-                          </th>
                           {% for question in currentProject.formInputs.all %}
                           <th class="text-center">
                             <div>
@@ -42,9 +37,6 @@
                           <tr class="">
                             <td class="col-xs-3">
                               <a href="{% url "worksheet_project.views.handGrade" currentProject.id 1 classroom.id student.id %}"><strong>{{ student.user.last_name }}, {{ student.user.first_name }}</strong></a>
-                            </td>
-                            <td class="col-xs-3">
-                              {% if student.studentID %}{{ student.studentID }}{% endif %}
                             </td>
                             {% for myAnswer in student.user|myAnswers:currentProject %}
                               

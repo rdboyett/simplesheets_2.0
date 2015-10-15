@@ -1,22 +1,53 @@
 $(document).ready(function(){
     
       $("#download-btn").click(function(){
+            /*
         $('table').table2CSV({
           documentName: currentProjectTitle+' grades.csv',
           delivery: 'download',
           header:['Student','ID #','Average']
         });
+        */
+            var $this = $(this);
+            var projectID = $this.data('options').projectID;
+            var filename = currentProjectTitle+' grades.csv';
+            
+            $.ajax({
+                  method: "POST",
+                  url: csvDownloadURL,
+                  data: { projectID:projectID, classID:'allClasses' },
+                  dataType: "text"
+            })
+                  .done(function( response ) {
+                        console.log(response);
+                        download(filename, response);
+                  });
+            
       });
       
       $(".downloadCSV-btn").click(function(){
-            var parent = $(this).parents('.panel-heading').next();
+            //var parent = $(this).parents('.panel-heading').next();
             var className = $(this).prev().prev().text();
-            
+            var projectID = $(this).data('options').projectID;
+            var classID = $(this).data('options').classID;
+            var filename = currentProjectTitle+' - '+className+' grades.csv';
+            /*
             parent.find('table').table2CSV({
                   documentName: currentProjectTitle+' - '+className+' grades.csv',
                   delivery: 'download',
                   header:['Student','ID #','Average']
             });
+            */
+            $.ajax({
+                  method: "POST",
+                  url: csvDownloadURL,
+                  data: { projectID:projectID, classID:classID },
+                  dataType: "text"
+            })
+                  .done(function( response ) {
+                        console.log(response);
+                        download(filename, response);
+                  });
       });
     
       $(function () {
@@ -69,6 +100,7 @@ $(document).ready(function(){
             if ($this.hasClass('unloaded')) {
                   var tableHolder = $(this).next().children('div');
                   tableHolder.hide();
+                  var spinner = $(this).next().children('.faa-spin');
                   var classID = $(this).data('options').classID;
                   var projectID = $(this).data('options').projectID;
                         
@@ -80,7 +112,8 @@ $(document).ready(function(){
                   })
                         .done(function( response ) {
                             console.log(response);
-                            tableHolder.html(response).fadeIn(300);
+                            tableHolder.html(response)
+                            spinner.fadeOut(300, function(){tableHolder.fadeIn(300);});
                             $this.removeClass('unloaded');
                             $this.find('button').fadeIn(300);
                             $("#download-btn").fadeIn(300);
@@ -140,4 +173,18 @@ $.ajaxSetup({
         }
     }
 });
+
+
+    function download(filename, text) {
+        var pom = document.createElement('a');
+        pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+        pom.setAttribute('download', filename);
+      
+        pom.style.display = 'none';
+        document.body.appendChild(pom);
+      
+        pom.click();
+      
+        document.body.removeChild(pom);
+    }
 

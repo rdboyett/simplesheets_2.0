@@ -258,6 +258,55 @@ def lockStudentNames(request):
 
 
 
+@login_required
+def csvDownload(request):
+    if request.method == 'POST':
+        projectID =request.POST["projectID"].strip()
+        classID =request.POST["classID"].strip()
+        
+        if ClassUser.objects.filter(user=request.user, teacher=True):
+            if Project.objects.filter(id=projectID):
+                project = Project.objects.get(id=projectID)
+                
+                if classID == 'allClasses':
+                    if Classroom.objects.filter(worksheets=project):
+                        classrooms = Classroom.objects.filter(worksheets=project).order_by('id')
+                        
+                        for classroom in classrooms:
+                            if ClassUser.objects.filter(classrooms=classroom, teacher=False):
+                                students = ClassUser.objects.filter(classrooms=classroom, teacher=False).order_by('user__last_name', 'user__first_name')
+                            else:
+                                students = False
+                    else:
+                        students = False
+                else:
+                    if Classroom.objects.filter(id=classID):
+                        classroom = Classroom.objects.get(id=classID)
+                        
+                        if ClassUser.objects.filter(classrooms=classroom, teacher=False):
+                            students = ClassUser.objects.filter(classrooms=classroom, teacher=False).order_by('user__last_name', 'user__first_name')
+                        else:
+                            students = False
+                    else:
+                        students = False
+                    
+            else:
+                students = False
+        else:
+            students = False
+
+        args = {
+                "students":students,
+                "currentProject":project,
+            }
+        
+        return render_to_response('csvDownload.txt', args)
+    else:
+        return HttpResponse('Sorry, something went wrong.')
+
+
+
+
 
 @login_required
 def googleDriveGradeUpload(request):
@@ -280,9 +329,12 @@ def googleDriveGradeUpload(request):
                             for student in students:
                                 if MyGrade.objects.filter(project=project, userInfo__user=student.user):
                                     myGrade = MyGrade.objects.get(project=project, userInfo__user=student.user)
-                                    row.append('"'+ student.user.last_name +', '+ student.user.first_name +'","'+student.studentID+'","{0:.2f}%'.format(round(myGrade.average),2) +'"')
+                                    if student.studentID:
+                                        row.append('"'+ student.user.last_name +', '+ student.user.first_name +'","'+student.studentID+'","{0:.2f}%'.format(round(myGrade.average),2) +'"')
+                                    else:
+                                        row.append('"'+ student.user.last_name +', '+ student.user.first_name +'","--no id--","{0:.2f}%'.format(round(myGrade.average),2) +'"')
                                 else:
-                                    row.append('"'+ student.user.last_name +', '+ student.user.first_name +'","no grade"')
+                                    row.append('"'+ student.user.last_name +', '+ student.user.first_name +'","*"')
                     
                     FILENAME = makeCSV(request.user, row ,project.title.title()+' grades')
                     
