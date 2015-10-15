@@ -264,6 +264,7 @@ def csvDownload(request):
         projectID =request.POST["projectID"].strip()
         classID =request.POST["classID"].strip()
         
+        students = []
         if ClassUser.objects.filter(user=request.user, teacher=True):
             if Project.objects.filter(id=projectID):
                 project = Project.objects.get(id=projectID)
@@ -274,26 +275,15 @@ def csvDownload(request):
                         
                         for classroom in classrooms:
                             if ClassUser.objects.filter(classrooms=classroom, teacher=False):
-                                students = ClassUser.objects.filter(classrooms=classroom, teacher=False).order_by('user__last_name', 'user__first_name')
-                            else:
-                                students = False
-                    else:
-                        students = False
+                                tempStudents = ClassUser.objects.filter(classrooms=classroom, teacher=False).order_by('user__last_name', 'user__first_name')
+                                students.extend(tempStudents)
                 else:
                     if Classroom.objects.filter(id=classID):
                         classroom = Classroom.objects.get(id=classID)
                         
                         if ClassUser.objects.filter(classrooms=classroom, teacher=False):
                             students = ClassUser.objects.filter(classrooms=classroom, teacher=False).order_by('user__last_name', 'user__first_name')
-                        else:
-                            students = False
-                    else:
-                        students = False
-                    
-            else:
-                students = False
-        else:
-            students = False
+                        
 
         args = {
                 "students":students,
