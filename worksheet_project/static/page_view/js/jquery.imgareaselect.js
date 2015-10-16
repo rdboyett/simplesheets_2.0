@@ -621,11 +621,13 @@ $.imgAreaSelect = function (img, options) {
         $actionBtn.width(135);
         $actionBtn.css({ position: 'absolute', cursor: 'default' });
         
+        
         //.append($actionBtn)
             
         $box.append($area.add($border).add($areaOpera)).append($handles);
         
         $('body').append($actionBtn);
+        hide($actionBtn);
         
         //$box.append('<div class="actionBtns">test this here</div>');
 
