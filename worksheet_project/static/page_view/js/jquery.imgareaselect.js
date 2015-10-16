@@ -182,9 +182,10 @@ $.imgAreaSelect = function (img, options) {
         $($outer[3]).css({ left: left + selection.x1, top: top + selection.y2,
             width: w, height: imgHeight - selection.y2 });
         
-        var actionBtnW = w - $actionBtn.outerWidth();
+        var actionBtnLeft = left + selection.x1 + w - $actionBtn.outerWidth();
+        var actionBtnTop = top + selection.y2;
         //var actionBtnH = h - $actionBtn.outerHeight();
-        $actionBtn.css({ left: actionBtnW, top: h });
+        $actionBtn.css({ left: actionBtnLeft, top: actionBtnTop });
         
         w -= $handles.outerWidth();
         h -= $handles.outerHeight();
@@ -415,8 +416,10 @@ $.imgAreaSelect = function (img, options) {
 
         resize = '';
 
-        if (!$outer.is(':visible'))
+        if (!$outer.is(':visible')) {
             $box.add($outer).hide().fadeIn(options.fadeSpeed||0);
+            $actionBtn.hide().fadeIn(600);
+        }
 
         shown = true;
 
@@ -431,6 +434,7 @@ $.imgAreaSelect = function (img, options) {
         $(document).unbind('mousemove', startSelection)
             .unbind('mouseup', cancelSelection);
         hide($box.add($outer));
+        $actionBtn.fadeOut(300);
 
         setSelection(selX(x1), selY(y1), selX(x1), selY(y1));
 
@@ -612,13 +616,16 @@ $.imgAreaSelect = function (img, options) {
         if (o = options.borderColor2)
             $($border[1]).css({ borderStyle: 'dashed', borderColor: o });
 
-        $actionBtn.html('<div class="row"><div class="col-xs-12"><div id="createSelection" class="btn btn-success btn-xs pull-right" style="margin-top:5px;"><i class="fa fa-check"></i>  create</div><div id="cancelSelection" class="btn btn-default btn-xs pull-right" style="margin-right:5px;margin-top:5px;"><i class="fa fa-ban text-danger"></i>  cancel</div></div></div>');
+        $actionBtn.html('<div id="createSelection" class="btn btn-success btn-xs pull-right" style="margin-top:5px;"><i class="fa fa-check"></i>  create</div><div id="cancelSelection" class="btn btn-default btn-xs pull-right" style="margin-right:5px;margin-top:5px;"><i class="fa fa-ban text-danger"></i>  cancel</div>');
         $actionBtn.addClass('actionBtns');
-        $actionBtn.width(200);
-        $actionBtn.css({ position: 'absolute' });
+        $actionBtn.width(135);
+        $actionBtn.css({ position: 'absolute', cursor: 'default' });
         
+        //.append($actionBtn)
             
-        $box.append($area.add($border).add($areaOpera)).append($handles).append($actionBtn);
+        $box.append($area.add($border).add($areaOpera)).append($handles);
+        
+        $('body').append($actionBtn);
         
         //$box.append('<div class="actionBtns">test this here</div>');
 
@@ -629,11 +636,13 @@ $.imgAreaSelect = function (img, options) {
                 $border.css('opacity', o[1]/100);
         }
 
-        if (newOptions.hide)
+        if (newOptions.hide){
             hide($box.add($outer));
-        else if (newOptions.show && imgLoaded) {
+            hide($actionBtn);
+        }else if (newOptions.show && imgLoaded) {
             shown = true;
             $box.add($outer).fadeIn(options.fadeSpeed||0);
+            $actionBtn.fadeIn(options.fadeSpeed||0);
             doUpdate();
         }
 
