@@ -117,7 +117,7 @@
 				    "question_number":"{{ input.questionNumber }}",
 				    "input_type":"{{ input.inputType }}",
 				    "points":"{{ input.points }}",
-				    "help_text":{% if input.helpText %}"{{ input.helpText }}"{% else %}""{% endif %},
+				    "help_text":"",
 				    "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}'
 				  style="resize: none;
 				    position: absolute;
@@ -136,7 +136,7 @@
 				    "question_number":"{{ input.questionNumber }}",
 				    "input_type":"{{ input.inputType }}",
 				    "points":"{{ input.points }}",
-				    "help_text":{% if input.helpText %}"{{ input.helpText }}"{% else %}""{% endif %},
+				    "help_text":"",
 				    "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}'
 				    
 				  style="
@@ -180,7 +180,7 @@
 				       "question_number":"{{ input.questionNumber }}",
 				       "input_type":"{{ input.inputType }}",
 				       "points":"{{ input.points }}",
-				       "help_text":{% if input.helpText %}"{{ input.helpText }}"{% else %}""{% endif %},
+				       "help_text":"",
 				       "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}' type="text"
 				       style="width:70%;" title="answer..." name="">
 			    </div>
@@ -194,7 +194,7 @@
 				    "question_number":"{{ input.questionNumber }}",
 				    "input_type":"{{ input.inputType }}",
 				    "points":"{{ input.points }}",
-				    "help_text":{% if input.helpText %}"{{ input.helpText }}"{% else %}""{% endif %},
+				    "help_text":"",
 				    "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}'
 				    
 				  style="
@@ -238,7 +238,7 @@
 				       "question_number":"{{ input.questionNumber }}",
 				       "input_type":"{{ input.inputType }}",
 				       "points":"{{ input.points }}",
-				       "help_text":{% if input.helpText %}"{{ input.helpText }}"{% else %}""{% endif %},
+				       "help_text":"",
 				       "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}'
 				       style="background-color: #FFF !important;">
 				</span>
@@ -255,7 +255,7 @@
 				"question_number":"{{ input.questionNumber }}",
 				"input_type":"{{ input.inputType }}",
 				"points":"{{ input.points }}",
-				"help_text":{% if input.helpText %}"{{ input.helpText }}"{% else %}""{% endif %},
+				"help_text":"",
 				"help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}'
 			       
 			       style="
@@ -276,7 +276,7 @@
 				    "question_number":"{{ input.questionNumber }}",
 				    "input_type":"{{ input.inputType }}",
 				    "points":"{{ input.points }}",
-				    "help_text":{% if input.helpText %}"{{ input.helpText }}"{% else %}""{% endif %},
+				    "help_text":"",
 				    "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}'
 				    
 				  style="
@@ -315,7 +315,7 @@
 				    "question_number":"{{ input.questionNumber }}",
 				    "input_type":"{{ input.inputType }}",
 				    "points":"{{ input.points }}",
-				    "help_text":{% if input.helpText %}"{{ input.helpText }}"{% else %}""{% endif %},
+				    "help_text":"",
 				    "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}'
 				style="
 				    position: absolute;
@@ -347,7 +347,7 @@
 				"question_number":"{{ input.questionNumber }}",
 				"input_type":"{{ input.inputType }}",
 				"points":"{{ input.points }}",
-				"help_text":{% if input.helpText %}"{{ input.helpText }}"{% else %}""{% endif %},
+				"help_text":"",
 				"help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}'
 			       type="{{ input.inputType }}" title='answer...'
 			       name=""
@@ -366,7 +366,7 @@
 				"question_number":"{{ input.questionNumber }}",
 				"input_type":"{{ input.inputType }}",
 				"points":"{{ input.points }}",
-				"help_text":{% if input.helpText %}"{{ input.helpText }}"{% else %}""{% endif %},
+				"help_text":"",
 				"help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}'
 			       type="{{ input.inputType }}" title='answer...'
 			       value="" name=""
@@ -380,22 +380,6 @@
 			    
 		    {% endif %}
 		    
-		    {% if input.helpText or input.helpLink %}
-		    <div id="help{{ input.id }}" class="helpQuestionMark popovers" data-container="body"
-			data-toggle="popover" data-placement="bottom" data-trigger="hover"
-			data-content="help">
-			<span class="fa fa-question-circle text-danger"></span>
-		    </div>
-		    <script>
-			$("#input{{ input.id }}").data('bCorrect','incorrect');
-			$("#help{{ input.id }}").attr('data-options','{"help_text":{% if input.helpText %}"{{ input.helpText }}"{% else %}""{% endif %}, "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}');
-			var left = parseFloat({{ input.left }})+parseFloat({{ input.width }})+.5;
-			$("#help{{ input.id }}").css({
-			    'left':left+'%',
-			    'top':'{{ input.top }}%',
-			});
-		    </script>
-		    {% endif %}
 		    
 		{% endifequal %}
 	    {% endfor %}
@@ -594,7 +578,7 @@
 		{% for myAnswer in myAnswers %}
 		    {% ifequal myAnswer.answer.id input.id %}
 			{% if input.inputType == 'textarea' %}
-			    $('#input{{ input.id }}').val('{{ myAnswer.myAnswer }}');
+			    $('#input{{ input.id }}').val('{{ myAnswer.myAnswer|escapejs }}');
 			    {% if myAnswer.bCorrect %}
 			    $("#input{{ input.id }}").data('bCorrect','correct').addClass('correctOutline');
 			    {% elif myAnswer.partialCredit > 0 %}
@@ -615,7 +599,7 @@
 			    $('#workinput{{ input.id }} img').attr('src', '{{ MEDIA_URL }}{{ myAnswer.workImagePath }}')
 			    {% endif %}
 			    {% if myAnswer.myAnswer %}
-			    $('#input{{ input.id }}').val('{{ myAnswer.myAnswer }}');
+			    $('#input{{ input.id }}').val('{{ myAnswer.myAnswer|escapejs }}');
 			    {% endif %}
 			    
 			{% elif input.inputType == 'mathwork' %}
@@ -661,7 +645,7 @@
 			    $('#input{{ input.id }}').prop("checked", {% if myAnswer.myAnswer == "true" %}{{ myAnswer.myAnswer }}{%else%}false{%endif%});
 				    
 			{% else %}
-			    $('#input{{ input.id }}').val('{{ myAnswer.myAnswer }}');
+			    $('#input{{ input.id }}').val('{{ myAnswer.myAnswer|escapejs }}');
 			{% endif %}
 		    {% endifequal %}
 		{% endfor %}
@@ -686,7 +670,7 @@
     </script>
     
     
-    <script src="{% static "adminBoot/js/edit_worksheets/handGrade_worksheet.js" %}?version=2"></script>
+    <script src="{% static "adminBoot/js/edit_worksheets/handGrade_worksheet.js" %}?version=3"></script>
     
     
   

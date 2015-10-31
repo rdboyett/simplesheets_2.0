@@ -84,7 +84,7 @@
 				    "question_number":"{{ input.questionNumber }}",
 				    "input_type":"{{ input.inputType }}",
 				    "points":"{{ input.points }}",
-				    "help_text":{% if input.helpText %}"{{ input.helpText }}"{% else %}""{% endif %},
+				    "help_text":"",
 				    "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}'
 				  style="resize: none;
 				    position: absolute;
@@ -96,6 +96,11 @@
 			    <div id="textareaOverlay{{ input.id }}" class="show_work btn btn-primary"
 				 style="display: none;position: absolute; z-index: 1; left: {{ input.left }}%; top: {{ input.top|add:input.height }}%;"></div>
 			
+			<script>
+			    {% if input.helpText %}
+				$('#input{{ input.id }}').data('options').help_text = "{{ input.helpText|escapejs }}";
+			    {% endif %}
+			</script>
 		    {% elif input.inputType == 'work' %}
 			<div id="workinput{{ input.id }}" class="highlight" readonly="readonly"
 				  data-options='{
@@ -103,7 +108,7 @@
 				    "question_number":"{{ input.questionNumber }}",
 				    "input_type":"{{ input.inputType }}",
 				    "points":"{{ input.points }}",
-				    "help_text":{% if input.helpText %}"{{ input.helpText }}"{% else %}""{% endif %},
+				    "help_text":"",
 				    "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}'
 				    
 				  style="
@@ -147,12 +152,17 @@
 				       "question_number":"{{ input.questionNumber }}",
 				       "input_type":"{{ input.inputType }}",
 				       "points":"{{ input.points }}",
-				       "help_text":{% if input.helpText %}"{{ input.helpText }}"{% else %}""{% endif %},
+				       "help_text":"",
 				       "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}' type="text"
 				       style="width:70%;" title="answer..." name="">
 			    </div>
 			</div>
 			
+			<script>
+			    {% if input.helpText %}
+				$('#workinput{{ input.id }}').data('options').help_text = "{{ input.helpText|escapejs }}";
+			    {% endif %}
+			</script>
 			
 		    {% elif input.inputType == 'mathwork' %}
 			<div id="mathworkinput{{ input.id }}" class="highlight" readonly="readonly"
@@ -161,7 +171,7 @@
 				    "question_number":"{{ input.questionNumber }}",
 				    "input_type":"{{ input.inputType }}",
 				    "points":"{{ input.points }}",
-				    "help_text":{% if input.helpText %}"{{ input.helpText }}"{% else %}""{% endif %},
+				    "help_text":"",
 				    "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}'
 				    
 				  style="
@@ -205,7 +215,7 @@
 				       "question_number":"{{ input.questionNumber }}",
 				       "input_type":"{{ input.inputType }}",
 				       "points":"{{ input.points }}",
-				       "help_text":{% if input.helpText %}"{{ input.helpText }}"{% else %}""{% endif %},
+				       "help_text":"",
 				       "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}'
 				       style="background-color: #FFF !important;">
 				</span>
@@ -214,6 +224,11 @@
 			</div>
 			
 			
+			<script>
+			    {% if input.helpText %}
+				$('#mathworkinput{{ input.id }}').data('options').help_text = "{{ input.helpText|escapejs }}";
+			    {% endif %}
+			</script>
 			
 		    {% elif input.inputType == 'mathChem' %}
 			<span id="input{{ input.id }}" class="answers highlight mathquill-editable"
@@ -222,7 +237,7 @@
 				"question_number":"{{ input.questionNumber }}",
 				"input_type":"{{ input.inputType }}",
 				"points":"{{ input.points }}",
-				"help_text":{% if input.helpText %}"{{ input.helpText }}"{% else %}""{% endif %},
+				"help_text":"",
 				"help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}'
 			       
 			       style="
@@ -236,6 +251,11 @@
 		<span id="editorBtn-input{{ input.id }}" class="editor-btn btn btn-success btn-xs" style="display: none;position: absolute;z-index: 1;left: {{ input.left|add:input.width }}%;top: {{ input.top|add:input.height }}%;margin-left: -45px;">editor</span>
 			    
 			
+			<script>
+			    {% if input.helpText %}
+				$('#input{{ input.id }}').data('options').help_text = "{{ input.helpText|escapejs }}";
+			    {% endif %}
+			</script>
 		    {% elif input.inputType == 'drawing' %}
 			<div id="drawinginput{{ input.id }}" class="highlight" readonly="readonly"
 				  data-options='{
@@ -243,7 +263,7 @@
 				    "question_number":"{{ input.questionNumber }}",
 				    "input_type":"{{ input.inputType }}",
 				    "points":"{{ input.points }}",
-				    "help_text":{% if input.helpText %}"{{ input.helpText }}"{% else %}""{% endif %},
+				    "help_text":"",
 				    "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}'
 				    
 				  style="
@@ -275,6 +295,11 @@
 			    
 			</div>
 			
+			<script>
+			    {% if input.helpText %}
+				$('#drawinginput{{ input.id }}').data('options').help_text = "{{ input.helpText|escapejs }}";
+			    {% endif %}
+			</script>
 			
 		    {% elif input.inputType == 'select' %}
 			<select id="input{{ input.id }}" class="answers highlight"
@@ -283,7 +308,7 @@
 				    "question_number":"{{ input.questionNumber }}",
 				    "input_type":"{{ input.inputType }}",
 				    "points":"{{ input.points }}",
-				    "help_text":{% if input.helpText %}"{{ input.helpText }}"{% else %}""{% endif %},
+				    "help_text":"",
 				    "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}'
 				style="
 				    position: absolute;
@@ -308,6 +333,11 @@
 			    {% endif %}
 			</select>
 			
+			<script>
+			    {% if input.helpText %}
+				$('#input{{ input.id }}').data('options').help_text = "{{ input.helpText|escapejs }}";
+			    {% endif %}
+			</script>
 		    {% elif input.inputType == 'checkbox' %}
 			<input id="input{{ input.id }}" class="answers highlight"
 			       data-options='{
@@ -315,7 +345,7 @@
 				"question_number":"{{ input.questionNumber }}",
 				"input_type":"{{ input.inputType }}",
 				"points":"{{ input.points }}",
-				"help_text":{% if input.helpText %}"{{ input.helpText }}"{% else %}""{% endif %},
+				"help_text":"",
 				"help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}'
 			       type="{{ input.inputType }}" title='answer...'
 			       name=""
@@ -327,6 +357,11 @@
 				width: {{ input.width }}%;
 				height: {{ input.height }}%">
 			    
+			<script>
+			    {% if input.helpText %}
+				$('#input{{ input.id }}').data('options').help_text = "{{ input.helpText|escapejs }}";
+			    {% endif %}
+			</script>
 		    {% else %}
 			<input id="input{{ input.id }}" class="answers highlight"
 			       data-options='{
@@ -334,7 +369,7 @@
 				"question_number":"{{ input.questionNumber }}",
 				"input_type":"{{ input.inputType }}",
 				"points":"{{ input.points }}",
-				"help_text":{% if input.helpText %}"{{ input.helpText }}"{% else %}""{% endif %},
+				"help_text":"",
 				"help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}'
 			       type="{{ input.inputType }}" title='answer...'
 			       value="" name=""
@@ -346,6 +381,11 @@
 				width: {{ input.width }}%;
 				height: {{ input.height }}%">
 			    
+			<script>
+			    {% if input.helpText %}
+				$('#input{{ input.id }}').data('options').help_text = "{{ input.helpText|escapejs }}";
+			    {% endif %}
+			</script>
 		    {% endif %}
 		    
 		    {% if input.helpText or input.helpLink %}
@@ -356,13 +396,18 @@
 		    </div>
 		    <script>
 			$("#input{{ input.id }}").data('bCorrect','incorrect');
-			$("#help{{ input.id }}").attr('data-options','{"help_text":{% if input.helpText %}"{{ input.helpText }}"{% else %}""{% endif %}, "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}');
+			$("#help{{ input.id }}").attr('data-options','{"help_text":"", "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}');
 			var left = parseFloat({{ input.left }})+parseFloat({{ input.width }})+.5;
 			$("#help{{ input.id }}").css({
 			    'left':left+'%',
 			    'top':'{{ input.top }}%',
 			});
 		    </script>
+			<script>
+			    {% if input.helpText %}
+				$('#help{{ input.id }}').data('options').help_text = "{{ input.helpText|escapejs }}";
+			    {% endif %}
+			</script>
 		    {% endif %}
 		    
 		{% endifequal %}
@@ -425,7 +470,7 @@
 		    {% for myAnswer in myAnswers %}
 			{% ifequal myAnswer.answer.id input.id %}
 			    {% if input.inputType == 'textarea' %}
-				$('#input{{ input.id }}').val('{{ myAnswer.myAnswer }}');
+				$('#input{{ input.id }}').val('{{ myAnswer.myAnswer|escapejs }}');
 				{% if myAnswer.bCorrect %}
 				    {% if myGrade %}$("#input{{ input.id }}").data('bCorrect','correct').addClass('correctOutline');{%endif%}
 				{% elif myAnswer.partialCredit > 0 %}
@@ -453,7 +498,7 @@
 			    $('#workinput{{ input.id }} img').attr('src', '{{ MEDIA_URL }}{{ myAnswer.workImagePath }}')
 			    {% endif %}
 			    {% if myAnswer.myAnswer %}
-			    $('#input{{ input.id }}').val('{{ myAnswer.myAnswer }}');
+			    $('#input{{ input.id }}').val('{{ myAnswer.myAnswer|escapejs }}');
 			    {% endif %}
 			    
 			{% elif input.inputType == 'mathwork' %}
@@ -514,7 +559,7 @@
 			    {% endif %}
 				    
 			{% elif input.inputType == 'textarea' %}
-			    $('#input{{ input.id }}').val('{{ myAnswer.myAnswer }}');
+			    $('#input{{ input.id }}').val('{{ myAnswer.myAnswer|escapejs }}');
 			    {% if myAnswer.bCorrect %}
 				$("#input{{ input.id }}").data('bCorrect','correct');
 				{% if myGrade %}
@@ -532,7 +577,7 @@
 			    {% endif %}
 			    
 			{% else %}
-			    $('#input{{ input.id }}').val('{{ myAnswer.myAnswer }}');
+			    $('#input{{ input.id }}').val('{{ myAnswer.myAnswer|escapejs }}');
 			{% endif %}
 			{% endifequal %}
 		    {% endfor %}

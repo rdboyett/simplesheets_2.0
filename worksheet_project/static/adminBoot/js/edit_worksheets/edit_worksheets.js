@@ -679,7 +679,7 @@ function changeQuestionType() {
 	    $('#input'+inputNumber_id).get(0).type = inputType;
 	    var data = $('#input'+inputNumber_id).data("options");
 	    $('#input'+inputNumber_id).data("options").input_type = inputType;
-	    $('#input'+inputNumber_id).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"'+inputType+'", "points":"'+data.points+'", "help_text":"'+data.help_text+'", "help_link":"'+data.help_link+'"}');
+	    $('#input'+inputNumber_id).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"'+inputType+'", "points":"'+data.points+'", "help_text":"", "help_link":"'+data.help_link+'"}');
 	}
 	$('#input'+inputNumber_id).focus();
 }
@@ -720,7 +720,7 @@ function changeQuestionType() {
         $('#'+elementID).attr('style',testStyle);
         //$('#'+elementID).attr('data-options', '{"answer_id":"'+ options.answer_id + '", "question_number":"'+ options.question_number + '"}');
 	
-	$('#'+elementID).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"textarea", "points":"'+data.points+'", "help_text":"'+data.help_text+'", "help_link":"'+data.help_link+'"}');
+	$('#'+elementID).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"textarea", "points":"'+data.points+'", "help_text":"", "help_link":"'+data.help_link+'"}');
 	
 		for (var j=1; j<6; j++) {
 		    if (choice[j-1]) {
@@ -774,7 +774,7 @@ function changeQuestionType() {
 		    }
 		}
 	
-	$('#'+elementID).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"select", "points":"'+data.points+'", "help_text":"'+data.help_text+'", "help_link":"'+data.help_link+'"}');
+	$('#'+elementID).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"select", "points":"'+data.points+'", "help_text":"", "help_link":"'+data.help_link+'"}');
 	
 	$('#'+elementID).focus();
         resizeElements();
@@ -819,8 +819,8 @@ function changeQuestionType() {
         $('#work'+elementID).attr('style',testStyle);
         //$('#'+elementID).attr('data-options', '{"answer_id":"'+ options.answer_id + '", "question_number":"'+ options.question_number + '"}');
 	
-        $('#work'+elementID).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"work", "points":"'+data.points+'", "help_text":"'+data.help_text+'", "help_link":"'+data.help_link+'"}');
-	$('#'+elementID).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"work", "points":"'+data.points+'", "help_text":"'+data.help_text+'", "help_link":"'+data.help_link+'"}');
+        $('#work'+elementID).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"work", "points":"'+data.points+'", "help_text":"", "help_link":"'+data.help_link+'"}');
+	$('#'+elementID).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"work", "points":"'+data.points+'", "help_text":"", "help_link":"'+data.help_link+'"}');
 	
 		for (var j=1; j<6; j++) {
 		    if (choice[j-1]) {
@@ -875,8 +875,8 @@ function changeQuestionType() {
         $('#mathwork'+elementID).attr('style',testStyle);
         //$('#'+elementID).attr('data-options', '{"answer_id":"'+ options.answer_id + '", "question_number":"'+ options.question_number + '"}');
 	
-        $('#mathwork'+elementID).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"mathwork", "points":"'+data.points+'", "help_text":"'+data.help_text+'", "help_link":"'+data.help_link+'"}');
-	$('#'+elementID).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"mathwork", "points":"'+data.points+'", "help_text":"'+data.help_text+'", "help_link":"'+data.help_link+'"}');
+        $('#mathwork'+elementID).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"mathwork", "points":"'+data.points+'", "help_text":"", "help_link":"'+data.help_link+'"}');
+	$('#'+elementID).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"mathwork", "points":"'+data.points+'", "help_text":"", "help_link":"'+data.help_link+'"}');
 	$('#'+elementID).css({'backgroundColor':'#FFF',});
 	$('#'+elementID).mathquill('editable');
 	
@@ -935,7 +935,7 @@ function changeQuestionType() {
         
 	$( "#default_form" ).append( html );
         $('#'+elementID).attr('style',testStyle);
-	$('#'+elementID).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"mathChem", "points":"'+data.points+'", "help_text":"'+data.help_text+'", "help_link":"'+data.help_link+'"}');
+	$('#'+elementID).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"mathChem", "points":"'+data.points+'", "help_text":"", "help_link":"'+data.help_link+'"}');
 	$('#'+elementID).mathquill('editable');
 	console.log(testStyle);
 	console.log(editorStyle);
@@ -990,7 +990,7 @@ function changeQuestionType() {
         $('#drawing'+elementID).attr('style',testStyle.split('height')[0]+'text-align: center;');
         //$('#'+elementID).attr('data-options', '{"answer_id":"'+ options.answer_id + '", "question_number":"'+ options.question_number + '"}');
 	
-	$('#'+elementID).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"drawing", "points":"'+data.points+'", "help_text":"'+data.help_text+'", "help_link":"'+data.help_link+'"}');
+	$('#'+elementID).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"drawing", "points":"'+data.points+'", "help_text":"", "help_link":"'+data.help_link+'"}');
 	
 		for (var j=1; j<6; j++) {
 		    if (choice[j-1]) {
@@ -1040,7 +1040,7 @@ function changeQuestionType() {
         $('#'+elementID).attr('style',testStyle);
         //$('#'+elementID).attr('data-options', '{"answer_id":"'+ options.answer_id + '", "question_number":"'+ options.question_number + '"}');
 	
-	$('#'+elementID).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"'+inputType+'", "points":"'+data.points+'", "help_text":"'+data.help_text+'", "help_link":"'+data.help_link+'"}');
+	$('#'+elementID).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"'+inputType+'", "points":"'+data.points+'", "help_text":"", "help_link":"'+data.help_link+'"}');
 	
 		for (var j=1; j<6; j++) {
 		    if (choice[j-1]) {
@@ -1067,7 +1067,7 @@ function changePoints() {
         updatePoints(parseInt(inputNumber_id), parseInt(newPoints));
         
 	$('#input'+inputNumber_id).data("options").points = newPoints;
-	$('#input'+inputNumber_id).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"'+data.input_type+'", "points":"'+newPoints+'", "help_text":"'+data.help_text+'", "help_link":"'+data.help_link+'"}');
+	$('#input'+inputNumber_id).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"'+data.input_type+'", "points":"'+newPoints+'", "help_text":"", "help_link":"'+data.help_link+'"}');
 }
 
 function synchronizeCheckbox() {
@@ -1122,13 +1122,13 @@ function changeHelpLink(helpID) {
                 updateHelpLink(parseInt(inputNumber_id), newHelpLink);
                 
 		$('#input'+inputNumber_id).data("options").help_link = newHelpLink;
-		$('#input'+inputNumber_id).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"'+data.input_type+'", "points":"'+data.points+'", "help_text":"'+data.help_text+'", "help_link":"'+newHelpLink+'"}');
+		$('#input'+inputNumber_id).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"'+data.input_type+'", "points":"'+data.points+'", "help_text":"", "help_link":"'+newHelpLink+'"}');
 		//console.log("isValid");
 	    }else{
 		$("#"+helpID).attr('style','background-color:#F8E0E0; color:red;');
 		newHelpLink = "Not a Valid URL";
 		$('#input'+inputNumber_id).data("options").help_link = newHelpLink;
-		$('#input'+inputNumber_id).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"'+data.input_type+'", "points":"'+data.points+'", "help_text":"'+data.help_text+'", "help_link":"'+newHelpLink+'"}');
+		$('#input'+inputNumber_id).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"'+data.input_type+'", "points":"'+data.points+'", "help_text":"", "help_link":"'+newHelpLink+'"}');
 		//console.log("Not Valid");
 	    }
 	}else{
@@ -1137,7 +1137,7 @@ function changeHelpLink(helpID) {
             updateHelpLink(parseInt(inputNumber_id), newHelpLink);
                 
 	    $('#input'+inputNumber_id).data("options").help_link = newHelpLink;
-	    $('#input'+inputNumber_id).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"'+data.input_type+'", "points":"'+data.points+'", "help_text":"'+data.help_text+'", "help_link":"'+newHelpLink+'"}');
+	    $('#input'+inputNumber_id).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"'+data.input_type+'", "points":"'+data.points+'", "help_text":"", "help_link":"'+newHelpLink+'"}');
 		
 	}
 	*/
@@ -1722,7 +1722,7 @@ $.ajaxSetup({
 		    else{
 		    
 			$("#input"+ data.inputNumber).data("options").question_number = data.newQuestionNumber;
-			$("#input"+ data.inputNumber).attr('data-options', '{"answer_id":"'+ data.inputNumber + '", "question_number":"'+ data.newQuestionNumber + '", "input_type":"'+ data.inputType +'", "points":"'+data.points+'", "help_text":"'+data.help_text+'", "help_link":"'+data.help_link+'"}');
+			$("#input"+ data.inputNumber).attr('data-options', '{"answer_id":"'+ data.inputNumber + '", "question_number":"'+ data.newQuestionNumber + '", "input_type":"'+ data.inputType +'", "points":"'+data.points+'", "help_text":"", "help_link":"'+data.help_link+'"}');
 			//alert(data.inputNumber);
 			
 			//update questionTab

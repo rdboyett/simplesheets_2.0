@@ -20,17 +20,10 @@ function resizeElements() {
 	
 	//console.log(fontPixels);
 	
-        $("#default_form input").css({
-                'font-size': fontPixels+'px',
-                'line-height': fontPixels+'px' 
-        });
-	$("#default_form textarea").css({
-                'font-size': fontPixels+'px',
-                'line-height': fontPixels+'px' 
-        });
-	$("#default_form select").css({
-                'font-size': fontPixels+'px',
-                'line-height': fontPixels+'px' 
+	$("#default_form textarea.answers").css({
+                'font-size': 25+'px',
+                'line-height': 25+'px',
+		'color':'#000',
         });
 	if (fontPixels2 < 12) {
 	    fontPixels2 = 12
@@ -39,6 +32,48 @@ function resizeElements() {
                 'font-size': fontPixels2+'px',
                 'line-height': fontPixels2+'px' 
         });
+	
+	
+	$("#default_form input.answers").each(function(){
+		//subtract 10px for padding
+		var height = $(this).height();
+		var font = height*.85;
+		$(this).css({
+			'font-size': font+'px',
+			'line-height': height+'px' 
+		});
+	});
+	
+	$("#default_form select.answers").each(function(){
+		//subtract 10px for padding
+		var height = $(this).height();
+		var font = height*.85;
+		$(this).css({
+			'font-size': font+'px',
+			'line-height': height+'px' 
+		});
+	});
+	
+	$("#default_form .mathquill-editable").each(function(){
+		
+		//subtract 10px for padding
+		var height = $(this).height();
+		var font = height*.5;
+		if (font<12) {
+			$(this).css({
+				'font-size': 12+'px',
+				'line-height': 1,
+				'padding':5+'px',
+			});
+		}else{
+			$(this).css({
+				'font-size': font+'px',
+				'line-height': 1,
+			});
+		}
+	});
+	
+	
 }
     
     resizeElements()
