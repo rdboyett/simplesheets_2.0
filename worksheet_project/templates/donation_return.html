@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+
+{% block title %}Payment{% endblock %}
+
+
+{% block extraBottomHead %}
+  <link href="{% static "index/css/pricing.css" %}?version=1" rel="stylesheet">
+{% endblock %}
+
+
+{% block body %}
+
+
+
+  <div id="main-region" class="mt">
+      <div class="row">
+	<div class="col-xs-12">
+          
+          
+          <div class="showback">
+	    <div id="topImage-01" class="bg1">
+              <div class="row">
+                  <div id="profile-float-photo">
+                    <img {% if googleUserInfo %}
+                          src="{{ googleUserInfo.googleAvatar }}"
+                        {% else %}
+                          src="{% static "main_project/images/default_avatar.png" %}"
+                        {% endif %}
+                          alt="User photo" class="img-thumbnail img-circle">
+                      
+                  </div>
+                </div> <!-- end of row -->
+            </div>
+	    <div id="profile-01" class="noBg" style="margin-top: 10px;">
+                <div class="row">
+                  <div class="col-xs-12 text-center">
+		    
+		    <h1 class="text-primary">Thank You So Much!!!</h1>
+		    <img src="{% static "adminBoot/img/awesome.gif"%}" alt="So Awesome">
+		    <h1 class="text-primary">You are AWESOME!</h1>
+		</div> <!-- end of profile-01 -->
+          </div> <!-- end of showback -->
+          
+          
+            
+        </div>
+            
+      </div>
+  </div> <!-- end of main-region -->
+        
+        
+        
+
+{% endblock %}  <!-- end of body block -->
+
+
+
+
+
+
+
+
+
+

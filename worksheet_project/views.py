@@ -1279,6 +1279,71 @@ def paypalReturn(request):
 
 
 
+@login_required
+@csrf_exempt
+def thankYouDonation(request):
+        if UserInfo.objects.filter(user=request.user):
+            userInfo = UserInfo.objects.get(user=request.user)
+        else:
+            userInfo = False
+            
+        #if there is a google account
+        if GoogleUserInfo.objects.filter(user=request.user):
+            googleUserInfo = GoogleUserInfo.objects.get(user=request.user)
+        else:
+            googleUserInfo = False
+            
+        #check if teacher or student is set
+        if not userInfo.teacher_student:
+            teacherStudent = False
+        else:
+            teacherStudent = True
+            
+        #Get all users Classes
+        if ClassUser.objects.filter(user=request.user):
+            classUser = ClassUser.objects.get(user=request.user)
+        else:
+            if userInfo.teacher_student == 'teacher':
+                teacher = True
+            else:
+                teacher = False
+            classUser = ClassUser.objects.create(
+                user = request.user,
+                teacher = teacher,
+            )
+            
+        
+            
+        #Get all users Class
+        if classUser.classrooms.all():
+            allClasses = classUser.classrooms.all().order_by('name')
+        else:
+            allClasses = False
+        
+        
+        
+        
+        args = {
+                "profile":True,
+                "user":request.user,
+                "userInfo":userInfo,
+                "googleUserInfo":googleUserInfo,
+                "teacherStudent":teacherStudent,
+                "classUser":classUser,
+                "allClasses":allClasses,
+                "bPaidUp":True,
+            }
+        args.update(csrf(request))
+            
+        return render_to_response('donation_return.html', args)
+            
+
+
+
+
+
+
+
 
 
 
