@@ -295,6 +295,7 @@ function resizeElements() {
 	columnIndex = 5;
 	
 	var serverAverage = $('#averageBlock').html();
+	var serverPointsPossible = $('#pointsPossibleBlock').html();
 	
 	// Set all the elements with that index in a tr red
 	//$('table tr td:nth-child(' + columnIndex + ')').css("color", "#F00");
@@ -308,7 +309,7 @@ function resizeElements() {
 			totalQuestions++;
 		}
 	});
-	var average = parseFloat(parseFloat(totalScore)/parseFloat(totalQuestions)*100).toFixed(2);
+	var average = parseFloat(parseFloat(totalScore)/parseFloat(serverPointsPossible)*100).toFixed(2);
 	var newAverage = parseFloat(parseFloat(average) + parseFloat(extraCredit)).toFixed(2);
 	var endingPoints = parseFloat(totalScore).toFixed(2);
 	console.log("total score: "+parseFloat(totalScore));

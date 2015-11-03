@@ -42,7 +42,8 @@ from django.dispatch import receiver
 from worksheet_project import settings
 
 
-#this is commited again
+import logging
+log = logging.getLogger(__name__)
 
 
 def loginRedirect(request):
@@ -391,8 +392,10 @@ def handGrade(request, projectID=False, pageNumber=False, classID=False, student
         if MyGrade.objects.filter(project=newProject, userInfo=studentUserInfo, highestGrade=True):
             myGrade = MyGrade.objects.filter(project=newProject, userInfo=studentUserInfo, highestGrade=True).order_by('-dateTime')[0]
             #Check if the average was calculated incorrectly
+            log.info(myGrade.average)
             if (myGrade.average + myGrade.extraCredit) > (100 + myGrade.extraCredit):
                 newAverage = float(float(myGrade.pointsEarned)/float(myGrade.pointsPossible)*float(100))
+                log.info("here is new average: "+newAverage)
                 myGrade.average = newAverage+myGrade.extraCredit
                 myGrade.save()
         else:
