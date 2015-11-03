@@ -1,6 +1,7 @@
 {% extends "base_worksheet.html" %}
 {% load staticfiles %}
 {% load my_tags %}
+{% load worksheet_creator_tags %}
 
 
 {% block title %}{{ newProject.title|capfirst }}{% endblock %}
@@ -456,7 +457,19 @@
                         {% if answer.myAnswer == 'option4' %}{{ answer.answer.option4 }}{% endif %}
                 {% elif answer.answer.inputType == "checkbox" %}
 		    {% if answer.myAnswer == 'true' %}Checked{% else %}Not Checked{% endif %}
-		{% else %}
+                {% elif answer.answer.inputType == "mathwork" %}
+		    {% if answer.myAnswer != "" %}
+                    <span class="mathquill-embedded-latex">{{ answer.myAnswer|subtractSlash }}</span>
+		    {% else %}
+			no answer
+		    {% endif %}
+                {% elif answer.answer.inputType == "mathChem" %}
+		    {% if answer.myAnswer != "" %}
+                    <span class="mathquill-embedded-latex">{{ answer.myAnswer|subtractSlash }}</span>
+		    {% else %}
+			no answer
+		    {% endif %}
+                {% else %}
 		    {{ answer.myAnswer }}
 		{% endif %}
 		</td>
@@ -471,7 +484,19 @@
                 {% elif answer.answer.inputType == "checkbox" %}
 		    {% if answer.answer.correctAnswer == "true" %}Checked{% endif %}
 		    {% if answer.answer.correctAnswer == null %}Not Checked{% endif %}
-		{% else %}
+                {% elif answer.answer.inputType == "mathwork" %}
+		    {% if answer.answer.correctAnswer != "" %}
+                    <span class="mathquill-embedded-latex">{{ answer.answer.correctAnswer|subtractSlash }}</span>
+		    {% else %}
+			no answer
+		    {% endif %}
+                {% elif answer.answer.inputType == "mathChem" %}
+		    {% if answer.answer.correctAnswer != "" %}
+                    <span class="mathquill-embedded-latex">{{ answer.answer.correctAnswer|subtractSlash }}</span>
+		    {% else %}
+			no answer
+		    {% endif %}
+                {% else %}
 		    {{ answer.answer.correctAnswer }}
 		{% endif %}
 		</td>
@@ -670,7 +695,7 @@
     </script>
     
     
-    <script src="{% static "adminBoot/js/edit_worksheets/handGrade_worksheet.js" %}?version=4"></script>
+    <script src="{% static "adminBoot/js/edit_worksheets/handGrade_worksheet.js" %}?version=5"></script>
     
     
   

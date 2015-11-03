@@ -1033,6 +1033,9 @@ function showGradeColors() {
 	 
 	if (pageNumber_ajax<2) {
 		$("#changeGrade-modal").modal('show');
+		setTimeout(function(){ 
+			$("#changeGrade-modal .mathquill-embedded-latex").mathquill('redraw');
+		}, 500);
 	}
 	
 
