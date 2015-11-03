@@ -390,6 +390,11 @@ def handGrade(request, projectID=False, pageNumber=False, classID=False, student
         #Get my grade for this project (if there is one)
         if MyGrade.objects.filter(project=newProject, userInfo=studentUserInfo, highestGrade=True):
             myGrade = MyGrade.objects.filter(project=newProject, userInfo=studentUserInfo, highestGrade=True).order_by('-dateTime')[0]
+            #Check if the average was calculated incorrectly
+            if (myGrade.average + myGrade.extraCredit) > (100 + myGrade.extraCredit):
+                newAverage = float(float(myGrade.pointsEarned)/float(myGrade.pointsPossible)*float(100))
+                myGrade.average = newAverage+myGrade.extraCredit
+                myGrade.save()
         else:
             myGrade = False
         

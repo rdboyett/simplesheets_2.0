@@ -49,9 +49,17 @@ def myGrade(user, project):
         userInfo = UserInfo.objects.filter(user=user)
         if MyGrade.objects.filter(project=project, userInfo=userInfo, highestGrade=True):
             if MyGrade.objects.filter(project=project, userInfo=userInfo, highestGrade=True).count() > 1:
-                return MyGrade.objects.filter(project=project, userInfo=userInfo, highestGrade=True)[0].average
+                myGradeReturn = MyGrade.objects.filter(project=project, userInfo=userInfo, highestGrade=True)[0]
             else:
-                return MyGrade.objects.get(project=project, userInfo=userInfo, highestGrade=True).average
+                myGradeReturn = MyGrade.objects.get(project=project, userInfo=userInfo, highestGrade=True)
+                
+            #Check if the average was calculated incorrectly
+            if (myGradeReturn.average + myGradeReturn.extraCredit) > (100 + myGradeReturn.extraCredit):
+                newAverage = float(float(myGradeReturn.pointsEarned)/float(myGradeReturn.pointsPossible)*float(100))
+                myGradeReturn.average = newAverage+myGradeReturn.extraCredit
+                myGradeReturn.save()
+                
+            return myGradeReturn.average
         else:
             return 'no grade'
     else:
