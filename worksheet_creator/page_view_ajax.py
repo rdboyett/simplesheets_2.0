@@ -809,9 +809,7 @@ def sendStudentAnswer(request):
         projectID = request.POST["project_id"].strip()
         myAnswer = request.POST["answer"].strip()
         classID = request.POST["classID"].strip()
-        
-        myAnswer = myAnswer.strip()
-        myAnswer = myAnswer.lower()
+
         
         if UserInfo.objects.filter(id=userInfo_id):
             userInfo = UserInfo.objects.get(id=userInfo_id)
@@ -828,7 +826,14 @@ def sendStudentAnswer(request):
                 data = {
                     'error': "There is no question with ID: "+str(answerID),
                 }
-                
+
+            #Having a problem with Math and Chem answer types with answers being lowercase
+            #We should get rid of the lowercase for all answers and just lowercase for grading.
+            if question.inputType == 'mathChem' or question.inputType == "mathwork":
+                myAnswer = myAnswer.strip()
+            else:
+                myAnswer = myAnswer.strip().lower()
+
             if question.correctAnswer == myAnswer:
                 bCorrect = True
                 data = {'answer':"correct"}
