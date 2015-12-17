@@ -681,10 +681,11 @@ def changeWorksheetName(request):
                             oldProject.numberOfRetry = numberOfRetry
                             
                         oldProject.save()
-                            
-                        drive_service = get_service(request.user)
-                        
-                        rename_google_file(drive_service, oldProject.uploadedFileID, oldProject.title)
+
+                        if oldProject.uploadedFileID:
+                            drive_service = get_service(request.user)
+
+                            rename_google_file(drive_service, oldProject.uploadedFileID, oldProject.title)
                             
                         data = {
                             'success': "success",
