@@ -1187,7 +1187,7 @@ def forceGradeWorksheet(request):
                     for question in project.formInputs.all().order_by('pageNumber'):  #question is a FormInput
                         #get myAnswer for this question
                         if MyAnswer.objects.filter(project=project, userInfo=userInfo, answer=question):
-                            myAnswer = MyAnswer.objects.get(project=project, userInfo=userInfo, answer=question)
+                            myAnswer = MyAnswer.objects.filter(project=project, userInfo=userInfo, answer=question)[0]
                             
                             pointsPossible += float(question.points)
                             if not question.inputType == 'textarea':
