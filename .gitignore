@@ -19,6 +19,7 @@
 *.sqlite3
 logfile
 logfile.*
+.idea/
  
 # OS generated files #
 ######################

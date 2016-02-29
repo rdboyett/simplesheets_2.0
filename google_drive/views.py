@@ -89,7 +89,12 @@ def google_picker(request):
     if GoogleUserInfo.objects.filter(user=request.user):
         googleUser = GoogleUserInfo.objects.get(user=request.user)
         today = datetime.date.today()
-        yearAgo = datetime.date(today.year - 1, today.month, today.day)
+        try:
+            yearAgo = datetime.date(today.year - 1, today.month, today.day)
+        except:
+            #This is for leap year (Feb 29th does not exist last year)
+            yearAgo = datetime.date(today.year - 1, today.month, today.day-2)
+
         yearAgo = yearAgo.strftime("%Y-%m-%d")+'T12:00:00'
         
         drive_service = get_service(request.user)
