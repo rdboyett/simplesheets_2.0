@@ -1536,7 +1536,7 @@ def ipnProcessing(sender, **kwargs):
 
 
 def verifyGoogle(request):
-    return render_to_response('googleae943400297db25e.html')
+    return render_to_response('googlec038507091ab1984.html')
 
 
 
