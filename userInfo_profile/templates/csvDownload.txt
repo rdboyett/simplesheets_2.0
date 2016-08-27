@@ -1,0 +1,4 @@
+{% load staticfiles %}{% load userInfo_tags %}{% if students %}Last Name,First Name,ID
+{% for student in students %}{{ student.user.last_name|capfirst }},{{ student.user.first_name|capfirst }},{% if student.studentID %}{{ student.studentID }}{%else%}--no id--{% endif %},{% if student.user|myGrade:currentProject == 'no grade' %}*{% else %}{{ student.user|myGrade:currentProject|floatformat:0 }}{% endif %}
+{% endfor %}
+{% endif %}

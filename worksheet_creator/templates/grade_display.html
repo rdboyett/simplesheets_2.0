@@ -1,4 +1,4 @@
-
+{% load worksheet_creator_tags %}
 {% if not error %}
     <div>You have completed this e-sheet {{ myGrade.timesGraded }} time{{ myGrade.timesGraded|pluralize }}.</div>
     <br>
@@ -22,6 +22,8 @@
                 <td class="text-center">Multiple Choice</td>
                 {% elif answer.answer.inputType == "textarea" %}
                 <td class="text-center">Paragraph</td>
+                {% elif answer.answer.inputType == "mathwork" %}
+                <td class="text-center">Math</td>
                 {% else %}
                 <td class="text-center">{{ answer.answer.inputType|capfirst }}</td>
                 {% endif %}
@@ -37,6 +39,18 @@
                         {% if answer.myAnswer == 'option4' %}{{ answer.answer.option4 }}{% endif %}
                     {% elif answer.answer.inputType == "checkbox" %}
                         {% if answer.myAnswer == 'true' %}Checked{% else %}Not Checked{% endif %}
+                    {% elif answer.answer.inputType == "mathwork" %}
+			{% if answer.myAnswer != "" %}
+                        <span class="mathquill-embedded-latex">{{ answer.myAnswer|subtractSlash }}</span>
+			{% else %}
+			    no answer
+			{% endif %}
+                    {% elif answer.answer.inputType == "mathChem" %}
+			{% if answer.myAnswer != "" %}
+                        <span class="mathquill-embedded-latex">{{ answer.myAnswer|subtractSlash }}</span>
+			{% else %}
+			    no answer
+			{% endif %}
                     {% else %}
                         {{ answer.myAnswer }}
                     {% endif %}

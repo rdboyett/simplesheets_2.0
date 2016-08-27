@@ -46,15 +46,14 @@ urlpatterns += patterns('worksheet_project.views',
     (r'^handGrade/(?P<projectID>(\d+))/$', 'handGrade'),
     (r'^pay/$', 'initiatePayment'),
     (r'^paypalReturn/$', 'paypalReturn'),
-    (r'^googleae943400297db25e.html/$', 'verifyGoogle'),
+    (r'^googlec038507091ab1984.html/$', 'verifyGoogle'),
     (r'^teacherConvert/$', 'teacherConvert'),
     (r'^userSearch/$', 'userSearch'),
-    
-    
     #ajax loads
     (r'^getFolder/$', 'getFolder'),
     (r'^getFolder/(?P<folderID>(\d+))/$', 'getFolder'),
-    
 
+    (r'^thankYouDonation/$', 'thankYouDonation'),
+    (r'^ajaxMonitor/$', 'ajaxMonitor'),
     (r'^test/$', 'test'),
 )

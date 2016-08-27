@@ -1,5 +1,5 @@
 $('document').ready(function(){
-    
+
     
 $( window ).resize(function() {
         resizeElements();
@@ -15,17 +15,10 @@ function resizeElements() {
 	
 	//console.log(fontPixels);
 	
-        $("#default_form input").css({
-                'font-size': fontPixels+'px',
-                'line-height': fontPixels+'px' 
-        });
-	$("#default_form textarea").css({
-                'font-size': fontPixels+'px',
-                'line-height': fontPixels+'px' 
-        });
-	$("#default_form select").css({
-                'font-size': fontPixels+'px',
-                'line-height': fontPixels+'px' 
+	$("#default_form textarea.answers").css({
+                'font-size': 25+'px',
+                'line-height': 25+'px',
+		'color':'#000',
         });
 	if (fontPixels2 < 12) {
 	    fontPixels2 = 12
@@ -34,6 +27,48 @@ function resizeElements() {
                 'font-size': fontPixels2+'px',
                 'line-height': fontPixels2+'px' 
         });
+	
+	
+	$("#default_form input.answers").each(function(){
+		//subtract 10px for padding
+		var height = $(this).height();
+		var font = height*.85;
+		$(this).css({
+			'font-size': font+'px',
+			'line-height': height+'px' 
+		});
+	});
+	
+	$("#default_form select.answers").each(function(){
+		//subtract 10px for padding
+		var height = $(this).height();
+		var font = height*.85;
+		$(this).css({
+			'font-size': font+'px',
+			'line-height': height+'px' 
+		});
+	});
+	
+	$("#default_form .mathquill-editable").each(function(){
+		
+		//subtract 10px for padding
+		var height = $(this).height();
+		var font = height*.5;
+		if (font<12) {
+			$(this).css({
+				'font-size': 12+'px',
+				'line-height': 1,
+				'padding':5+'px',
+			});
+		}else{
+			$(this).css({
+				'font-size': font+'px',
+				'line-height': 1,
+			});
+		}
+	});
+	
+	
 }
     
     resizeElements()
@@ -262,6 +297,40 @@ function makeImageAreaSelection() {
     });
     
     
+    $("#default_form").on('blur', '.answers.mathquill-editable', function () {
+        console.log("on change mathquill answers");
+        var elementID = $(this).attr('id');
+	$(this).next('.editor-btn').fadeOut(300);
+        //$("#savedSignal").show();
+        //setTimeout(function(){$("#savedSignal").hide();},3500);
+	changeAnswer(elementID);
+    });
+    $("#default_form").on('focus', '.answers.mathquill-editable', function () {
+	$(this).next('.editor-btn').fadeIn(300);
+    });
+    
+    $("#default_form").on('click','.editor-btn', function(){
+	$("#mathChemEditor-modal .modal-body").html("");
+	var latex = $(this).prev().mathquill('latex');
+	$("#mathChemEditorInputID").val($(this).prev().attr('id'));
+	console.log('from edit: '+latex);
+	$("#mathChemEditor-modal").modal('show');
+	
+	setTimeout(function(){ 
+		$("<div>"+latex+"</div>").mathquill('editable').appendTo("#mathChemEditor-modal .modal-body").mathquill('redraw').find('textarea').focus();
+	}, 500);
+    });
+    
+    $("#mathChemEditor-modal").on('click','#updateMathChem-btn', function(){
+	var latex = $("#mathChemEditor-modal .modal-body div").mathquill('latex');
+	var inputID = $("#mathChemEditorInputID").val();
+	console.log('from edit: '+latex);
+	$("#"+inputID).html(latex).mathquill('editable').mathquill('redraw');
+	$("#"+inputID+" textarea").focus();
+	$("#mathChemEditor-modal").modal('hide');
+	$("#tryTyping").html('');
+    });
+    
     /******************Change question Type****************************/
     $( "#questionType" ).change(function() {
 	changeQuestionType();
@@ -329,7 +398,13 @@ function makeImageAreaSelection() {
     
     $(".page_title").on('click','.questionTab-holder', function(){
         var data = $(this).data('options');
-        $("#input"+data.answer_id).focus();
+	var element = $("#input"+data.answer_id);
+        
+	if (element.data('options').input_type=='mathChem' || element.data('options').input_type=='mathwork') {
+		$("#input"+data.answer_id+" textarea").focus();
+	}else{
+		element.focus();
+	}
     });
     
     $(".page_title").on('click','.resize-icon', function(){
@@ -552,7 +627,10 @@ function changeAnswer(elementID) {
                 $('#showCheckbox').prop("checked", true);
             }
             else{$('#showCheckbox').prop("checked", false);}
-        }else{
+        }else if ($("#"+elementID).data("options").input_type=='mathwork' || $("#"+elementID).data("options").input_type=='mathChem') {
+	    var newCorrectAnswer = $('#'+elementID).mathquill('latex');
+	    newCorrectAnswer = newCorrectAnswer.replace(/\\/g, "\\\\");
+	}else{
             var newCorrectAnswer = $('#'+elementID).val();
         }
         console.log("correct answer with change: "+newCorrectAnswer);
@@ -580,10 +658,16 @@ function changeQuestionType() {
 	else if (inputType == 'work') {
 	    createWork(oldInputType, 'input'+inputNumber_id);
 	}
+	else if (inputType == 'mathwork') {
+	    createMathWork(oldInputType, 'input'+inputNumber_id);
+	}
+	else if (inputType == 'mathChem') {
+	    createMathChem(oldInputType, 'input'+inputNumber_id);
+	}
 	else if (inputType == 'drawing') {
 	    createDrawing(oldInputType, 'input'+inputNumber_id);
 	}
-	else if ((inputType == 'text' || inputType == 'number' || inputType == 'checkbox') && (oldInputType == 'textarea' || oldInputType == 'select' || oldInputType == 'work' || oldInputType == 'drawing')) {
+	else if ((inputType == 'text' || inputType == 'number' || inputType == 'checkbox') && (oldInputType == 'textarea' || oldInputType == 'select' || oldInputType == 'work' || oldInputType == 'mathwork' || oldInputType == 'mathChem' || oldInputType == 'drawing')) {
 	    //Re-create the default input type
 	    createDefaultInput(oldInputType, 'input'+inputNumber_id, inputType);
 	    /*
@@ -595,7 +679,7 @@ function changeQuestionType() {
 	    $('#input'+inputNumber_id).get(0).type = inputType;
 	    var data = $('#input'+inputNumber_id).data("options");
 	    $('#input'+inputNumber_id).data("options").input_type = inputType;
-	    $('#input'+inputNumber_id).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"'+inputType+'", "points":"'+data.points+'", "help_text":"'+data.help_text+'", "help_link":"'+data.help_link+'"}');
+	    $('#input'+inputNumber_id).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"'+inputType+'", "points":"'+data.points+'", "help_text":"", "help_link":"'+data.help_link+'"}');
 	}
 	$('#input'+inputNumber_id).focus();
 }
@@ -606,9 +690,11 @@ function changeQuestionType() {
     /****************************Create Inputs Area*********************************/
     function createTextarea(oldInputType, elementID) {
 	//get the important parts of element
-	if (oldInputType=="work") {
+        if (oldInputType=="work") {
             var testStyle = $('#work'+elementID).attr('style');
-        }else{var testStyle = $('#'+elementID).attr('style');}
+        }else if (oldInputType=="mathwork") {
+            var testStyle = $('#mathwork'+elementID).attr('style');
+	}else{var testStyle = $('#'+elementID).attr('style');}
 	
 	var data = $('#'+elementID).data("options");
 	var choice = [];
@@ -623,7 +709,9 @@ function changeQuestionType() {
 	//make the old input disappear
 	$('#'+elementID).remove();
 	$('#work'+elementID).remove();
+	$('#mathwork'+elementID).remove();
 	$('#drawing'+elementID).remove();
+	$('#editorBtn-'+elementID).remove();
 	//$('#'+elementID).css("display","none");
 	//$('#'+elementID).attr('id','noShow');
 	
@@ -632,7 +720,7 @@ function changeQuestionType() {
         $('#'+elementID).attr('style',testStyle);
         //$('#'+elementID).attr('data-options', '{"answer_id":"'+ options.answer_id + '", "question_number":"'+ options.question_number + '"}');
 	
-	$('#'+elementID).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"textarea", "points":"'+data.points+'", "help_text":"'+data.help_text+'", "help_link":"'+data.help_link+'"}');
+	$('#'+elementID).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"textarea", "points":"'+data.points+'", "help_text":"", "help_link":"'+data.help_link+'"}');
 	
 		for (var j=1; j<6; j++) {
 		    if (choice[j-1]) {
@@ -652,9 +740,11 @@ function changeQuestionType() {
     
     function createSelect(oldInputType, elementID) {
 	//get the important parts of element
-	if (oldInputType=="work") {
+        if (oldInputType=="work") {
             var testStyle = $('#work'+elementID).attr('style');
-        }else{var testStyle = $('#'+elementID).attr('style');}
+        }else if (oldInputType=="mathwork") {
+            var testStyle = $('#mathwork'+elementID).attr('style');
+	}else{var testStyle = $('#'+elementID).attr('style');}
         
 	var data = $('#'+elementID).data("options");
 	var choice = [];
@@ -668,7 +758,9 @@ function changeQuestionType() {
 	//make the old input disappear
 	$('#'+elementID).remove();
 	$('#work'+elementID).remove();
+	$('#mathwork'+elementID).remove();
 	$('#drawing'+elementID).remove();
+	$('#editorBtn-'+elementID).remove();
 	
 	//Now, create the textarea
 	$( "#default_form" ).append( "<select id='"+ elementID +"' class='answers highlight img-rounded' data-options=''><option id='option0' value='none'>Select One...</option></select>" );
@@ -682,16 +774,20 @@ function changeQuestionType() {
 		    }
 		}
 	
-	$('#'+elementID).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"select", "points":"'+data.points+'", "help_text":"'+data.help_text+'", "help_link":"'+data.help_link+'"}');
+	$('#'+elementID).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"select", "points":"'+data.points+'", "help_text":"", "help_link":"'+data.help_link+'"}');
 	
 	$('#'+elementID).focus();
         resizeElements();
     }
+    
+    
     function createWork(oldInputType, elementID) {
 	//get the important parts of element
         if (oldInputType=="work") {
             var testStyle = $('#work'+elementID).attr('style');
-        }else{var testStyle = $('#'+elementID).attr('style');}
+        }else if (oldInputType=="mathwork") {
+            var testStyle = $('#mathwork'+elementID).attr('style');
+	}else{var testStyle = $('#'+elementID).attr('style');}
         
 	var data = $('#'+elementID).data("options");
 	var choice = [];
@@ -705,6 +801,8 @@ function changeQuestionType() {
 	//make the old input disappear
 	$('#'+elementID).remove();
 	$('#drawing'+elementID).remove();
+	$('#mathwork'+elementID).remove();
+	$('#editorBtn-'+elementID).remove();
 	
 	//Now, create the textarea
         var html = '<div id="work'+ elementID +'" class="highlight img-rounded" data-options="">'+
@@ -721,8 +819,127 @@ function changeQuestionType() {
         $('#work'+elementID).attr('style',testStyle);
         //$('#'+elementID).attr('data-options', '{"answer_id":"'+ options.answer_id + '", "question_number":"'+ options.question_number + '"}');
 	
-        $('#work'+elementID).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"work", "points":"'+data.points+'", "help_text":"'+data.help_text+'", "help_link":"'+data.help_link+'"}');
-	$('#'+elementID).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"work", "points":"'+data.points+'", "help_text":"'+data.help_text+'", "help_link":"'+data.help_link+'"}');
+        $('#work'+elementID).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"work", "points":"'+data.points+'", "help_text":"", "help_link":"'+data.help_link+'"}');
+	$('#'+elementID).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"work", "points":"'+data.points+'", "help_text":"", "help_link":"'+data.help_link+'"}');
+	
+		for (var j=1; j<6; j++) {
+		    if (choice[j-1]) {
+			$('#'+elementID).data("choice"+j, choice[j-1]);
+			$('#'+elementID).data("keyword"+j, choice[j-1]);
+			//console.log("Choice"+j+" saved as: "+choice[j-1]);
+		    }
+		}
+	$('#'+elementID).focus();
+        resizeElements();
+        //setWorkImage(data.answer_id);
+        
+    }
+    
+    
+    
+    function createMathWork(oldInputType, elementID) {
+	//get the important parts of element
+        if (oldInputType=="work") {
+            var testStyle = $('#work'+elementID).attr('style');
+        }else if (oldInputType=="mathwork") {
+            var testStyle = $('#mathwork'+elementID).attr('style');
+	}else{var testStyle = $('#'+elementID).attr('style');}
+        
+	var data = $('#'+elementID).data("options");
+	var choice = [];
+	for (var i=0;i<5;i++) {
+	    choice[i] = $('#'+elementID).data("choice"+(i+1));
+	    if (!choice[i]) {
+		choice[i] = $('#'+elementID).data("keyword"+(i+1));
+	    }
+	    //console.log("Create Work Choice "+(i+1)+" = "+choice[i]);
+	}
+	//make the old input disappear
+	$('#'+elementID).remove();
+	$('#drawing'+elementID).remove();
+	$('#work'+elementID).remove();
+	$('#editorBtn-'+elementID).remove();
+	
+	//Now, create the textarea
+        var html = '<div id="mathwork'+ elementID +'" class="highlight img-rounded" data-options="">'+
+                        '<div class="work-button img-rounded" style="position:relative;top:40%;left:0;font-size: 20px;text-align: center;">Work Area will be activated for student use...<span style="font-size: 12px;">place MATH answer here.</span>'+
+                        '<span id="'+ elementID +'" class="answers highlight" data-options=""></span>'+
+			'<span id="editorBtn-'+ elementID +'" class="editor-btn btn btn-success btn-xs" style="display: none;position: absolute;z-index: 1;left: 100%;top: 100%;margin: -20px 0 0 -45px;">editor</span>'+
+                        '</div>'+
+                    '</div>'
+        
+        
+        
+        
+	$( "#default_form" ).append( html );
+        $('#mathwork'+elementID).attr('style',testStyle);
+        //$('#'+elementID).attr('data-options', '{"answer_id":"'+ options.answer_id + '", "question_number":"'+ options.question_number + '"}');
+	
+        $('#mathwork'+elementID).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"mathwork", "points":"'+data.points+'", "help_text":"", "help_link":"'+data.help_link+'"}');
+	$('#'+elementID).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"mathwork", "points":"'+data.points+'", "help_text":"", "help_link":"'+data.help_link+'"}');
+	$('#'+elementID).css({'backgroundColor':'#FFF',});
+	$('#'+elementID).mathquill('editable');
+	
+		for (var j=1; j<6; j++) {
+		    if (choice[j-1]) {
+			$('#'+elementID).data("choice"+j, choice[j-1]);
+			$('#'+elementID).data("keyword"+j, choice[j-1]);
+			//console.log("Choice"+j+" saved as: "+choice[j-1]);
+		    }
+		}
+	$('#'+elementID).focus();
+        resizeElements();
+        //setWorkImage(data.answer_id);
+        
+    }
+    
+    
+    
+    function createMathChem(oldInputType, elementID) {
+	//get the important parts of element
+        if (oldInputType=="work") {
+            var testStyle = $('#work'+elementID).attr('style');
+        }else if (oldInputType=="mathwork") {
+            var testStyle = $('#mathwork'+elementID).attr('style');
+	}else{var testStyle = $('#'+elementID).attr('style');}
+        
+	var data = $('#'+elementID).data("options");
+	var choice = [];
+	for (var i=0;i<5;i++) {
+	    choice[i] = $('#'+elementID).data("choice"+(i+1));
+	    if (!choice[i]) {
+		choice[i] = $('#'+elementID).data("keyword"+(i+1));
+	    }
+	    //console.log("Create Work Choice "+(i+1)+" = "+choice[i]);
+	}
+	//make the old input disappear
+	$('#'+elementID).remove();
+	$('#drawing'+elementID).remove();
+	$('#work'+elementID).remove();
+	$('#mathwork'+elementID).remove();
+	$('#editorBtn-'+elementID).remove();
+	
+	
+	var styleList = testStyle.split(' ');
+	var editorLeft = parseFloat(styleList[3].split('%')[0])+parseFloat(styleList[7].split('%')[0]);
+	var editorTop = parseFloat(styleList[5].split('%')[0])+parseFloat(styleList[9].split('%')[0]);
+	var editorStyle = '"display: none; position: absolute; left: '+editorLeft+'%; top: '+editorTop+'%; z-index: 1; margin-left: -45px;"';
+	
+	
+	//Now, create the textarea
+        var html = '<span id="'+ elementID +'" class="answers" data-options=""></span>'+
+		   '<span id="editorBtn-'+ elementID +'" class="editor-btn btn btn-success btn-xs" style="display: none; position: absolute; left: '+editorLeft+'%; top: '+editorTop+'%; z-index: 1; margin: -9px 0 0 -55px;">editor</span>'
+        
+        
+        
+        
+	$( "#default_form" ).append( html );
+        $('#'+elementID).attr('style',testStyle);
+	$('#'+elementID).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"mathChem", "points":"'+data.points+'", "help_text":"", "help_link":"'+data.help_link+'"}');
+	$('#'+elementID).mathquill('editable');
+	console.log(testStyle);
+	console.log(editorStyle);
+	console.log(editorTop);
 	
 		for (var j=1; j<6; j++) {
 		    if (choice[j-1]) {
@@ -741,9 +958,11 @@ function changeQuestionType() {
     
     function createDrawing(oldInputType, elementID) {
 	//get the important parts of element
-	if (oldInputType=="work") {
+        if (oldInputType=="work") {
             var testStyle = $('#work'+elementID).attr('style');
-        }else{var testStyle = $('#'+elementID).attr('style');}
+        }else if (oldInputType=="mathwork") {
+            var testStyle = $('#mathwork'+elementID).attr('style');
+	}else{var testStyle = $('#'+elementID).attr('style');}
 	
 	var data = $('#'+elementID).data("options");
 	var choice = [];
@@ -757,19 +976,21 @@ function changeQuestionType() {
 	//make the old input disappear
 	$('#'+elementID).remove();
 	$('#work'+elementID).remove();
+	$('#mathwork'+elementID).remove();
 	$('#drawing'+elementID).remove();
+	$('#editorBtn-'+elementID).remove();
 	//$('#'+elementID).css("display","none");
 	//$('#'+elementID).attr('id','noShow');
 	
 	//Now, create the textarea
-	html = "<textarea id='"+ elementID +"' class='answers highlight img-rounded' readonly='readonly' data-options=''></textarea><div id='drawing"+ elementID +"' class='work-button img-rounded'>Drawing Area will be activated for student use...</div>"
+	html = "<textarea id='"+ elementID +"' class='answers highlight img-rounded' readonly='readonly' data-options=''></textarea><div id='drawing"+ elementID +"' class='work-button img-rounded'>Drawing Area will be activated for student use. If you don't want this to be auto-graded, assign a point value of zero to the right.</div>"
 	
 	$( "#default_form" ).append( html );
         $('#'+elementID).attr('style',testStyle+"resize: none;");
         $('#drawing'+elementID).attr('style',testStyle.split('height')[0]+'text-align: center;');
         //$('#'+elementID).attr('data-options', '{"answer_id":"'+ options.answer_id + '", "question_number":"'+ options.question_number + '"}');
 	
-	$('#'+elementID).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"drawing", "points":"'+data.points+'", "help_text":"'+data.help_text+'", "help_link":"'+data.help_link+'"}');
+	$('#'+elementID).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"drawing", "points":"'+data.points+'", "help_text":"", "help_link":"'+data.help_link+'"}');
 	
 		for (var j=1; j<6; j++) {
 		    if (choice[j-1]) {
@@ -788,10 +1009,13 @@ function changeQuestionType() {
     
     
     function createDefaultInput(oldInputType, elementID, inputType) {
+	console.log('oldInputType: '+oldInputType);
 	//get the important parts of element
         if (oldInputType=="work") {
             var testStyle = $('#work'+elementID).attr('style');
-        }else{var testStyle = $('#'+elementID).attr('style');}
+        }else if (oldInputType=="mathwork") {
+            var testStyle = $('#mathwork'+elementID).attr('style');
+	}else{var testStyle = $('#'+elementID).attr('style');}
         
 	var data = $('#'+elementID).data("options");
 	var choice = [];
@@ -805,7 +1029,9 @@ function changeQuestionType() {
 	//make the old input disappear
 	$('#'+elementID).remove();
 	$('#work'+elementID).remove();
+	$('#mathwork'+elementID).remove();
 	$('#drawing'+elementID).remove();
+	$('#editorBtn-'+elementID).remove();
 	//$('#'+elementID).css("display","none");
 	//$('#'+elementID).attr('id','noShow');
 	
@@ -814,7 +1040,7 @@ function changeQuestionType() {
         $('#'+elementID).attr('style',testStyle);
         //$('#'+elementID).attr('data-options', '{"answer_id":"'+ options.answer_id + '", "question_number":"'+ options.question_number + '"}');
 	
-	$('#'+elementID).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"'+inputType+'", "points":"'+data.points+'", "help_text":"'+data.help_text+'", "help_link":"'+data.help_link+'"}');
+	$('#'+elementID).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"'+inputType+'", "points":"'+data.points+'", "help_text":"", "help_link":"'+data.help_link+'"}');
 	
 		for (var j=1; j<6; j++) {
 		    if (choice[j-1]) {
@@ -841,7 +1067,7 @@ function changePoints() {
         updatePoints(parseInt(inputNumber_id), parseInt(newPoints));
         
 	$('#input'+inputNumber_id).data("options").points = newPoints;
-	$('#input'+inputNumber_id).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"'+data.input_type+'", "points":"'+newPoints+'", "help_text":"'+data.help_text+'", "help_link":"'+data.help_link+'"}');
+	$('#input'+inputNumber_id).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"'+data.input_type+'", "points":"'+newPoints+'", "help_text":"", "help_link":"'+data.help_link+'"}');
 }
 
 function synchronizeCheckbox() {
@@ -896,13 +1122,13 @@ function changeHelpLink(helpID) {
                 updateHelpLink(parseInt(inputNumber_id), newHelpLink);
                 
 		$('#input'+inputNumber_id).data("options").help_link = newHelpLink;
-		$('#input'+inputNumber_id).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"'+data.input_type+'", "points":"'+data.points+'", "help_text":"'+data.help_text+'", "help_link":"'+newHelpLink+'"}');
+		$('#input'+inputNumber_id).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"'+data.input_type+'", "points":"'+data.points+'", "help_text":"", "help_link":"'+newHelpLink+'"}');
 		//console.log("isValid");
 	    }else{
 		$("#"+helpID).attr('style','background-color:#F8E0E0; color:red;');
 		newHelpLink = "Not a Valid URL";
 		$('#input'+inputNumber_id).data("options").help_link = newHelpLink;
-		$('#input'+inputNumber_id).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"'+data.input_type+'", "points":"'+data.points+'", "help_text":"'+data.help_text+'", "help_link":"'+newHelpLink+'"}');
+		$('#input'+inputNumber_id).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"'+data.input_type+'", "points":"'+data.points+'", "help_text":"", "help_link":"'+newHelpLink+'"}');
 		//console.log("Not Valid");
 	    }
 	}else{
@@ -911,7 +1137,7 @@ function changeHelpLink(helpID) {
             updateHelpLink(parseInt(inputNumber_id), newHelpLink);
                 
 	    $('#input'+inputNumber_id).data("options").help_link = newHelpLink;
-	    $('#input'+inputNumber_id).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"'+data.input_type+'", "points":"'+data.points+'", "help_text":"'+data.help_text+'", "help_link":"'+newHelpLink+'"}');
+	    $('#input'+inputNumber_id).attr('data-options', '{"answer_id":"'+ data.answer_id + '", "question_number":"'+ data.question_number + '", "input_type":"'+data.input_type+'", "points":"'+data.points+'", "help_text":"", "help_link":"'+newHelpLink+'"}');
 		
 	}
 	*/
@@ -948,7 +1174,12 @@ function updateMulitipleChoice(choiceID) {
 	var newChoice = $("#"+choiceID).val();
 	//console.log('keyword ID: '+keywordID+' OptionID number: '+optionIDNumber+' Ney Keyword: '+newKeyword);
 	//Dajaxice.myproject.googleapi.updateChoice(updateChoice_callback, {'inputNumber': parseInt(inputNumber_id), 'optionIDNumber': parseInt(optionIDNumber), 'newChoice': newChoice});
-        updateChoice(parseInt(inputNumber_id), parseInt(optionIDNumber), newChoice);
+        if (newChoice.length>45){
+		alert('Woops, you can only use 45 characters for an answer.')
+	}else{
+		updateChoice(parseInt(inputNumber_id), parseInt(optionIDNumber), newChoice);
+	}
+	
         
 	$('#input'+inputNumber_id).data(choiceID, newChoice);
 	
@@ -1419,7 +1650,7 @@ $.ajaxSetup({
             xhr.onreadystatechange = function() {
                 if (xhr.readyState == 4 && xhr.status == 200) {
                     // Handle response.
-		    //console.log(xhr.responseText);
+		    console.log(xhr.responseText);
 		    var data = JSON.parse(xhr.responseText)
 		    console.log("Return from updateChoice: "+data);
 		    if (data.error) {alert(data.error);}
@@ -1491,7 +1722,7 @@ $.ajaxSetup({
 		    else{
 		    
 			$("#input"+ data.inputNumber).data("options").question_number = data.newQuestionNumber;
-			$("#input"+ data.inputNumber).attr('data-options', '{"answer_id":"'+ data.inputNumber + '", "question_number":"'+ data.newQuestionNumber + '", "input_type":"'+ data.inputType +'", "points":"'+data.points+'", "help_text":"'+data.help_text+'", "help_link":"'+data.help_link+'"}');
+			$("#input"+ data.inputNumber).attr('data-options', '{"answer_id":"'+ data.inputNumber + '", "question_number":"'+ data.newQuestionNumber + '", "input_type":"'+ data.inputType +'", "points":"'+data.points+'", "help_text":"", "help_link":"'+data.help_link+'"}');
 			//alert(data.inputNumber);
 			
 			//update questionTab
@@ -1577,6 +1808,7 @@ $.ajaxSetup({
 			$("#questionTab"+inputNumber).parent().remove();
 			$("#input"+inputNumber).remove();
 			$("#workinput"+inputNumber).remove();
+			$("#mathworkinput"+inputNumber).remove();
 		    }
                 }
             };
@@ -1713,8 +1945,41 @@ $.ajaxSetup({
 	
 	
 	
+	
+	
+	
+	
+	
+	// Math Chem editor
+	$('#editor-tabs a').click(function (e) {
+		e.preventDefault()
+		$(this).tab('show')
+	})
+        
+	    
+	$("#mathTab button, #chemTab button").each(function(){
+	    $(this).popover();
+	});
         
         
-        
+	$("#mathTab button, #chemTab button").click(function(){
+		var latex = $(this).data('mathquill');
+		var tryTyping = $(this).data('trytyping');
+		
+		console.log(tryTyping);
+		$("#mathChemEditor-modal .modal-body div").mathquill('write',latex);
+		if ($("#mathChemEditor-modal .modal-body div .empty:first").length){
+			$("#mathChemEditor-modal .modal-body div .empty:first").mousedown().mouseup();
+		}else{
+			$("#mathChemEditor-modal .modal-body div textarea").focus();
+		}
+		$("#tryTyping").fadeOut(300, function(){
+			$("#tryTyping").html("Or try typing: <span class='text-danger'>"+tryTyping+"</span>").fadeIn(300);
+		});
+	});
+	
+	
+	
+	
         
 });  /****************** End of Ajax calls ***************************/

@@ -204,7 +204,15 @@ jQuery.validator.addMethod("complete_url", function(val, elem) {
                 }
             },
             dataType:  'json',
-            timeout:   4000 
+            timeout:   4000,
+	    error: function(jqXHR, textStatus, errorThrown) {
+		if(textStatus==="timeout") {
+		   location.reload();
+		}else{
+		    alert("Sorry, something went wrong...That's all we know.");
+		    location.reload();
+		}
+	    }
         });
     
     
@@ -421,7 +429,7 @@ jQuery.validator.addMethod("complete_url", function(val, elem) {
     }
     
     setListGridDisplay();
-    
+
     
     
     //Load folders async
@@ -495,6 +503,37 @@ jQuery.validator.addMethod("complete_url", function(val, elem) {
     
     
     
+    
+
+
+    $(".modal-content").on("resizestart", function(event, ui) {
+	if (!$(this).data('originalHeight')) {
+	    $(this).css({"min-height":ui.size.height, "min-width":ui.size.width});
+	    $(this).data("originalHeight", $(this).height());
+	    $(this).data("originalWidth", $(this).width());
+	    $(this).find('.modal-footer').addClass('resized');
+	}
+	
+    });
+    
+    
+    /*
+    $(".modal-content").on("resize", function(event, ui) {
+
+	$(this).css("min-height", $(this).data("resizeoriginalheight") + ui.size.height - ui.originalSize.height);
+    });
+    */
+    
+    $(".modal-content").resizable({
+	stop: function(event, ui) {
+	    if (ui.size.width<$(this).data('originalWidth')) {
+		ui.element.css("margin-left", -$(this).data('originalWidth')/2);
+	    }else{
+		ui.element.css("margin-left", -ui.size.width/2);
+	    }
+	    ui.element.css("left", "50%");
+	}
+    });
     
     
 }();  //End of $(document).ready();

@@ -125,7 +125,19 @@ def profileUpdate(request):
         fullName = fullName.title()
         
         firstName = fullName.split(' ',1)[0]
-        lastName = fullName.split(' ',1)[1]
+        try:
+            lastName = fullName.split(' ',1)[1]
+        except:
+            return HttpResponse(json.dumps({'error':'Oops, we need your full name.'}))
+        
+        try:
+            studentID = request.POST["studentID"]
+            if ClassUser.objects.filter(user=request.user):
+                classUser = ClassUser.objects.get(user=request.user)
+                classUser.studentID = studentID
+                classUser.save()
+        except:
+            pass
         
         data = {
             'fullName': fullName,
@@ -156,6 +168,134 @@ def profileUpdate(request):
 
 
 
+@login_required
+def studentInfoUpdate(request):
+    if request.method == 'POST':
+        fullName = request.POST["fullName"]
+        classUserID = request.POST["classUserID"]
+        
+        fullName = fullName.strip(' \t\n\r')
+        fullName = fullName.title()
+        
+        firstName = fullName.split(' ',1)[0]
+        try:
+            lastName = fullName.split(' ',1)[1]
+        except:
+            return HttpResponse(json.dumps({'error':"Oops, we need the student's full name."}))
+        
+        try:
+            studentID = request.POST["studentID"]
+        except:
+            studentID = False
+        
+        
+        if ClassUser.objects.filter(id=classUserID):
+            classUser = ClassUser.objects.get(id=classUserID)
+            classUser.user.first_name = firstName
+            classUser.user.last_name = lastName
+            classUser.user.save()
+            if studentID:
+                classUser.studentID = studentID
+                classUser.save()
+            
+            data = {
+                'fullName': lastName.title()+", "+firstName.title(),
+            }
+        else:
+            data = {
+                'error': "We can't find that student's information.",
+            }
+        
+    else:
+        data = {
+            'error': "There was an error posting this request. Please try again.",
+        }
+        
+    
+    return HttpResponse(json.dumps(data))
+
+
+
+
+@login_required
+def lockStudentNames(request):
+    if request.method == 'POST':
+        classID = request.POST["classID"]
+        
+        if ClassUser.objects.filter(user=request.user):
+            teacher = ClassUser.objects.get(user=request.user)
+        if Classroom.objects.filter(id=classID):
+            classroom = Classroom.objects.get(id=classID)
+            if classroom.classOwnerID != teacher.id:
+                return HttpResponse(json.dumps({"error":"You must be the teacher of this classroom."}))
+            else:
+                if ClassUser.objects.filter(classrooms=classroom, teacher=False):
+                    students = ClassUser.objects.filter(classrooms=classroom, teacher=False)
+                    if students[0].lockedChanges:
+                        students.update(lockedChanges=False)
+                        bLocked = False
+                    else:
+                        students.update(lockedChanges=True)
+                        bLocked = True
+        
+            data = {
+                'bLocked': bLocked,
+            }
+        else:
+            data = {
+                'error': "We can't find that student's information.",
+            }
+        
+    else:
+        data = {
+            'error': "There was an error posting this request. Please try again.",
+        }
+        
+    
+    return HttpResponse(json.dumps(data))
+
+
+
+
+
+@login_required
+def csvDownload(request):
+    if request.method == 'POST':
+        projectID =request.POST["projectID"].strip()
+        classID =request.POST["classID"].strip()
+        
+        students = []
+        if ClassUser.objects.filter(user=request.user, teacher=True):
+            if Project.objects.filter(id=projectID):
+                project = Project.objects.get(id=projectID)
+                
+                if classID == 'allClasses':
+                    if Classroom.objects.filter(worksheets=project):
+                        classrooms = Classroom.objects.filter(worksheets=project).order_by('id')
+                        
+                        for classroom in classrooms:
+                            if ClassUser.objects.filter(classrooms=classroom, teacher=False):
+                                tempStudents = ClassUser.objects.filter(classrooms=classroom, teacher=False).order_by('user__last_name', 'user__first_name')
+                                students.extend(tempStudents)
+                else:
+                    if Classroom.objects.filter(id=classID):
+                        classroom = Classroom.objects.get(id=classID)
+                        
+                        if ClassUser.objects.filter(classrooms=classroom, teacher=False):
+                            students = ClassUser.objects.filter(classrooms=classroom, teacher=False).order_by('user__last_name', 'user__first_name')
+                        
+
+        args = {
+                "students":students,
+                "currentProject":project,
+            }
+        
+        return render_to_response('csvDownload.txt', args)
+    else:
+        return HttpResponse('Sorry, something went wrong.')
+
+
+
 
 
 @login_required
@@ -175,13 +315,16 @@ def googleDriveGradeUpload(request):
                         row.append('"'+classroom.name.title()+'"')
                         if ClassUser.objects.filter(classrooms=classroom, teacher=False):
                             students = ClassUser.objects.filter(classrooms=classroom, teacher=False).order_by('user__last_name')
-                            row.append('"Students","Average"')
+                            row.append('"Students","ID","Average"')
                             for student in students:
                                 if MyGrade.objects.filter(project=project, userInfo__user=student.user):
                                     myGrade = MyGrade.objects.get(project=project, userInfo__user=student.user)
-                                    row.append('"'+ student.user.last_name +', '+ student.user.first_name +'","{0:.2f}%'.format(round(myGrade.average),2) +'"')
+                                    if student.studentID:
+                                        row.append('"'+ student.user.last_name +', '+ student.user.first_name +'","'+student.studentID+'","{0:.2f}%'.format(round(myGrade.average),2) +'"')
+                                    else:
+                                        row.append('"'+ student.user.last_name +', '+ student.user.first_name +'","--no id--","{0:.2f}%'.format(round(myGrade.average),2) +'"')
                                 else:
-                                    row.append('"'+ student.user.last_name +', '+ student.user.first_name +'","no grade"')
+                                    row.append('"'+ student.user.last_name +', '+ student.user.first_name +'","*"')
                     
                     FILENAME = makeCSV(request.user, row ,project.title.title()+' grades')
                     

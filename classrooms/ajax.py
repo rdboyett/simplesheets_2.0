@@ -1,20 +1,49 @@
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals
+
 import json
 import re
 
+from django.views.generic import FormView
 from django.shortcuts import render_to_response, get_object_or_404
+from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponse
 from django.core.context_processors import csrf
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 
+from braces.views import LoginRequiredMixin
 
-from classrooms.models import ClassUser, Classroom, HashTag, Message
-from classrooms.views import generateCode
-#from userInfo_profile.models import AIS_admin
+from .models import ClassUser, Classroom, HashTag, Message
+from .views import generateCode
+from .forms import ChangeTeacherForm
+from userInfo_profile.models import UserInfo
 
 
 import logging
 log = logging.getLogger(__name__)
+
+
+class ChangeTeacherStudentView(LoginRequiredMixin, FormView):
+    template_name = 'change_teacher_student.html'
+    form_class = ChangeTeacherForm
+    success_url = reverse_lazy('changeTeacherStudentSuccess')
+
+    def form_valid(self, form):
+        print form.cleaned_data['username']
+        changeUser = get_object_or_404(User, username=form.cleaned_data['username'])
+        classUser = get_object_or_404(ClassUser, user=changeUser)
+        userInfo = get_object_or_404(UserInfo, user=changeUser)
+        if form.cleaned_data['teacherStudent'] == 'Teacher':
+            classUser.teacher = True
+            userInfo.teacher_student = 'teacher'
+        else:
+            classUser.teacher = False
+            userInfo.teacher_student = 'student'
+
+        classUser.save()
+        userInfo.save()
+        return super(ChangeTeacherStudentView, self).form_valid(form)
 
 
 

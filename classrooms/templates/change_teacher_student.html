@@ -1,0 +1,10 @@
+
+
+{% if user.is_superuser %}
+<form action="" method="post">{% csrf_token %}
+    {{ form.as_ul }}
+    <input type="submit" value="Change User" />
+</form>
+{% else %}
+    <div>Sorry, you are not authorized to change accounts.</div>
+{% endif %}

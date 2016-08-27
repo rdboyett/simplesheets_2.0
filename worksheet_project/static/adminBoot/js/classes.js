@@ -198,7 +198,152 @@ $.validator.addMethod("noWhitespace",
     });
     
     
+    $(".changeStudentName").click(function(){
+        var link = $(this).parent().children('.col-xs-10').children('.studentNameLink');
+        var input = $(this).parent().children('.col-xs-10').children('.studentNameInput');
+        if ($(this).hasClass('fa-rotate-left')) {
+            link.fadeOut(300, function(){
+                input.fadeIn(300);
+            });
+            $(this).removeClass('fa-rotate-left').addClass('fa-thumbs-o-up');
+        }else{
+            input.fadeOut(300, function(){
+                link.fadeIn(300);
+            });
+            $(this).removeClass('fa-thumbs-o-up').addClass('fa-rotate-left');
+            
+        }
+    });
+    
+    $(".studentNameInput").blur(function(){
+        //get info and submit it.
+        var parent = $(this).parents('.studentID-row');
+        var studentID = parent.data('studentid');
+        var fullName = $(this).val();
+        var studentNameLink = $(this).parent().children('.studentNameLink');
+        
+        $.ajax({
+            method: "POST",
+            url: studentInfoUpdateURL,
+            data: { fullName: fullName, classUserID:studentID },
+            dataType: "json"
+        })
+            .done(function( response ) {
+                console.log(response);
+                if (response.error) {
+                    alert(response.error);
+                }else{
+                    studentNameLink.html('<strong class="text-primary">'+response.fullName+'&nbsp;&nbsp;</strong>');
+                }
+            });
+    });
+    
+    
+    
+    
+    
+    $('#lockStudentNames-form').ajaxForm({ 
+        success:       function(responseText){
+            console.log(responseText);
+            if (responseText.error) {
+                alert(responseText.error);
+            }else {
+		if (responseText.bLocked == true) {
+                    $("#lockStudentNames-btn").removeClass('btn-danger').addClass('btn-success');
+                    $("#lockStudentNames-btn").html("<i class='fa fa-unlock'></i>  unlock all student names and id's");
+                }else{
+                    $("#lockStudentNames-btn").removeClass('btn-success').addClass('btn-danger');
+                    $("#lockStudentNames-btn").html("<i class='fa fa-lock'></i>  lock all student names and id's");
+                }
+            }
+        },
+        dataType:  'json',
+        timeout:   4000 
+    });
+    
+    
+    
+    $(".form-control.studentID-input").blur(function(){
+        var studentSchoolID = $(this).val();
+        //get info and submit it.
+        var parent = $(this).parents('.studentID-row');
+        console.log(parent.attr('class'));
+        var studentID = parent.data('studentid');
+        console.log(studentID);
+        var fullName = parent.children('.col-xs-3').children('.col-xs-10').children('.studentNameInput').val();
+        console.log(fullName);
+        
+        
+        $.ajax({
+            method: "POST",
+            url: studentInfoUpdateURL,
+            data: { fullName: fullName, classUserID:studentID, studentID:studentSchoolID },
+            dataType: "json"
+        })
+            .done(function( response ) {
+                console.log(response);
+                if (response.error) {
+                    alert(response.error);
+                }else{
+                    //studentNameLink.html('<strong class="text-primary">'+response.fullName+'&nbsp;&nbsp;</strong>');
+                }
+            });
+        
+    });
+    
+    
     
     
     
 });
+
+function getCSRFCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+function sameOrigin(url) {
+    // test that a given url is a same-origin URL
+    // url could be relative or scheme relative or absolute
+    var host = document.location.host; // host + port
+    var protocol = document.location.protocol;
+    var sr_origin = '//' + host;
+    var origin = protocol + sr_origin;
+    // Allow absolute or scheme relative URLs to same origin
+    return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
+        (url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
+        // or any other URL that isn't scheme relative or absolute i.e relative.
+        !(/^(\/\/|http:|https:).*/.test(url));
+}
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        var csrftoken = getCSRFCookie('csrftoken');
+        if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
+            // Send the token to same-origin, relative URLs only.
+            // Send the token only if the method warrants CSRF protection
+            // Using the CSRFToken value acquired earlier
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
+
+
+
+
+

@@ -25,17 +25,10 @@ function resizeElements() {
 	
 	//console.log(fontPixels);
 	
-        $("#default_form input").css({
-                'font-size': fontPixels+'px',
-                'line-height': fontPixels+'px' 
-        });
-	$("#default_form textarea").css({
-                'font-size': fontPixels+'px',
-                'line-height': fontPixels+'px' 
-        });
-	$("#default_form select").css({
-                'font-size': fontPixels+'px',
-                'line-height': fontPixels+'px' 
+	$("#default_form textarea.answers").css({
+                'font-size': 25+'px',
+                'line-height': 25+'px',
+		'color':'#000',
         });
 	if (fontPixels2 < 12) {
 	    fontPixels2 = 12
@@ -44,6 +37,47 @@ function resizeElements() {
                 'font-size': fontPixels2+'px',
                 'line-height': fontPixels2+'px' 
         });
+	
+	
+	$("#default_form input.answers").each(function(){
+		//subtract 10px for padding
+		var height = $(this).height();
+		var font = height*.85;
+		$(this).css({
+			'font-size': font+'px',
+			'line-height': height+'px' 
+		});
+	});
+	
+	$("#default_form select.answers").each(function(){
+		//subtract 10px for padding
+		var height = $(this).height();
+		var font = height*.85;
+		$(this).css({
+			'font-size': font+'px',
+			'line-height': height+'px' 
+		});
+	});
+	
+	$("#default_form .mathquill-editable").each(function(){
+		
+		//subtract 10px for padding
+		var height = $(this).height();
+		var font = height*.5;
+		if (font<12) {
+			$(this).css({
+				'font-size': 12+'px',
+				'line-height': 1,
+				'padding':5+'px',
+			});
+		}else{
+			$(this).css({
+				'font-size': font+'px',
+				'line-height': 1,
+			});
+		}
+	});
+	
 }
     
     resizeElements()
@@ -275,12 +309,73 @@ function resizeElements() {
         }else{
             var newCorrectAnswer = $('#'+elementID).val();
         }
+	
+	if (data.input_type=='textarea') {
+		newCorrectAnswer = newCorrectAnswer.replace(/[\r\n]/g, " ");
+		console.log('paragraph: '+data.input_type);
+	}
         
         
         sendStudentAnswer($(this), newCorrectAnswer, data);
         if (elt.nodeName != 'SELECT') {
             updateCorrectAnswer_function(elementID);
         }
+    });
+    
+    
+    $("#default_form").on('blur', '.answers.mathquill-editable', function () {
+        var elementID = $(this).attr('id');
+        var elt = document.getElementById(elementID);
+        //console.log(elt.nodeName);
+        var data = $(this).data('options');
+	$(this).next('.editor-btn').fadeOut(300);
+        
+        
+        if ($("#"+elementID).attr('type')=='checkbox') {
+            var newCorrectAnswer = document.getElementById(elementID).checked;
+            if (document.getElementById(elementID).checked == true) {
+                $('#showCheckbox').prop("checked", true);
+            }
+            else{$('#showCheckbox').prop("checked", false);}
+        }else if (data.input_type=='mathwork' || data.input_type=='mathChem') {
+	    var newCorrectAnswer = $('#'+elementID).mathquill('latex');
+	    newCorrectAnswer = newCorrectAnswer.replace(/\\/g, "\\\\");
+	}else{
+            var newCorrectAnswer = $('#'+elementID).val();
+        }
+	
+	console.log(newCorrectAnswer);
+        
+        
+        sendStudentAnswer($(this), newCorrectAnswer, data);
+        if (elt.nodeName != 'SELECT') {
+            updateCorrectAnswer_function(elementID);
+        }
+    });
+    $("#default_form").on('focus', '.answers.mathquill-editable', function () {
+	$(this).next('.editor-btn').fadeIn(300);
+    });
+    
+    $("#default_form").on('click','.editor-btn', function(){
+	$("#mathChemEditor-modal .modal-body").html("");
+	var latex = $(this).prev().mathquill('latex');
+	$("#mathChemEditorInputID").val($(this).prev().attr('id'));
+	console.log('from edit: '+latex);
+	$("#mathChemEditor-modal").modal('show');
+	
+	setTimeout(function(){ 
+		$("<div>"+latex+"</div>").mathquill('editable').appendTo("#mathChemEditor-modal .modal-body").mathquill('redraw').find('textarea').focus();
+	}, 500);
+    });
+    
+    $("#mathChemEditor-modal").on('click','#updateMathChem-btn', function(){
+	var latex = $("#mathChemEditor-modal .modal-body div").mathquill('latex');
+	var inputID = $("#mathChemEditorInputID").val();
+	console.log('from edit: '+latex);
+	$("#"+inputID).html(latex).mathquill('editable').mathquill('redraw');
+	$("#"+inputID+" textarea").focus();
+	$("#mathChemEditor-modal").modal('hide');
+	$("#tryTyping").html('');
     });
     
     
@@ -334,7 +429,7 @@ function resizeElements() {
         //console.log("in grade check");
         var complete = checkAllAnswersFilled();
         console.log("complete: "+complete);
-        if (checkAllAnswersFilled()==true) {
+        if (complete==true) {
 	    if (!jQuery.isEmptyObject(bErrorSubmittingAnswers)) {
 		sendLeftoverAnswers(bErrorSubmittingAnswers, true);
 	    }
@@ -493,52 +588,48 @@ function checkAllAnswersFilled() {
 	answer = 'morePages';
     }
     console.log('inputs');
-    $("#default_form input").each(function(){
+    $("#default_form input.answers").each(function(){
         var val = $(this).val();
         console.log(val);
         if ($(this).attr('type')!='checkbox') {
             if (val==null || val== "" || val== " " || val=='none') {
                 console.log('empty');
                 var top = $(this).position().top;
-		/*
-                $('html, body').animate({
-                    scrollTop: (top-100) + 'px'
-                }, 2000);
-                */
                 $(this).css({'background-color':'#ffa8a8',});
                 answer = false;
             }
         }
     });
     console.log('selects');
-    $("#default_form select").each(function(){
+    $("#default_form select.answers").each(function(){
         var val = $(this).val();
         console.log(val);
         if (val==null || val== "" || val== " " || val=='none') {
             console.log('empty');
                 var top = $(this).position().top;
-		/*
-                $('html, body').animate({
-                    scrollTop: (top-100) + 'px'
-                }, 2000);
-                */
             $(this).css({'background-color':'#ffa8a8',});
             answer = false;
         }
     });
     console.log('textareas');
-    $("#default_form textarea").each(function(){
+    $("#default_form textarea.answers").each(function(){
         var val = $(this).val();
         console.log(val);
         if (val==null || val== "" || val== " " || val=='none') {
             console.log('empty');
                 var top = $(this).position().top;
-		/*
-                $('html, body').animate({
-                    scrollTop: (top-100) + 'px'
-                }, 2000);
-                */
             $(this).css({'background-color':'#ffa8a8',});
+            answer = false;
+        }
+    });
+    console.log('math');
+    $("#default_form .mathquill-editable").each(function(){
+        var val = $(this).mathquill('latex');
+        console.log(val);
+        if (val==null || val== "" || val== " " || val=='none') {
+            console.log('empty');
+                var top = $(this).position().top;
+            $(this).css({'background-color':'#ffa8a8 !important',});
             answer = false;
         }
     });
@@ -649,6 +740,71 @@ function showGradeColors() {
                         'top':((pos.top / $("#backgroundImage").height() * 100)-.2)+'%',
                         'width':((workElement.width() / $("#backgroundImage").width() * 100)+1)+'%',
                         'height':((workElement.height() / $("#backgroundImage").height() * 100)+.8)+'%',
+                        'background-color':correct.backColor,
+                        'border':'2px solid '+correct.borderColor,
+                        'opacity':'0.4',
+                    });
+            
+            
+            
+        }else if ($(this).data('options').input_type=='mathwork') {
+                    if ($(this).data('bCorrect') == 'correct') {
+			$(this).addClass('correctOutline').removeClass('incorrectOutline');
+                        var correct = {
+                            'backColor':"#9efe83",
+                            'borderColor':"#1b7401",
+                        }
+                    }else{
+			$(this).addClass('incorrectOutline').removeClass('correctOutline');
+                        var correct = {
+                            'backColor':"#ffa8a8",
+                            'borderColor':"#dd0000",
+                        }
+                    }
+                    $( "#default_form" ).append('<div id="checkboxNotify'+ counter +'" class="" title="Auto Graded By Keyword.  You teacher can adjust your grade at a later time if you feel there is an error."><div>');
+                    var workElement = $(this).parent().parent();
+                    var pos = workElement.position();
+                    $("#checkboxNotify"+ counter).css({
+                        'position':workElement.css('position'),
+                        'z-index':2,
+                        'left':((pos.left / $("#backgroundImage").width() * 100)-.2)+'%',
+                        'top':((pos.top / $("#backgroundImage").height() * 100)-.2)+'%',
+                        'width':((workElement.width() / $("#backgroundImage").width() * 100)+1)+'%',
+                        'height':((workElement.height() / $("#backgroundImage").height() * 100)+.8)+'%',
+                        'background-color':correct.backColor,
+                        'border':'2px solid '+correct.borderColor,
+                        'opacity':'0.4',
+                    });
+            
+            
+            
+        }else if ($(this).data('options').input_type=='mathChem') {
+		console.log('mathChem Cover');
+                    if ($(this).data('bCorrect') == 'correct') {
+			$(this).addClass('correctOutline').removeClass('incorrectOutline');
+                        var correct = {
+                            'backColor':"#9efe83",
+                            'borderColor':"#1b7401",
+                        }
+                    }else{
+			$(this).addClass('incorrectOutline').removeClass('correctOutline');
+                        var correct = {
+                            'backColor':"#ffa8a8",
+                            'borderColor':"#dd0000",
+                        }
+                    }
+                    $( "#default_form" ).append('<div id="checkboxNotify'+ counter +'" class=""><div>');
+                    var workElement = $(this);
+                    var pos = workElement.position();
+		    var padding = parseInt($(this).css('padding').replace('px',''))*2;
+		    console.log("padding: "+padding);
+                    $("#checkboxNotify"+ counter).css({
+                        'position':workElement.css('position'),
+                        'z-index':2,
+                        'left':((pos.left / $("#backgroundImage").width() * 100)-.2)+'%',
+                        'top':((pos.top / $("#backgroundImage").height() * 100)-.2)+'%',
+                        'width':(((workElement.width()+padding) / $("#backgroundImage").width() * 100)+1)+'%',
+                        'height':(((workElement.height()+padding) / $("#backgroundImage").height() * 100)+.8)+'%',
                         'background-color':correct.backColor,
                         'border':'2px solid '+correct.borderColor,
                         'opacity':'0.4',
@@ -873,6 +1029,12 @@ function showGradeColors() {
 					    $("#retry-btn").addClass('disabled');
 				    }
 			    }else{$("#retry-btn").hide();}
+			    
+			    
+			    setTimeout(function(){ 
+				$("#display-grade-modal .mathquill-embedded-latex").mathquill();
+			    }, 500);
+			    
 			    $("#display-grade-modal").modal('show');
 		    }
 		};
@@ -944,6 +1106,36 @@ function showGradeColors() {
 	 */
 
 
+	
+	// Math Chem editor
+	$('#editor-tabs a').click(function (e) {
+		e.preventDefault()
+		$(this).tab('show')
+	})
+        
+	    
+	$("#mathTab button, #chemTab button").each(function(){
+	    $(this).popover();
+	});
+        
+        
+	$("#mathTab button, #chemTab button").click(function(){
+		var latex = $(this).data('mathquill');
+		var tryTyping = $(this).data('trytyping');
+		
+		console.log(tryTyping);
+		$("#mathChemEditor-modal .modal-body div").mathquill('write',latex);
+		if ($("#mathChemEditor-modal .modal-body div .empty:first").length){
+			$("#mathChemEditor-modal .modal-body div .empty:first").mousedown().mouseup();
+		}else{
+			$("#mathChemEditor-modal .modal-body div textarea").focus();
+		}
+		$("#tryTyping").fadeOut(300, function(){
+			$("#tryTyping").html("Or try typing: <span class='text-danger'>"+tryTyping+"</span>").fadeIn(300);
+		});
+	});
+	
+	
         
 }); 
 

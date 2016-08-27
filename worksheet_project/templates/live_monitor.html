@@ -23,7 +23,7 @@
         </div>
         
         
-        <div class="panel-body table-responsive">
+        <div class="panel-body">
           
           
           <!------------------------------------  Start of list holder -------------------------------------------->
@@ -53,9 +53,9 @@
 
     </div>
                 
-    <div id="collapse{{ class.class.id }}" class="accordion-body collapse {% if forloop.counter == 1 %}in{% endif %}">
+    <div id="collapse{{ class.class.id }}" class="accordion-body collapse {% if forloop.counter == 1 %}in{% endif %}" style="overflow-x: scroll;">
       <div class="accordion-inner">
-                    <table class="table table-bordered table-hover table-striped table-responsive">
+                    <table class="table table-bordered table-hover table-striped">
                       <thead>
                         <!-------------------- Start of table headers -------------------------------------------->
                         <tr class="" id="students-table-headers">
@@ -267,4 +267,21 @@
     var liveMonitorData = { projectID: {{ currentProject.id }}, classID: {% for class in classesAndStudents %}{{ class.class.id }}{%endfor%} }
   </script>
   <script type="text/javascript" src="{% static "adminBoot/js/monitor/live_monitor.js" %}?version=1"></script>
+    <script>
+      $(document).ready(function(){
+        setTimeout(function(){
+          $(".accordion-body.collapse").niceScroll({
+            styler:"fb",
+            cursorcolor:"#4ECDC4",
+            autohidemode: "leave",
+            cursorwidth: '10px',
+            cursorborderradius: '10px',
+            background: '#404040',
+            spacebarenabled:false,
+            cursorborder: '',
+            zindex: '1000'
+          });
+        }, 1000);
+      });
+    </script>
 {% endblock %}

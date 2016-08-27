@@ -55,13 +55,28 @@
                           </select>
                         </div>
                     </div>
+		    {% else %}
+                    <div class="form-group">
+                        <label class="col-sm-2 col-sm-2 control-label">Student ID</label>
+                        <div class="col-sm-10">
+			  {% if classUser.lockedChanges and not classUser.teacher %}
+			    <h5>{% if classUser.studentID %}{{ classUser.studentID }}{% endif %}</h5><span class="text-danger">teacher locked changes</span>
+			  {% else %}
+                          <input type="text" class="form-control" name="studentID" value="{% if classUser.studentID %}{{ classUser.studentID }}{% endif %}">
+			  {% endif %}
+                        </div>
+                    </div>
 		    {% endif %}
                     
                     <div class="form-group">
                       <label class="col-sm-2 col-sm-2 control-label">Name</label>
                       <div class="col-sm-10">
-                        <input id="fullName-input" type="text" class="form-control" name="fullName" value="{% if userInfo.user.first_name %}{{ userInfo.user.first_name|capfirst }} {{ userInfo.user.last_name|capfirst }}{%endif%}" minlength="3" maxlength="60" required placeholder="Name...">
-                        <span class="register-check register-check-error"></span>
+			  {% if classUser.lockedChanges and not classUser.teacher %}
+			    <h5>{% if userInfo.user.first_name %}{{ userInfo.user.first_name|capfirst }} {{ userInfo.user.last_name|capfirst }}{%endif%}</h5><span class="text-danger">teacher locked changes</span>
+			  {% else %}
+			    <input id="fullName-input" type="text" class="form-control" name="fullName" value="{% if userInfo.user.first_name %}{{ userInfo.user.first_name|capfirst }} {{ userInfo.user.last_name|capfirst }}{%endif%}" minlength="3" maxlength="60" required placeholder="Name...">
+			    <span class="register-check register-check-error"></span>
+			  {% endif %}
                       </div>
                     </div>
                     
@@ -73,7 +88,7 @@
                     <button type="button" class="btn btn-block btn-primary rounded" data-toggle="modal" data-target="#reset-password">Password</button>
                   </div>
                   <div class="col-xs-6 col-sm-5 col-md-3">
-                    <button id="updateBtn" type="submit" class="btn btn-block btn-primary rounded">Update</button>
+                    <button id="updateBtn" type="submit" class="btn btn-block btn-primary rounded {% if classUser.lockedChanges and not classUser.teacher %}disabled{%endif%}">Update</button>
                   </div>
                 </div>
               </form>
@@ -688,6 +703,44 @@ var checkUsernameURI = "{% url 'google_login.views.checkUsername' %}";
     $("#blinky-class").click(function(){
       tour.end();
     });
+{% elif not userInfo.user.first_name %}
+    //  Go to http://bootstraptour.com/api/ for documentation
+    
+    var tour = new Tour({
+	name: "tour",
+	steps: [
+	    {
+	      element: "#fullName-input",
+	      title: "Your Name",
+	      content: "Please put your FIRST and LAST NAME...",
+	      placement: 'top',
+	    },
+	    {
+	      element: "#updateBtn",
+	      title: "Update",
+	      content: 'Make sure you "Update" any changes...',
+	      placement: 'top',
+	    },
+	    {
+	      element: "#blinky-class",
+	      title: "Classes",
+	      content: "Now, let's get some class...",
+	      backdropPositioning: 'fixed',
+	    }
+	],
+	container: "body",
+	keyboard: true,
+	storage: false,
+	debug: true,
+	backdrop: true,
+	backdropPadding: 5,
+    });
+    
+    // Initialize the tour
+    tour.init();
+    
+    tour.start();
+    
 {% endif %}
 
 </script>

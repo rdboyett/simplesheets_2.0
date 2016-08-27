@@ -263,12 +263,13 @@ def updateCorrectAnswer(request):
         newCorrectAnswer = request.POST["newCorrectAnswer"]
     
     
-        newCorrectAnswer = newCorrectAnswer.strip()
-        newCorrectAnswer = newCorrectAnswer.lower()
         
         if FormInput.objects.filter(id=int(inputNumber)):
             formInput = FormInput.objects.get(id=int(inputNumber))
-            formInput.correctAnswer = newCorrectAnswer.strip()
+            if formInput.inputType == 'mathChem' or formInput.inputType == "mathwork":
+                formInput.correctAnswer = newCorrectAnswer.strip()
+            else:
+                formInput.correctAnswer = newCorrectAnswer.strip().lower()
             formInput.save()
 
 
@@ -680,10 +681,11 @@ def changeWorksheetName(request):
                             oldProject.numberOfRetry = numberOfRetry
                             
                         oldProject.save()
-                            
-                        drive_service = get_service(request.user)
-                        
-                        rename_google_file(drive_service, oldProject.uploadedFileID, oldProject.title)
+
+                        if oldProject.uploadedFileID:
+                            drive_service = get_service(request.user)
+
+                            rename_google_file(drive_service, oldProject.uploadedFileID, oldProject.title)
                             
                         data = {
                             'success': "success",
@@ -808,9 +810,7 @@ def sendStudentAnswer(request):
         projectID = request.POST["project_id"].strip()
         myAnswer = request.POST["answer"].strip()
         classID = request.POST["classID"].strip()
-        
-        myAnswer = myAnswer.strip()
-        myAnswer = myAnswer.lower()
+
         
         if UserInfo.objects.filter(id=userInfo_id):
             userInfo = UserInfo.objects.get(id=userInfo_id)
@@ -827,7 +827,14 @@ def sendStudentAnswer(request):
                 data = {
                     'error': "There is no question with ID: "+str(answerID),
                 }
-                
+
+            #Having a problem with Math and Chem answer types with answers being lowercase
+            #We should get rid of the lowercase for all answers and just lowercase for grading.
+            if question.inputType == 'mathChem' or question.inputType == "mathwork":
+                myAnswer = myAnswer.strip()
+            else:
+                myAnswer = myAnswer.strip().lower()
+
             if question.correctAnswer == myAnswer:
                 bCorrect = True
                 data = {'answer':"correct"}
@@ -932,7 +939,7 @@ def submitGradeWorksheet(request):
                     for question in project.formInputs.all().order_by('pageNumber'):  #question is a FormInput
                         #get myAnswer for this question
                         if MyAnswer.objects.filter(project=project, userInfo=userInfo, answer=question):
-                            myAnswer = MyAnswer.objects.get(project=project, userInfo=userInfo, answer=question)
+                            myAnswer = MyAnswer.objects.filter(project=project, userInfo=userInfo, answer=question)[0]
                             
                             pointsPossible += float(question.points)
                             if not question.inputType == 'textarea':
@@ -1181,7 +1188,7 @@ def forceGradeWorksheet(request):
                     for question in project.formInputs.all().order_by('pageNumber'):  #question is a FormInput
                         #get myAnswer for this question
                         if MyAnswer.objects.filter(project=project, userInfo=userInfo, answer=question):
-                            myAnswer = MyAnswer.objects.get(project=project, userInfo=userInfo, answer=question)
+                            myAnswer = MyAnswer.objects.filter(project=project, userInfo=userInfo, answer=question)[0]
                             
                             pointsPossible += float(question.points)
                             if not question.inputType == 'textarea':
@@ -1414,7 +1421,7 @@ def updateInputType(request):
             if FormInput.objects.filter(id=inputNumber):
                 workInput = FormInput.objects.get(id=inputNumber)
                 
-                if newInputType == 'work' or newInputType == 'drawing':
+                if newInputType == 'work' or newInputType == 'drawing' or newInputType == 'mathwork':
                     workInput.inputType = str(newInputType)
                     try:
                         if BackImage.objects.filter(project__id=project_id, pageNumber=pageNumber):

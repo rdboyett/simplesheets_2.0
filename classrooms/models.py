@@ -57,6 +57,8 @@ class ClassUser(models.Model):
     avatarBackColor = models.CharField(max_length=45, blank=True, null=True)
     avatarTextColor = models.CharField(max_length=45, blank=True, null=True)
     googleFolderID = models.CharField(max_length=45, blank=True, null=True)
+    studentID = models.CharField(max_length=45, blank=True, null=True)
+    lockedChanges = models.BooleanField(default=False)
 
 
     def __unicode__(self):

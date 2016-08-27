@@ -8,10 +8,17 @@
     
 
 {% block body %}
-	<a href="{% url "worksheet_project.views.worksheet_display" newProject.id %}" class="btn btn-primary">settings</a>
-	<button id="addQuestion-btn" class="btn btn-danger">add answer block</button>
-	<button id="zoom-out-btn" class="btn btn-primary"><span class="fa fa-search-minus"></span></button>
-	<button id="zoom-in-btn" class="btn btn-primary"><span class="fa fa-search-plus"></button>
+    <div class="row">
+	<div class="col-md-5">
+	    <a href="{% url "worksheet_project.views.worksheet_display" newProject.id %}" class="btn btn-primary">settings</a>
+	    <button id="addQuestion-btn" class="btn btn-danger">add answer block</button>
+	    <button id="zoom-out-btn" class="btn btn-primary"><span class="fa fa-search-minus"></span></button>
+	    <button id="zoom-in-btn" class="btn btn-primary"><span class="fa fa-search-plus"></button>
+	</div>
+	<div class="col-md-2 text-center">
+	    <div class="g-sharetoclassroom" data-size="50" data-title="{{ newProject.title|title }}" data-url="{{ siteURL }}nextPage/{{ newProject.id }}/{{ pageNumber }}/" ></div>
+	</div>
+    </div>
 <section id="wrapper-holder">
     <section id="wrapper">
 	{% for backImage in newProject.backgroundImages.all %}
@@ -33,64 +40,125 @@
 	    {% for input in formInputs %}
 		{% ifequal input.pageNumber pageNumber %}
 		    {% if input.inputType == 'textarea' %}
-			<textarea id="input{{ input.id }}" class="answers highlight img-rounded" readonly="readonly" data-options='{"answer_id":"{{ input.id }}", "question_number":"{{ input.questionNumber }}", "input_type":"{{ input.inputType }}", "points":"{{ input.points }}", "help_text":{% if input.helpText %}"{{ input.helpText }}"{% else %}""{% endif %}, "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}' style="resize: none;position: absolute;z-index: 1;left: {{ input.left }}%;top: {{ input.top }}%;width: {{ input.width }}%; height: {{ input.height }}%">Place keywords to search in order to help with grading later.</textarea>
+			<textarea id="input{{ input.id }}" class="answers highlight img-rounded" readonly="readonly" data-options='{"answer_id":"{{ input.id }}", "question_number":"{{ input.questionNumber }}", "input_type":"{{ input.inputType }}", "points":"{{ input.points }}", "help_text":"", "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}' style="resize: none;position: absolute;z-index: 1;left: {{ input.left }}%;top: {{ input.top }}%;width: {{ input.width }}%; height: {{ input.height }}%">Place keywords to search in order to help with grading later.</textarea>
 			<script>
 			    {% if input.option1 %}
-			    $('#input{{ input.id }}').data('keyword1', '{{ input.option1 }}');
+			    $('#input{{ input.id }}').data('keyword1', '{{ input.option1|escapejs }}');
 			    {% endif %}
 			    {% if input.option2 %}
-			    $('#input{{ input.id }}').data('keyword2', '{{ input.option2 }}');
+			    $('#input{{ input.id }}').data('keyword2', '{{ input.option2|escapejs }}');
 			    {% endif %}
 			    {% if input.option3 %}
-			    $('#input{{ input.id }}').data('keyword3', '{{ input.option3 }}');
+			    $('#input{{ input.id }}').data('keyword3', '{{ input.option3|escapejs }}');
 			    {% endif %}
 			    {% if input.option4 %}
-			    $('#input{{ input.id }}').data('keyword4', '{{ input.option4 }}');
+			    $('#input{{ input.id }}').data('keyword4', '{{ input.option4|escapejs }}');
+			    {% endif %}
+			    {% if input.helpText %}
+				$('#input{{ input.id }}').data('options').help_text = "{{ input.helpText|escapejs }}";
 			    {% endif %}
 			</script>
 		    {% elif input.inputType == 'work' %}
-		    <div id="workinput{{ input.id }}" class="highlight img-rounded" style="position: absolute;z-index: 1;left: {{ input.left }}%;top: {{ input.top }}%;width: {{ input.width }}%; height: {{ input.height }}%" data-options='{"answer_id":"{{ input.id }}", "question_number":"{{ input.questionNumber }}", "input_type":"{{ input.inputType }}", "points":"{{ input.points }}", "help_text":{% if input.helpText %}"{{ input.helpText }}"{% else %}""{% endif %}, "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}'>
+		    <div id="workinput{{ input.id }}" class="highlight img-rounded" style="position: absolute;z-index: 1;left: {{ input.left }}%;top: {{ input.top }}%;width: {{ input.width }}%; height: {{ input.height }}%" data-options='{"answer_id":"{{ input.id }}", "question_number":"{{ input.questionNumber }}", "input_type":"{{ input.inputType }}", "points":"{{ input.points }}", "help_text":"", "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}'>
                         <div class="work-button img-rounded" style="position:relative;top:40%;left:0;font-size: 20px;text-align: center;">Work Area will be activated for student use...<span style="font-size: 12px;">place answer here.</span>
-			    <input id="input{{ input.id }}" class="answers highlight" value="{% if input.correctAnswer %}{{ input.correctAnswer }}{% endif %}" name="" data-options='{"answer_id":"{{ input.id }}", "question_number":"{{ input.questionNumber }}", "input_type":"{{ input.inputType }}", "points":"{{ input.points }}", "help_text":{% if input.helpText %}"{{ input.helpText }}"{% else %}""{% endif %}, "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}' type="text" style="width:100px;" title="answer..." name="">
+			    <input id="input{{ input.id }}" class="answers highlight" value="{% if input.correctAnswer %}{{ input.correctAnswer }}{% endif %}" name="" data-options='{"answer_id":"{{ input.id }}", "question_number":"{{ input.questionNumber }}", "input_type":"{{ input.inputType }}", "points":"{{ input.points }}", "help_text":"", "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}' type="text" style="width:100px;" title="answer..." name="">
 			</div>
 		    </div>
+			<script>
+			    {% if input.helpText %}
+				$('#workinput{{ input.id }}').data('options').help_text = "{{ input.helpText|escapejs }}";
+				$('#input{{ input.id }}').data('options').help_text = "{{ input.helpText|escapejs }}";
+			    {% endif %}
+			</script>
+		    
+		    {% elif input.inputType == 'mathwork' %}
+		    <div id="mathworkinput{{ input.id }}" class="highlight img-rounded" style="position: absolute;z-index: 1;left: {{ input.left }}%;top: {{ input.top }}%;width: {{ input.width }}%; height: {{ input.height }}%" data-options='{"answer_id":"{{ input.id }}", "question_number":"{{ input.questionNumber }}", "input_type":"{{ input.inputType }}", "points":"{{ input.points }}", "help_text":"", "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}'>
+                        <div class="work-button img-rounded" style="position:relative;top:40%;left:0;font-size: 20px;text-align: center;">Work Area will be activated for student use...<span style="font-size: 12px;">place MATH answer here.</span>
+			    <span id="input{{ input.id }}" class="answers highlight"
+				     data-options='{"answer_id":"{{ input.id }}", "question_number":"{{ input.questionNumber }}", "input_type":"{{ input.inputType }}", "points":"{{ input.points }}", "help_text":"", "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}'
+				     style="background-color: #FFF !important;">
+			    </span>
+		    <span id="editorBtn-input{{ input.id }}" class="editor-btn btn btn-success btn-xs" style="display: none;position: absolute;z-index: 1;left: 100%;top: 100%;margin: -20px 0 0 -45px;">editor</span>
+			    <script>
+				{% if input.correctAnswer %}
+				$("#input{{ input.id }}").mathquill('editable').mathquill('latex','{{ input.correctAnswer }}');
+				{% else %}
+				$("#input{{ input.id }}").mathquill('editable');
+				{% endif %}
+				
+			    </script>
+			</div>
+		    </div>
+		    
+			<script>
+			    {% if input.helpText %}
+				$('#mathworkinput{{ input.id }}').data('options').help_text = "{{ input.helpText|escapejs }}";
+			    {% endif %}
+			</script>
+		    
+		    
+		    {% elif input.inputType == 'mathChem' %}
+		    <span id="input{{ input.id }}" class="answers"
+			   data-options='{"answer_id":"{{ input.id }}",
+			   "question_number":"{{ input.questionNumber }}",
+			   "input_type":"{{ input.inputType }}", "points":"{{ input.points }}",
+			   "help_text":"",
+			   "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}'
+			    style="position: absolute;z-index: 1;left: {{ input.left }}%;top: {{ input.top }}%;
+			    width: {{ input.width }}%; height: {{ input.height }}%">
+		    </span>
+		    <span id="editorBtn-input{{ input.id }}" class="editor-btn btn btn-success btn-xs" style="display: none;position: absolute;z-index: 1;left: {{ input.left|add:input.width }}%;top: {{ input.top|add:input.height }}%;margin-left: -45px;">editor</span>
+			    <script>
+				{% if input.correctAnswer %}
+				$("#input{{ input.id }}").mathquill('editable').mathquill('latex','{{ input.correctAnswer }}');
+				{% else %}
+				$("#input{{ input.id }}").mathquill('editable');
+				{% endif %}
+				
+			    {% if input.helpText %}
+				$('#input{{ input.id }}').data('options').help_text = "{{ input.helpText|escapejs }}";
+			    {% endif %}
+			    </script>
 		    
 		    
 		    {% elif input.inputType == 'drawing' %}
 		    
 			<textarea id="input{{ input.id }}" class="answers highlight img-rounded" readonly="readonly" data-options='{"answer_id":"{{ input.id }}",
 			    "question_number":"{{ input.questionNumber }}", "input_type":"{{ input.inputType }}", "points":"{{ input.points }}",
-			    "help_text":{% if input.helpText %}"{{ input.helpText }}"{% else %}""{% endif %},
+			    "help_text":"",
 			    "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}'
 			    style="resize: none;position: absolute;z-index: 1;left: {{ input.left }}%;top: {{ input.top }}%;width: {{ input.width }}%;
 			    height: {{ input.height }}%"></textarea><div id="drawinginput{{ input.id }}" class="work-button img-rounded"
-			    style="position: absolute;z-index: 1;left: {{ input.left }}%;top: {{ input.top }}%;width: {{ input.width }}%; text-align: center;">Drawing Area will be activated for student use...</div>
+			    style="position: absolute;z-index: 1;left: {{ input.left }}%;top: {{ input.top }}%;width: {{ input.width }}%; text-align: center;">Drawing Area will be activated for student use. If you don't want this to be auto-graded, assign a point value of zero to the right.</div>
 			<script>
 			    {% if input.option1 %}
-			    $('#input{{ input.id }}').data('keyword1', '{{ input.option1 }}');
+			    $('#input{{ input.id }}').data('keyword1', '{{ input.option1|escapejs }}');
 			    {% endif %}
 			    {% if input.option2 %}
-			    $('#input{{ input.id }}').data('keyword2', '{{ input.option2 }}');
+			    $('#input{{ input.id }}').data('keyword2', '{{ input.option2|escapejs }}');
 			    {% endif %}
 			    {% if input.option3 %}
-			    $('#input{{ input.id }}').data('keyword3', '{{ input.option3 }}');
+			    $('#input{{ input.id }}').data('keyword3', '{{ input.option3|escapejs }}');
 			    {% endif %}
 			    {% if input.option4 %}
-			    $('#input{{ input.id }}').data('keyword4', '{{ input.option4 }}');
+			    $('#input{{ input.id }}').data('keyword4', '{{ input.option4|escapejs }}');
+			    {% endif %}
+			    {% if input.helpText %}
+				$('#input{{ input.id }}').data('options').help_text = "{{ input.helpText|escapejs }}";
 			    {% endif %}
 			</script>
 		    
 		    
 		    <!--
-		    <div id="drawinginput{{ input.id }}" class="highlight img-rounded" style="position: absolute;z-index: 1;left: {{ input.left }}%;top: {{ input.top }}%;width: {{ input.width }}%; height: {{ input.height }}%" data-options='{"answer_id":"{{ input.id }}", "question_number":"{{ input.questionNumber }}", "input_type":"{{ input.inputType }}", "points":"{{ input.points }}", "help_text":{% if input.helpText %}"{{ input.helpText }}"{% else %}""{% endif %}, "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}'>
+		    <div id="drawinginput{{ input.id }}" class="highlight img-rounded" style="position: absolute;z-index: 1;left: {{ input.left }}%;top: {{ input.top }}%;width: {{ input.width }}%; height: {{ input.height }}%" data-options='{"answer_id":"{{ input.id }}", "question_number":"{{ input.questionNumber }}", "input_type":"{{ input.inputType }}", "points":"{{ input.points }}", "help_text":"", "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}'>
                         <div class="work-button img-rounded" style="position:relative;top:40%;left:0;font-size: 20px;text-align: center;">Drawing Area will be activated for student use...
-			    <input id="input{{ input.id }}" class="answers highlight" value="{% if input.correctAnswer %}{{ input.correctAnswer }}{% endif %}" name="" data-options='{"answer_id":"{{ input.id }}", "question_number":"{{ input.questionNumber }}", "input_type":"{{ input.inputType }}", "points":"{{ input.points }}", "help_text":{% if input.helpText %}"{{ input.helpText }}"{% else %}""{% endif %}, "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}' type="text" style="width:100px;" title="answer..." name="">
+			    <input id="input{{ input.id }}" class="answers highlight" value="{% if input.correctAnswer %}{{ input.correctAnswer }}{% endif %}" name="" data-options='{"answer_id":"{{ input.id }}", "question_number":"{{ input.questionNumber }}", "input_type":"{{ input.inputType }}", "points":"{{ input.points }}", "help_text":"", "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}' type="text" style="width:100px;" title="answer..." name="">
 			</div>
 		    </div>
 		    <!--
 		    <input id="input{{ input.id }}" placeholder="Drawing Area will be activated for student use..." class="answers highlight" data-options='{"answer_id":"{{ input.id }}",
 			"question_number":"{{ input.questionNumber }}", "input_type":"{{ input.inputType }}", "points":"{{ input.points }}",
-			"help_text":{% if input.helpText %}"{{ input.helpText }}"{% else %}""{% endif %},
+			"help_text":"",
 			"help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}'
 			type="{{ input.inputType }}" title='drawing area...'
 			value="{% if input.correctAnswer %}{{ input.correctAnswer }}{% endif %}"
@@ -101,7 +169,7 @@
 		    
 			
 		    {% elif input.inputType == 'select' %}
-			<select id="input{{ input.id }}" class="answers highlight img-rounded" data-options='{"answer_id":"{{ input.id }}", "question_number":"{{ input.questionNumber }}", "input_type":"{{ input.inputType }}", "points":"{{ input.points }}", "help_text":{% if input.helpText %}"{{ input.helpText }}"{% else %}""{% endif %}, "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}' style="position: absolute;z-index: 1;left: {{ input.left }}%;top: {{ input.top }}%;width: {{ input.width }}%; height: {{ input.height }}%">
+			<select id="input{{ input.id }}" class="answers highlight img-rounded" data-options='{"answer_id":"{{ input.id }}", "question_number":"{{ input.questionNumber }}", "input_type":"{{ input.inputType }}", "points":"{{ input.points }}", "help_text":"", "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}' style="position: absolute;z-index: 1;left: {{ input.left }}%;top: {{ input.top }}%;width: {{ input.width }}%; height: {{ input.height }}%">
 			    <option id="option0" value="none">Select One...</option>
 			    {% if input.option1 %}
 			    <option id="option1" value="option1">{{ input.option1 }}</option>
@@ -118,30 +186,38 @@
 			</select>
 			<script>
 			    {% if input.option1 %}
-			    $('#input{{ input.id }}').data('choice1', '{{ input.option1 }}');
+			    $('#input{{ input.id }}').data('choice1', '{{ input.option1|escapejs }}');
 			    {% endif %}
 			    {% if input.option2 %}
-			    $('#input{{ input.id }}').data('choice2', '{{ input.option2 }}');
+			    $('#input{{ input.id }}').data('choice2', '{{ input.option2|escapejs }}');
 			    {% endif %}
 			    {% if input.option3 %}
-			    $('#input{{ input.id }}').data('choice3', '{{ input.option3 }}');
+			    $('#input{{ input.id }}').data('choice3', '{{ input.option3|escapejs }}');
 			    {% endif %}
 			    {% if input.option4 %}
-			    $('#input{{ input.id }}').data('choice4', '{{ input.option4 }}');
+			    $('#input{{ input.id }}').data('choice4', '{{ input.option4|escapejs }}');
 			    {% endif %}
 			    {% if input.correctAnswer %}
-				$('#input{{ input.id }}').val('{{ input.correctAnswer }}');
+				$('#input{{ input.id }}').val('{{ input.correctAnswer|escapejs }}');
+			    {% endif %}
+			    {% if input.helpText %}
+				$('#input{{ input.id }}').data('options').help_text = "{{ input.helpText|escapejs }}";
 			    {% endif %}
 			</script>
 		    {% elif input.inputType == 'checkbox' %}
-			<input id="input{{ input.id }}" class="answers highlight" data-options='{"answer_id":"{{ input.id }}", "question_number":"{{ input.questionNumber }}", "input_type":"{{ input.inputType }}", "points":"{{ input.points }}", "help_text":{% if input.helpText %}"{{ input.helpText }}"{% else %}""{% endif %}, "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}' type="{{ input.inputType }}" title='answer...' name="" style="position: absolute;z-index: 1;left: {{ input.left }}%;top: {{ input.top }}%;width: {{ input.width }}%; height: {{ input.height }}%">
+			<input id="input{{ input.id }}" class="answers highlight" data-options='{"answer_id":"{{ input.id }}", "question_number":"{{ input.questionNumber }}", "input_type":"{{ input.inputType }}", "points":"{{ input.points }}", "help_text":"", "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}' type="{{ input.inputType }}" title='answer...' name="" style="position: absolute;z-index: 1;left: {{ input.left }}%;top: {{ input.top }}%;width: {{ input.width }}%; height: {{ input.height }}%">
 			<script>
 			    {% if input.correctAnswer %}
 				$('#input{{ input.id }}').prop("checked", {{ input.correctAnswer }});
 			    {% endif %}
 			</script>
 		    {% else %}
-			<input id="input{{ input.id }}" class="answers highlight" data-options='{"answer_id":"{{ input.id }}", "question_number":"{{ input.questionNumber }}", "input_type":"{{ input.inputType }}", "points":"{{ input.points }}", "help_text":{% if input.helpText %}"{{ input.helpText }}"{% else %}""{% endif %}, "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}' type="{{ input.inputType }}" title='answer...' value="{% if input.correctAnswer %}{{ input.correctAnswer }}{% endif %}" name="" style="position: absolute;z-index: 1;left: {{ input.left }}%;top: {{ input.top }}%;width: {{ input.width }}%; height: {{ input.height }}%">
+			<input id="input{{ input.id }}" class="answers highlight" data-options='{"answer_id":"{{ input.id }}", "question_number":"{{ input.questionNumber }}", "input_type":"{{ input.inputType }}", "points":"{{ input.points }}", "help_text":"", "help_link":{% if input.helpLink %}"{{ input.helpLink }}"{% else %}""{% endif %}}' type="{{ input.inputType }}" title='answer...' value="{% if input.correctAnswer %}{{ input.correctAnswer }}{% endif %}" name="" style="position: absolute;z-index: 1;left: {{ input.left }}%;top: {{ input.top }}%;width: {{ input.width }}%; height: {{ input.height }}%">
+			    <script>
+			    {% if input.helpText %}
+				$('#input{{ input.id }}').data('options').help_text = "{{ input.helpText|escapejs }}";
+			    {% endif %}
+			    </script>
 		    {% endif %}
 		{% endifequal %}
 	    {% endfor %}
@@ -285,7 +361,7 @@
 {% block extraScript %}
     
     <link rel="stylesheet" type="text/css" href="{% static "page_view/css/imgareaselect-animated.css" %}?version=1" />
-    <script type="text/javascript" src="{% static "page_view/js/jquery.imgareaselect.js" %}?version=1"></script>
+    <script type="text/javascript" src="{% static "page_view/js/jquery.imgareaselect.js" %}?version=2"></script>
     
 
     
@@ -306,14 +382,14 @@
 			$('#workinput{{ input.id }} img').attr('src', '{{ MEDIA_URL }}{{ myAnswer.workImagePath }}')
 			{% endif %}
 			{% if myAnswer.myAnswer %}
-			$('#input{{ input.id }}').val('{{ myAnswer.myAnswer }}');
+			$('#input{{ input.id }}').val('{{ myAnswer.myAnswer|escapejs }}');
 			{% endif %}
 			
 		    {% elif input.inputType == 'checkbox' %}
 			$('#input{{ input.id }}').prop("checked", {% if myAnswer.myAnswer == "true" %}{{ myAnswer.myAnswer }}{%else%}false{%endif%});
 				
 		    {% else %}
-			$('#input{{ input.id }}').val('{{ myAnswer.myAnswer }}');
+			$('#input{{ input.id }}').val('{{ myAnswer.myAnswer|escapejs }}');
 		    {% endif %}
 		    {% endifequal %}
 		{% endfor %}
@@ -346,7 +422,7 @@
     </script>
     
     
-    <script src="{% static "adminBoot/js/edit_worksheets/edit_worksheets.js" %}?version=1"></script>
+    <script src="{% static "adminBoot/js/edit_worksheets/edit_worksheets.js" %}?version=5"></script>
     
     
   
@@ -421,7 +497,7 @@ $(document).ready(function(){
 			    '<div class="row">'+
 				'<div class="col-xs-10 col-xs-offset-1">'+
 				    '<div class="text-center">'+
-					'<h4>Press <span class="text-danger">ENTER</span> to create the block!</h4>'+
+					'<h4>Press <span class="text-danger">ENTER</span> or click <span class="btn btn-success btn-xs"><i class="fa fa-check"></i> create</span> to create the block!</h4>'+
 					'</div>'+
 				'</div'+
 			    '</div>'+
@@ -515,7 +591,7 @@ $(document).ready(function(){
 			    '<div class="row">'+
 				'<div class="col-xs-10 col-xs-offset-1">'+
 				    '<div class="text-center">'+
-					"<h4>You can force your students to answer text or only numbers...</h4>"+
+					"<h4>You can have your students answer text or only numbers...</h4>"+
 					'</div>'+
 				'</div'+
 			    '</div>'+
@@ -528,6 +604,33 @@ $(document).ready(function(){
 			    '</div>'+
 			  '</div>',
 		  placement: 'left',
+		},
+		{
+		  element: "#sidebar-right",
+		  title: "Math or Chemistry",
+		  template: '<div class="popover" role="tooltip" style="width:300px;">'+
+			    '<div class="arrow"></div>'+
+			    '<h3 class="popover-title primary"></h3>'+
+			    '<div class="row">'+
+				'<div class="col-xs-10 col-xs-offset-1">'+
+				    '<div class="text-center">'+
+					"<h4>Have your students write equations for Math or Chemistry...</h4>"+
+					'</div>'+
+				'</div'+
+			    '</div>'+
+			    '<div class="popover-navigation">'+
+			      '<div class="btn-group">'+
+				'<button class="btn btn-sm btn-primary" data-role="prev"><i class="fa fa-angle-double-left"></i> Prev</button>'+
+				'<button class="btn btn-sm btn-primary" data-role="next">Next <i class="fa fa-angle-double-right"></i></button>'+
+				'<button class="btn btn-sm btn-primary" data-role="pause-resume" data-pause-text="Pause" data-resume-text="Resume">Pause</button>'+
+			      '</div>'+
+			    '</div>'+
+			  '</div>',
+		  placement: 'left',
+		  onShow: function(){
+		    $('#questionType').val('mathChem');
+		    $('#questionType').change();
+		  },
 		},
 		{
 		  element: "#sidebar-right",
@@ -607,6 +710,33 @@ $(document).ready(function(){
 		  placement: 'left',
 		  onShow: function(){
 		    $('#questionType').val('work');
+		    $('#questionType').change();
+		  },
+		},
+		{
+		  element: "#sidebar-right",
+		  title: "Math Equation and Show Your Work",
+		  template: '<div class="popover" role="tooltip" style="width:300px;">'+
+			    '<div class="arrow"></div>'+
+			    '<h3 class="popover-title primary"></h3>'+
+			    '<div class="row">'+
+				'<div class="col-xs-10 col-xs-offset-1">'+
+				    '<div class="text-center">'+
+					"<h4>Have your students show their work and respond with a Math or Chemistry equation...</h4>"+
+					'</div>'+
+				'</div'+
+			    '</div>'+
+			    '<div class="popover-navigation">'+
+			      '<div class="btn-group">'+
+				'<button class="btn btn-sm btn-primary" data-role="prev"><i class="fa fa-angle-double-left"></i> Prev</button>'+
+				'<button class="btn btn-sm btn-primary" data-role="next">Next <i class="fa fa-angle-double-right"></i></button>'+
+				'<button class="btn btn-sm btn-primary" data-role="pause-resume" data-pause-text="Pause" data-resume-text="Resume">Pause</button>'+
+			      '</div>'+
+			    '</div>'+
+			  '</div>',
+		  placement: 'left',
+		  onShow: function(){
+		    $('#questionType').val('mathwork');
 		    $('#questionType').change();
 		  },
 		},
@@ -717,6 +847,12 @@ $(document).ready(function(){
 	    }
 	});
 	
+	$(document).on("click", "#createSelection", function (e) {
+		if (tour.getCurrentStep()==2) {
+		    tour.next();
+		}
+	});
+	
 	$(document).on('focus', '#default_form .answers', function(){
 		if (tour.getCurrentStep()==3) {
 		    tour.next();
@@ -724,6 +860,10 @@ $(document).ready(function(){
 	});
 });
   </script>
+  
 {% endif %}
+
+
+
 
 {% endblock %}

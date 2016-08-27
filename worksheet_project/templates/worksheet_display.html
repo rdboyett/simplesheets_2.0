@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 {% load userInfo_tags %}
+{% load worksheet_creator_tags %}
 
 
 {% block title %}{{ currentProject.title|capfirst }}{% endblock %}
@@ -8,6 +9,9 @@
 
     {% block extraBottomHead %}
     <link href="{% static "adminBoot/css/table-responsive.css" %}" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static "mathquill/mathquill.css" %}?version=1">
+    <!------------  Math Quill --------------------------------------->
+    <script src="{% static "mathquill/mathquill.js" %}"></script>
     {% endblock %}
 
 {% block body %}
@@ -227,7 +231,19 @@
                                     <td colspan="4" class="text-center correct">Checked</td>
                                   {% elif input.inputType == "checkbox"  and input.correctAnswer == "false" %}
                                     <td colspan="4" class="text-center correct">Not Checked</td>
-                                  {% else %}
+				  {% elif input.inputType == "mathwork" %}
+				      {% if input.correctAnswer != "" %}
+				      <td colspan="4" class="text-center correct"><span class="mathquill-embedded-latex">{{ input.correctAnswer|subtractSlash }}</span></td>
+				      {% else %}
+					  <td colspan="4" class="text-center">no answer</td>
+				      {% endif %}
+				  {% elif input.inputType == "mathChem" %}
+				      {% if input.correctAnswer != "" %}
+				      <td colspan="4" class="text-center correct"><span class="mathquill-embedded-latex">{{ input.correctAnswer|subtractSlash }}</span></td>
+				      {% else %}
+					  <td colspan="4" class="text-center">no answer</td>
+				      {% endif %}
+				  {% else %}
                                     <td colspan="4" class="text-center correct">{{ input.correctAnswer }}</td>
                                   {% endif %}
                                 {% endif %}

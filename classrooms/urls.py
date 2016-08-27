@@ -1,7 +1,11 @@
 from django.conf.urls import patterns, include, url
+from django.views.generic import TemplateView
 
-urlpatterns = patterns('classrooms.views',
-	(r'^test/', 'test'),
+from .ajax import ChangeTeacherStudentView
+
+urlpatterns = patterns('',
+    url(r'^changeTeacherStudent/', ChangeTeacherStudentView.as_view(), name='changeTeacherStudent'),
+    url(r'^success/', TemplateView.as_view(template_name="success.html"), name='changeTeacherStudentSuccess'),
 )
 
 urlpatterns += patterns('classrooms.ajax',
@@ -19,5 +23,5 @@ urlpatterns += patterns('classrooms.ajax',
     (r'^getNewMessages/$', 'getNewMessages'),
     (r'^removeFromClass/$', 'removeFromClass'),
     (r'^newCode/$', 'newCode'),
-    
 )
+

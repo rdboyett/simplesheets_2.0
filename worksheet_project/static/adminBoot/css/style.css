@@ -58,20 +58,15 @@ a, a:hover, a:focus {
 	-webkit-border-radius: 20px;
 }
 
-.accordion-heading .accordion-toggle {
-	display: block;
-	cursor: pointer;
-	border-top: 1px solid #F5F5F5;
-	padding: 5px 0px;
-	line-height: 28.75px;
-	text-transform: uppercase;
-	color: #1a1a1a;
-	background-color: #ffffff;
-	outline: none !important;
-	text-decoration: none;
-}	
-
-.accordion-toggle:hover{background-color: #68dff0 !important;}
+#accordionHolder .panel-heading:hover, #accordionHolder .panel-heading.active{
+    background-color: #68dff0 !important;
+    cursor: pointer;
+}
+#accordionHolder .panel-heading.collapsed{
+    background-color: #f5f5f5;
+    cursor: pointer;
+}
+    
 
 /*Theme Backgrounds*/
 
@@ -3019,7 +3014,7 @@ fieldset[disabled] .btn-schoology.active {
 }
 
 .correctOutline {
-    border: 3px solid green;
+    border: 3px solid green !important;
     /* default fallback */
     background: rgb(26, 117, 12) transparent;
     /* nice browsers */
@@ -3032,7 +3027,7 @@ fieldset[disabled] .btn-schoology.active {
 
 
 .incorrectOutline {
-    border: 3px solid red;
+    border: 3px solid red !important;
     /* default fallback */
     background: rgb(255, 0, 0) transparent;
     /* nice browsers */
@@ -3161,6 +3156,7 @@ fieldset[disabled] .btn-schoology.active {
     padding: 0;
 }
 
+
 .list-group-horizontal .list-group-item {
 	display: inline-block;
 }
@@ -3178,13 +3174,28 @@ fieldset[disabled] .btn-schoology.active {
 .list-group-horizontal .list-group-item:last-child {
 	border-top-right-radius:4px;
 	border-bottom-left-radius:4px;
+=======
+.ui-resizable-se {
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    right: 0px;
+    bottom: 0;
 }
 
+.modal-content{
+    overflow: hidden;
+}
 
+.modal-footer.resized{
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+}
 
-
-
-
-
-
+.ui-icon-gripsmall-diagonal-se{
+    background: url("../img/ui-icons.png") no-repeat;
+    background-position: -83px -227px;
+    cursor: se-resize;
+}
 

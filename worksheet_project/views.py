@@ -42,7 +42,8 @@ from django.dispatch import receiver
 from worksheet_project import settings
 
 
-#this is commited again
+import logging
+log = logging.getLogger(__name__)
 
 
 def loginRedirect(request):
@@ -248,7 +249,14 @@ def showNextPage(request, projectID=False, pageNumber=False, classID=False):
                 nTimesRan = 0,
             )
             
+        if not classID and not bTeacher:
+            if Classroom.objects.filter(worksheets=newProject, classuser=classUser):
+                classID = Classroom.objects.filter(worksheets=newProject, classuser=classUser)[0].id
+            else:
+                return redirect('/dashboard/');
+            
         args = {
+                "siteURL":settings.SITE_URL,
                 "worksheet":True,
                   'user':request.user,
                 "userInfo":userInfo,
@@ -393,6 +401,13 @@ def handGrade(request, projectID=False, pageNumber=False, classID=False, student
         #Get my grade for this project (if there is one)
         if MyGrade.objects.filter(project=newProject, userInfo=studentUserInfo, highestGrade=True):
             myGrade = MyGrade.objects.filter(project=newProject, userInfo=studentUserInfo, highestGrade=True).order_by('-dateTime')[0]
+            #Check if the average was calculated incorrectly
+            log.info(myGrade.average)
+            if (myGrade.average + myGrade.extraCredit) > (100 + myGrade.extraCredit):
+                newAverage = float(float(myGrade.pointsEarned)/float(myGrade.pointsPossible)*float(100))
+                log.info("here is new average: "+newAverage)
+                myGrade.average = newAverage+myGrade.extraCredit
+                myGrade.save()
         else:
             myGrade = False
         
@@ -608,12 +623,14 @@ def monitor(request, projectID=False, classID=False):
     #get all the users in each class and store it in an object
     if classrooms:
         for currentClass in classrooms:
+            '''
             if ClassUser.objects.filter(classrooms__id=currentClass.id, teacher=False):
                 students = ClassUser.objects.filter(classrooms__id=currentClass.id, teacher=False)
                 classesAndStudents.append({'class':currentClass, 'students':students})
             else:
                 classesAndStudents.append({'class':currentClass})
-        
+            '''
+            classesAndStudents.append({'class':currentClass})
         if not classesAndStudents:
             classesAndStudents = 'no students'
             
@@ -656,6 +673,49 @@ def monitor(request, projectID=False, classID=False):
         
 
     return render_to_response(htmlPage, args)
+
+
+
+
+@login_required
+def ajaxMonitor(request, projectID=False, classID=False):
+    if request.method == 'POST':
+        projectID = request.POST["projectID"].strip()
+        classID = request.POST["classID"].strip()
+        
+        
+        if not classID or not projectID:
+            students = False
+            currentProject = False
+            classroom = False
+        else:
+            if Project.objects.filter(id=projectID):
+                currentProject = Project.objects.get(id=projectID)
+            else:
+                currentProject = False
+                
+            if Classroom.objects.filter(id=classID):
+                classroom = Classroom.objects.get(id=classID)
+            else:
+                classroom = False
+                
+            if ClassUser.objects.filter(classrooms=classroom, teacher=False):
+                students = ClassUser.objects.filter(classrooms=classroom, teacher=False)
+            else:
+                students = False
+            
+        args = {
+                "students":students,
+                "classroom":classroom,
+                "currentProject":currentProject
+            }
+        
+        return render_to_response('ajax_html/ajaxMonitor.html', args)
+    else:
+        return HttpResponse('Sorry, something went wrong.')
+
+
+
 
 
 
@@ -1393,6 +1453,71 @@ def getFolder(request, folderID=False):
 
 
 
+@login_required
+@csrf_exempt
+def thankYouDonation(request):
+        if UserInfo.objects.filter(user=request.user):
+            userInfo = UserInfo.objects.get(user=request.user)
+        else:
+            userInfo = False
+            
+        #if there is a google account
+        if GoogleUserInfo.objects.filter(user=request.user):
+            googleUserInfo = GoogleUserInfo.objects.get(user=request.user)
+        else:
+            googleUserInfo = False
+            
+        #check if teacher or student is set
+        if not userInfo.teacher_student:
+            teacherStudent = False
+        else:
+            teacherStudent = True
+            
+        #Get all users Classes
+        if ClassUser.objects.filter(user=request.user):
+            classUser = ClassUser.objects.get(user=request.user)
+        else:
+            if userInfo.teacher_student == 'teacher':
+                teacher = True
+            else:
+                teacher = False
+            classUser = ClassUser.objects.create(
+                user = request.user,
+                teacher = teacher,
+            )
+            
+        
+            
+        #Get all users Class
+        if classUser.classrooms.all():
+            allClasses = classUser.classrooms.all().order_by('name')
+        else:
+            allClasses = False
+        
+        
+        
+        
+        args = {
+                "profile":True,
+                "user":request.user,
+                "userInfo":userInfo,
+                "googleUserInfo":googleUserInfo,
+                "teacherStudent":teacherStudent,
+                "classUser":classUser,
+                "allClasses":allClasses,
+                "bPaidUp":True,
+            }
+        args.update(csrf(request))
+            
+        return render_to_response('donation_return.html', args)
+            
+
+
+
+
+
+
+
 
 
 
@@ -1577,7 +1702,7 @@ def ipnProcessing(sender, **kwargs):
 
 
 def verifyGoogle(request):
-    return render_to_response('googleae943400297db25e.html')
+    return render_to_response('googlec038507091ab1984.html')
 
 
 

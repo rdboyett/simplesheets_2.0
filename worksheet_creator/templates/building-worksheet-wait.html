@@ -113,10 +113,10 @@
 		    }
                 }
             };
-	    xhr.timeout = 30000;
+	    xhr.timeout = 60000;
 	    xhr.ontimeout = function () { 
-              alert("Something went wrong, That's all we know.");
-              document.location.href = '/drive/pickFile/';
+              alert("Something went wrong, That's all we know. If you have a lot of pages in your eSheet, check your dashboard.");
+              document.location.href = '/dashboard/';
             }
             fd.append('fileID', fileId);
             
