@@ -1,12 +1,18 @@
 from django.contrib import admin
 
-from .models import Project
+from .models import Project, BackImage
 from django.contrib.auth.models import User
+
+
+class BackImageAdmin(admin.ModelAdmin):
+    list_display = ('imagePath', 'pageNumber')
+    search_fields = ('imagePath',)
 
 
 class ProjectAdmin(admin.ModelAdmin):
     list_display = ('title', 'user_fullname', 'username', 'email', 'backImages')
     search_fields = ('title', 'userinfo__user__first_name', 'userinfo__user__last_name', 'userinfo__user__email', 'userinfo__user__email')
+    filter_horizontal = ('backgroundImages',)
 
     def user_fullname(self, obj):
         user = User.objects.get(id=obj.ownerID)
@@ -36,3 +42,4 @@ class ProjectAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Project, ProjectAdmin)
+admin.site.register(BackImage, BackImageAdmin)

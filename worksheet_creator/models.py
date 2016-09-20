@@ -13,6 +13,12 @@ from oauth2client.django_orm import CredentialsField
 class BackImage(models.Model):
   imagePath = models.FilePathField()
   pageNumber = models.IntegerField()
+
+  class Meta:
+    ordering = ['imagePath']
+
+  def __unicode__(self):
+    return u'%s' % (self.imagePath)
   
 class FormInput(models.Model):
   pageNumber = models.IntegerField()
