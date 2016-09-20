@@ -12,7 +12,7 @@ class BackImageAdmin(admin.ModelAdmin):
 class ProjectAdmin(admin.ModelAdmin):
     list_display = ('title', 'user_fullname', 'username', 'email', 'backImages')
     search_fields = ('title', 'userinfo__user__first_name', 'userinfo__user__last_name', 'userinfo__user__email', 'userinfo__user__email')
-    filter_horizontal = ('backgroundImages',)
+    filter_horizontal = ('backgroundImages', 'sharedWithUsers')
 
     def user_fullname(self, obj):
         user = User.objects.get(id=obj.ownerID)
