@@ -1319,8 +1319,7 @@ def getFolder(request, folderID=False):
             folder = False
             allProjects = False
             allFolders = False
-            
-            
+
         args = {
                 "currentFolder":folder,
                 "randomNumber":['1','2','3','4','5','6'],

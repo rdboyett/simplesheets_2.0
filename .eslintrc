@@ -1,0 +1,19 @@
+{
+    "extends": "airbnb",
+    "rules": {
+        "react/jsx-quotes": 0,
+        "no-use-before-define": 2,
+        "no-undef": 2, // can't use a variable before declaring it
+        "no-var": 0, // prefer es6 let or const instead of var
+        "indent": [2, 4, {"SwitchCase": 1}], // indentation requirement of 4-spaces
+        "jsx-quotes": 2,
+        "func-names": 0, // requires function expressions to have name
+        "react/no-multi-comp": 0, // only one react component per file
+        "react/no-unknown-property": 2,
+        "react/jsx-boolean-value": 0,
+        "no-console": 0,
+        "one-var": 0, // whether one var statement at top, etc.
+        "no-warning-comments": 0, // want to turn this one one day...
+        "no-useless-concat": 2
+    }
+}

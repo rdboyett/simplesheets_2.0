@@ -4,358 +4,331 @@
 
 {% block title %}Dashboard{% endblock %}
 
+
+{% block extraTopHead %}
+{% endblock %}
+
+
+{% block extraBottomHead %}
+{% endblock %}
+
+
+
 {% block body %}
 
-          		
-					<! -- ROW OF PANELS -->
-					<!-- Product Panel -->
-					<div class="row mt">
-						
-{% if allFolders %}
 
-<div class="folderView" style="margin: 10px 5px;">
-          {% for folder in allFolders %}
-	<div class="panel panel-default col-xs-12 col-sm-4" style="padding: 0;background-color: transparent; margin-bottom: 5px">
-		<div class="panel-body text-centered" style="padding: 0;margin: 0px 3px;background-color: #FFF;">
-			
-			<div data-options='{"getFolderURL":"{% url "worksheet_project.views.getFolder" %}?q={{folder.id}}", "folderID":{{ folder.id }}}'
-			     class="getFolder worksheetThumbListBg col-xs-2 col-sm-3 col-md-2 text-center" style="cursor:pointer;background-color:#424a5d;
-			 height: 50px;overflow: hidden;margin-right: 10px;
-			border-top-left-radius: 4px; border-bottom-left-radius: 4px;padding-top: 12px;">
-				<i class="fa fa-folder fa-2x" style="color:#ffd777;"></i>
-			</div>
-			
-			<a href="{% url "worksheet_project.views.getFolder" %}?q={{folder.id}}">
-			<div class="worksheetListTitle ellipsis col-xs-8 col-sm-6 col-md-8" style="margin-top: 6px;">
-				<h4 data-container="body"
-				  data-toggle="popover" data-placement="bottom" data-trigger="hover"
-				  data-content="{{ folder.name|capfirst }}">{{ folder.name|capfirst }}</h4>
-			</div></a>
-			
-			
-			<!-----------This is only visible on small and xs ------------------------------------>
-			<div class="col-xs-1 col-sm-2 col-md-1 pull-right">
-				
-				{% if classUser.teacher %}
-				<div class="dropdown" style="color: inherit;margin-top: 7px;">
-					<i class="fa fa-ellipsis-v fa-3x" data-toggle="dropdown" aria-expanded="true" style="cursor: pointer;"></i>
-					<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu1">
-						
-						
-					  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#renameFolderFormFolderID').val('{{ folder.id }}');
-					  $('#renameFolderFormFolderName').val('{{ folder.name|capfirst }}');
-					  $('#renameFolder-modal').modal('show');"><i class="fa fa-repeat"></i>&nbsp;&nbsp;rename</a></li>
-					  
-					  
-					  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#deleteFolderFormFolderID').val({{ folder.id }});$('#deleteFolder-modal').modal('show');"><i class="fa fa-trash"></i>&nbsp;&nbsp;Delete</a></li>
-					  
-					  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#deleteFolderFormFolderID').val({{ folder.id }});$('#deleteFolder-modal').modal('show');"><i class="fa fa-folder"></i>&nbsp;&nbsp;Move to...</a></li>
-					  
-					  
-					</ul>
+<! -- ROW OF PANELS -->
+<!-- Product Panel -->
+<div id="dashboard">
+
+	<div class="row mt">
+
+		{% if allFolders %}
+
+		<div class="folderView">
+			{% for folder in allFolders %}
+			<div class="panel panel-default col-xs-12 col-sm-4">
+				<div class="panel-body text-centered">
+
+					<div data-options='{"getFolderURL":"{% url "worksheet_project.views.getFolder" %}?q={{folder.id}}", "folderID":{{ folder.id }}}'
+						 class="getFolder worksheetThumbListBg col-xs-2 col-sm-3 col-md-2 text-center">
+						<i class="fa fa-folder fa-2x"></i>
+					</div>
+
+					<div class="worksheetListTitle ellipsis col-xs-8 col-sm-6 col-md-8">
+						<h4 data-container="body"
+							data-toggle="popover" data-placement="bottom" data-trigger="hover"
+							data-content="{{ folder.name|capfirst }}">{{ folder.name|capfirst }}</h4>
+					</div>
+
+
+					<!-----------This is only visible on small and xs ------------------------------------>
+					<div class="col-xs-1 col-sm-2 col-md-1 pull-right">
+
+						{% if classUser.teacher %}
+						<div class="dropdown">
+							<i class="fa fa-ellipsis-v fa-3x" data-toggle="dropdown" aria-expanded="true"></i>
+							<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu1">
+
+
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#renameFolderFormFolderID').val('{{ folder.id }}');
+						  $('#renameFolderFormFolderName').val('{{ folder.name|capfirst }}');
+						  $('#renameFolder-modal').modal('show');"><i class="fa fa-repeat"></i>&nbsp;&nbsp;rename</a></li>
+
+
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#deleteFolderFormFolderID').val({{ folder.id }});$('#deleteFolder-modal').modal('show');"><i class="fa fa-trash"></i>&nbsp;&nbsp;Delete</a></li>
+
+								<li class="moveItem" role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#moveItem-modal').modal('show');"><i class="fa fa-folder"></i>&nbsp;&nbsp;Move to...</a></li>
+
+
+							</ul>
+						</div>
+						{%endif%}
+					</div>
+					<!----------------------Only visible on Small and XS -------------------------------------->
+
+
 				</div>
-				{%endif%}
 			</div>
-			<!----------------------Only visible on Small and XS -------------------------------------->
-			
-			
+			{% endfor %}
 		</div>
-	</div>
-	{% endfor %}
-</div>
-					</div><!--- End of first Row -------------->
-						
-<div class="row mt">
-{% endif %}
-						
-{% if allProjects %}
-          
-<div id="worksheetListView" style="display: none;">
-	<ul class="list-group" style="margin: 10px 5px;">
-          {% for worksheet in allProjects %}
-		<li class="list-group-item col-xs-12 text-centered {% if worksheet.status == "locked" %}list-group-item-danger{% endif %}" style="padding: 0;">
-			<a href="{% url "worksheet_project.views.worksheet_display" worksheet.id %}">
-			<div class="worksheetThumbListBg col-xs-2 col-sm-1 text-center" style="background-color:#424a5d;
-			 height: 50px;overflow: hidden;margin-right: 10px;
-			border-top-left-radius: 4px; border-bottom-left-radius: 4px;padding-top: 12px;">
-				{% if worksheet.thumb %}
-				<img class="" src="{{ worksheet.thumb }}" alt="eSheet" style="width: 20px;">
-				{% else %}
-					<span class="fa-stack fa-lg" style="margin-top: -4px;">
-						<i class="fa fa-square fa-stack-2x fa-inverse"></i>
-						<i class="fa fa-file-word-o fa-stack-1x"></i>
-					</span>
-				{% endif %}
-			</div></a>
-			
-			<a href="{% url "worksheet_project.views.showNextPage" worksheet.id 1 %}">
-			<div class="worksheetListTitle ellipsis col-xs-8 col-sm-5" style="margin-top: 6px;">
-				<h4>{{ worksheet.title|capfirst }}{% if worksheet.status == "locked" %}&nbsp;&nbsp;<span class="text-danger"><i class="fa fa-lock"></i>&nbsp;LOCKED</span>{%endif%}</h4>
-			</div></a>
-			
-			
-			<div class="col-md-1 hidden-sm hidden-xs col-md-push-2">
-				{% if classUser.teacher %}
-				<div class="dropdown" style="color: inherit;margin-top: 7px;">
-					<i class="fa fa-ellipsis-v fa-3x" data-toggle="dropdown" aria-expanded="true" style="cursor: pointer;"></i>
-					<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu1">
-					  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#worksheetFormWorksheetID').val('{{ worksheet.id }}');
-					  $('#worksheetFormWorksheetName').val('{{ worksheet.title|capfirst }}');
-					  $('#worksheetFormNumberOfRetry').val('{{ worksheet.numberOfRetry }}');
-					  $('#renameWorksheet-modal').modal('show');"><i class="fa fa-repeat"></i>&nbsp;&nbsp;rename</a></li>
-					  
-					  
-					  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#forceTurnIn-baseForm-WorksheetID').val({{ worksheet.id }});$('#forceTurnIn-modal').modal('show');">
-						<i class="fa fa-inbox"></i>&nbsp;&nbsp;force all to turn-in</a>
-					  </li>
-					  
-					  
-					  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#forceTurnIn-baseForm-WorksheetID').val({{ worksheet.id }});$('#forceTurnIn-baseForm-regrade').val('true');$('#forceTurnIn-baseForm').submit();">
-						<i class="fa fa-retweet"></i>&nbsp;&nbsp;regrade all students</a>
-					  </li>
-					  
-					  <!--
-					  <li role="presentation" onclick="$('#print-student-work-form-WorksheetID').val({{ worksheet.id }});$('#print-student-work-form').submit();">
-						<a role="menuitem" tabindex="-1" href="#" onclick="">
-							<i style="display: inline-block;vertical-align: middle;margin-left: -3px;">
-								<img src="{% static "googleDrive_icons/product20.png" %}" alt="google drive">
-							</i>
-							<span style="display: inline-block;vertical-align: middle;">
-								&nbsp;&nbsp;print student work
-							</span>
-						</a>
-					  </li>
-					  -->
-					  
-					  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#worksheetFormWorksheetID').val('{{ worksheet.id }}');
-					  $('#worksheetFormWorksheetName').val('{{ worksheet.title|capfirst }}');
-					  $('#worksheetFormNumberOfRetry').val('{{ worksheet.numberOfRetry }}');
-					  $('#renameWorksheet-modal').modal('show');"><i class="fa fa-arrows-v"></i>&nbsp;&nbsp;change retries</a></li>
-					  
-					  
-					  <li role="presentation"><a role="menuitem" tabindex="-1" href="{% url "worksheet_project.views.handGrade" worksheet.id %}"><i class="fa fa-check-circle"></i>&nbsp;&nbsp;hand grade</a></li>
-					  
-					  
-					  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#toggle-lock-worksheet-base-form-WorksheetID').val({{ worksheet.id }});
-						$('#toggle-lock-worksheet-base-form').submit();">
-						{% if worksheet.status == "locked" %}
-							<i class="fa fa-unlock"></i>&nbsp;&nbsp;unlock this eSheet
-						{%else%}
-							<i class="fa fa-lock"></i>&nbsp;&nbsp;lock this eSheet
-						{%endif%}
-					  </a></li>
-					  
-					  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#share-worksheet-form-input').val({{ worksheet.id }});$('#share-worksheet-modal').modal('show');"><i class="fa fa-share"></i>&nbsp;&nbsp;Share</a></li>
-					
-					  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#worksheetID-hidden-input').val({{ worksheet.id }});$('#delete-worksheet').modal('show');"><i class="fa fa-trash"></i>&nbsp;&nbsp;Delete</a></li>
-					</ul>
-				</div>
-				{%endif%}
-			</div>
-			
-			
-			<!-----------This is only visible on small and xs ------------------------------------>
-			<div class="col-xs-1 visible-sm visible-xs pull-right">
-				
-				{% if classUser.teacher %}
-				<div class="dropdown" style="color: inherit;margin-top: 7px;">
-					<i class="fa fa-ellipsis-v fa-3x" data-toggle="dropdown" aria-expanded="true" style="cursor: pointer;"></i>
-					<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu1">
-						
-					  <li role="presentation"><a role="menuitem" tabindex="-1" href="{% url "worksheet_project.views.showNextPage" worksheet.id 1 %}"><i class="fa fa-edit"></i>&nbsp;&nbsp;edit eSheet</a></li>
-					  
-					  <li role="presentation"><a role="menuitem" tabindex="-1" href="{% url "worksheet_project.views.monitor" worksheet.id %}"><i class="fa fa-bar-chart-o"></i>&nbsp;&nbsp;monitor</a></li>
-					  
-					  <li role="presentation"><a role="menuitem" tabindex="-1" href="{% url "worksheet_project.views.assign" worksheet.id %}"><i class="fa fa-thumb-tack"></i>&nbsp;&nbsp;assign/unassign</a></li>
-					  
-						
-					  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#worksheetFormWorksheetID').val('{{ worksheet.id }}');
-					  $('#worksheetFormWorksheetName').val('{{ worksheet.title|capfirst }}');
-					  $('#worksheetFormNumberOfRetry').val('{{ worksheet.numberOfRetry }}');
-					  $('#renameWorksheet-modal').modal('show');"><i class="fa fa-repeat"></i>&nbsp;&nbsp;rename</a></li>
-					  
-					  
-					  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#forceTurnIn-baseForm-WorksheetID').val({{ worksheet.id }});$('#forceTurnIn-modal').modal('show');">
-						<i class="fa fa-inbox"></i>&nbsp;&nbsp;force all to turn-in</a>
-					  </li>
-					  
-					  
-					  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#forceTurnIn-baseForm-WorksheetID').val({{ worksheet.id }});$('#forceTurnIn-baseForm-regrade').val('true');$('#forceTurnIn-baseForm').submit();">
-						<i class="fa fa-retweet"></i>&nbsp;&nbsp;regrade all students</a>
-					  </li>
-					  
-					  <!--
-					  <li role="presentation" onclick="$('#print-student-work-form-WorksheetID').val({{ worksheet.id }});$('#print-student-work-form').submit();">
-						<a role="menuitem" tabindex="-1" href="#" onclick="">
-							<i style="display: inline-block;vertical-align: middle;margin-left: -3px;">
-								<img src="{% static "googleDrive_icons/product20.png" %}" alt="google drive">
-							</i>
-							<span style="display: inline-block;vertical-align: middle;">
-								&nbsp;&nbsp;print student work
-							</span>
-						</a>
-					  </li>
-					  -->
-					  
-					  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#worksheetFormWorksheetID').val('{{ worksheet.id }}');
-					  $('#worksheetFormWorksheetName').val('{{ worksheet.title|capfirst }}');
-					  $('#worksheetFormNumberOfRetry').val('{{ worksheet.numberOfRetry }}');
-					  $('#renameWorksheet-modal').modal('show');"><i class="fa fa-arrows-v"></i>&nbsp;&nbsp;change retries</a></li>
-					  
-					  
-					  <li role="presentation"><a role="menuitem" tabindex="-1" href="{% url "worksheet_project.views.handGrade" worksheet.id %}"><i class="fa fa-check-circle"></i>&nbsp;&nbsp;hand grade</a></li>
-					  
-					  
-					  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#toggle-lock-worksheet-base-form-WorksheetID').val({{ worksheet.id }});
-						$('#toggle-lock-worksheet-base-form').submit();">
-						{% if worksheet.status == "locked" %}
-							<i class="fa fa-unlock"></i>&nbsp;&nbsp;unlock this eSheet
-						{%else%}
-							<i class="fa fa-lock"></i>&nbsp;&nbsp;lock this eSheet
-						{%endif%}
-					  </a></li>
-					  
-					  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#share-worksheet-form-input').val({{ worksheet.id }});$('#share-worksheet-modal').modal('show');"><i class="fa fa-share"></i>&nbsp;&nbsp;Share</a></li>
-					
-					  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#worksheetID-hidden-input').val({{ worksheet.id }});$('#delete-worksheet').modal('show');"><i class="fa fa-trash"></i>&nbsp;&nbsp;Delete</a></li>
-					</ul>
-				</div>
-				{%endif%}
-			</div>
-			<!----------------------Only visible on Small and XS -------------------------------------->
-			
-			
-			<div class="col-sm-4 col-md-3 hidden-xs pull-right" style="margin-top: 4px;">
-				<a href="{% url "worksheet_project.views.showNextPage" worksheet.id 1 %}"><button type="button" class="col-xs-4 btn btn-default" data-container="body"
-				  data-toggle="popover" data-placement="bottom" data-trigger="hover"
-				  data-content="Edit">
-				  <i class="fa fa-edit fa-2x"></i>
-				</button></a>
-				<a href="{% url "worksheet_project.views.monitor" worksheet.id %}"><button type="button" class="col-xs-4 btn btn-default" data-container="body"
-				  data-toggle="popover" data-placement="bottom" data-trigger="hover"
-				  data-content="Monitor">
-				  <i class="fa fa-bar-chart-o fa-2x"></i>
-				</button></a>
-				<a href="{% url "worksheet_project.views.assign" worksheet.id %}"><button type="button" class="col-xs-4 btn btn-default" data-container="body"
-				  data-toggle="popover" data-placement="bottom" data-trigger="hover"
-				  data-content="Assign/Unassign">
-				  <i class="fa fa-thumb-tack fa-2x"></i>
-				</button></a>
-			</div>
-			
-			
-			
-		</li>
-	{% endfor %}
-	</ul>
-</div> <!---------------------------- End of Worksheet List View --------------------------------->
+	</div><!--- End of first Row -------------->
 
-
-<div id="worksheetGridView" style="display: none;">
-          {% for worksheet in allProjects %}
-          <!------------------------------ Worksheet Display ------------------------------------->
-          <div class="col-lg-4 col-md-4 col-sm-5 mb">
-            <div class="content-panel pn">
-              <div id="profile-01" class="bg{{ randomNumber|random }}">
-                {% if worksheet.thumb %}
-                <img src="{{ worksheet.thumb }}" alt="eSheet">
+	<div class="row mt">
 		{% endif %}
-		
-		{% if classUser.teacher %}
-		<div class="dropdown worksheet-extras">
-			<i class="fa fa-ellipsis-v fa-3x" data-toggle="dropdown" aria-expanded="true"></i>
-			<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu1">
-			  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#worksheetFormWorksheetID').val('{{ worksheet.id }}');
-			  $('#worksheetFormWorksheetName').val('{{ worksheet.title|capfirst }}');
-			  $('#worksheetFormNumberOfRetry').val('{{ worksheet.numberOfRetry }}');
-			  $('#renameWorksheet-modal').modal('show');"><i class="fa fa-repeat"></i>&nbsp;&nbsp;rename</a></li>
-			  
-			  
-			  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#forceTurnIn-baseForm-WorksheetID').val({{ worksheet.id }});$('#forceTurnIn-modal').modal('show');">
-				<i class="fa fa-inbox"></i>&nbsp;&nbsp;force all to turn-in</a>
-			  </li>
-			  
-			  
-			  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#forceTurnIn-baseForm-WorksheetID').val({{ worksheet.id }});$('#forceTurnIn-baseForm-regrade').val('true');$('#forceTurnIn-baseForm').submit();">
-				<i class="fa fa-retweet"></i>&nbsp;&nbsp;regrade all students</a>
-			  </li>
-			  
-			  <!--
-			  <li role="presentation" onclick="$('#print-student-work-form-WorksheetID').val({{ worksheet.id }});$('#print-student-work-form').submit();">
-				<a role="menuitem" tabindex="-1" href="#" onclick="">
-					<i style="display: inline-block;vertical-align: middle;margin-left: -3px;">
-						<img src="{% static "googleDrive_icons/product20.png" %}" alt="google drive">
-					</i>
-					<span style="display: inline-block;vertical-align: middle;">
-						&nbsp;&nbsp;print student work
-					</span>
-				</a>
-			  </li>
-			  -->
-			  
-			  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#worksheetFormWorksheetID').val('{{ worksheet.id }}');
-			  $('#worksheetFormWorksheetName').val('{{ worksheet.title|capfirst }}');
-			  $('#worksheetFormNumberOfRetry').val('{{ worksheet.numberOfRetry }}');
-			  $('#renameWorksheet-modal').modal('show');"><i class="fa fa-arrows-v"></i>&nbsp;&nbsp;change retries</a></li>
-			  
-			  
-			  <li role="presentation"><a role="menuitem" tabindex="-1" href="{% url "worksheet_project.views.handGrade" worksheet.id %}"><i class="fa fa-check-circle"></i>&nbsp;&nbsp;hand grade</a></li>
-			  
-			  
-			  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#toggle-lock-worksheet-base-form-WorksheetID').val({{ worksheet.id }});
-				$('#toggle-lock-worksheet-base-form').submit();">
-				{% if worksheet.status == "locked" %}
-					<i class="fa fa-unlock"></i>&nbsp;&nbsp;unlock this eSheet
-				{%else%}
-					<i class="fa fa-lock"></i>&nbsp;&nbsp;lock this eSheet
-				{%endif%}
-			  </a></li>
-			  
-			  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#share-worksheet-form-input').val({{ worksheet.id }});$('#share-worksheet-modal').modal('show');"><i class="fa fa-share"></i>&nbsp;&nbsp;Share</a></li>
-			
-			  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#worksheetID-hidden-input').val({{ worksheet.id }});$('#delete-worksheet').modal('show');"><i class="fa fa-trash"></i>&nbsp;&nbsp;Delete</a></li>
+
+		{% if allProjects %}
+
+		<div id="worksheetListView">
+			<ul class="list-group">
+				{% for worksheet in allProjects %}
+				<li class="list-group-item col-xs-12 text-centered {% if worksheet.status == 'locked' %}list-group-item-danger{% endif %}">
+					<a href="{% url 'worksheet_project.views.worksheet_display' worksheet.id %}">
+						<div class="worksheetThumbListBg col-xs-2 col-sm-1 text-center">
+							{% if worksheet.thumb %}
+							<img class="" src="{{ worksheet.thumb }}" alt="eSheet">
+							{% else %}
+								<span class="fa-stack fa-lg">
+									<i class="fa fa-square fa-stack-2x fa-inverse"></i>
+									<i class="fa fa-file-word-o fa-stack-1x"></i>
+								</span>
+							{% endif %}
+						</div>
+					</a>
+
+					<a href="{% url 'worksheet_project.views.showNextPage' worksheet.id 1 %}">
+						<div class="worksheetListTitle ellipsis col-xs-8 col-sm-5">
+							<h4>{{ worksheet.title|capfirst }}{% if worksheet.status == 'locked' %}&nbsp;&nbsp;<span class="text-danger"><i class="fa fa-lock"></i>&nbsp;LOCKED</span>{%endif%}</h4>
+						</div>
+					</a>
+
+
+					<div class="col-md-1 hidden-sm hidden-xs col-md-push-2">
+						{% if classUser.teacher %}
+						<div class="dropdown">
+							<i class="fa fa-ellipsis-v fa-3x" data-toggle="dropdown" aria-expanded="true"></i>
+							<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu1">
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#worksheetFormWorksheetID').val('{{ worksheet.id }}');
+							  $('#worksheetFormWorksheetName').val('{{ worksheet.title|capfirst }}');
+							  $('#worksheetFormNumberOfRetry').val('{{ worksheet.numberOfRetry }}');
+							  $('#renameWorksheet-modal').modal('show');"><i class="fa fa-repeat"></i>&nbsp;&nbsp;rename</a></li>
+
+
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#forceTurnIn-baseForm-WorksheetID').val({{ worksheet.id }});$('#forceTurnIn-modal').modal('show');">
+									<i class="fa fa-inbox"></i>&nbsp;&nbsp;force all to turn-in</a>
+								</li>
+
+
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#forceTurnIn-baseForm-WorksheetID').val({{ worksheet.id }});$('#forceTurnIn-baseForm-regrade').val('true');$('#forceTurnIn-baseForm').submit();">
+									<i class="fa fa-retweet"></i>&nbsp;&nbsp;regrade all students</a>
+								</li>
+
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#worksheetFormWorksheetID').val('{{ worksheet.id }}');
+							  $('#worksheetFormWorksheetName').val('{{ worksheet.title|capfirst }}');
+							  $('#worksheetFormNumberOfRetry').val('{{ worksheet.numberOfRetry }}');
+							  $('#renameWorksheet-modal').modal('show');"><i class="fa fa-arrows-v"></i>&nbsp;&nbsp;change retries</a></li>
+
+
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="{% url "worksheet_project.views.handGrade" worksheet.id %}"><i class="fa fa-check-circle"></i>&nbsp;&nbsp;hand grade</a></li>
+
+
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#toggle-lock-worksheet-base-form-WorksheetID').val({{ worksheet.id }});
+								$('#toggle-lock-worksheet-base-form').submit();">
+									{% if worksheet.status == "locked" %}
+									<i class="fa fa-unlock"></i>&nbsp;&nbsp;unlock this eSheet
+									{%else%}
+									<i class="fa fa-lock"></i>&nbsp;&nbsp;lock this eSheet
+									{%endif%}
+								</a></li>
+
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#share-worksheet-form-input').val({{ worksheet.id }});$('#share-worksheet-modal').modal('show');"><i class="fa fa-share"></i>&nbsp;&nbsp;Share</a></li>
+
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#worksheetID-hidden-input').val({{ worksheet.id }});$('#delete-worksheet').modal('show');"><i class="fa fa-trash"></i>&nbsp;&nbsp;Delete</a></li>
+							</ul>
+						</div>
+						{%endif%}
+					</div>
+
+
+					<!-----------This is only visible on small and xs ------------------------------------>
+					<div class="col-xs-1 visible-sm visible-xs pull-right">
+
+						{% if classUser.teacher %}
+						<div class="dropdown">
+							<i class="fa fa-ellipsis-v fa-3x" data-toggle="dropdown" aria-expanded="true"></i>
+							<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu1">
+
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="{% url "worksheet_project.views.showNextPage" worksheet.id 1 %}"><i class="fa fa-edit"></i>&nbsp;&nbsp;edit eSheet</a></li>
+
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="{% url "worksheet_project.views.monitor" worksheet.id %}"><i class="fa fa-bar-chart-o"></i>&nbsp;&nbsp;monitor</a></li>
+
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="{% url "worksheet_project.views.assign" worksheet.id %}"><i class="fa fa-thumb-tack"></i>&nbsp;&nbsp;assign/unassign</a></li>
+
+
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#worksheetFormWorksheetID').val('{{ worksheet.id }}');
+							  $('#worksheetFormWorksheetName').val('{{ worksheet.title|capfirst }}');
+							  $('#worksheetFormNumberOfRetry').val('{{ worksheet.numberOfRetry }}');
+							  $('#renameWorksheet-modal').modal('show');"><i class="fa fa-repeat"></i>&nbsp;&nbsp;rename</a></li>
+
+
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#forceTurnIn-baseForm-WorksheetID').val({{ worksheet.id }});$('#forceTurnIn-modal').modal('show');">
+									<i class="fa fa-inbox"></i>&nbsp;&nbsp;force all to turn-in</a>
+								</li>
+
+
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#forceTurnIn-baseForm-WorksheetID').val({{ worksheet.id }});$('#forceTurnIn-baseForm-regrade').val('true');$('#forceTurnIn-baseForm').submit();">
+									<i class="fa fa-retweet"></i>&nbsp;&nbsp;regrade all students</a>
+								</li>
+
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#worksheetFormWorksheetID').val('{{ worksheet.id }}');
+							  $('#worksheetFormWorksheetName').val('{{ worksheet.title|capfirst }}');
+							  $('#worksheetFormNumberOfRetry').val('{{ worksheet.numberOfRetry }}');
+							  $('#renameWorksheet-modal').modal('show');"><i class="fa fa-arrows-v"></i>&nbsp;&nbsp;change retries</a></li>
+
+
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="{% url "worksheet_project.views.handGrade" worksheet.id %}"><i class="fa fa-check-circle"></i>&nbsp;&nbsp;hand grade</a></li>
+
+
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#toggle-lock-worksheet-base-form-WorksheetID').val({{ worksheet.id }});
+								$('#toggle-lock-worksheet-base-form').submit();">
+									{% if worksheet.status == "locked" %}
+									<i class="fa fa-unlock"></i>&nbsp;&nbsp;unlock this eSheet
+									{%else%}
+									<i class="fa fa-lock"></i>&nbsp;&nbsp;lock this eSheet
+									{%endif%}
+								</a></li>
+
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#share-worksheet-form-input').val({{ worksheet.id }});$('#share-worksheet-modal').modal('show');"><i class="fa fa-share"></i>&nbsp;&nbsp;Share</a></li>
+
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#worksheetID-hidden-input').val({{ worksheet.id }});$('#delete-worksheet').modal('show');"><i class="fa fa-trash"></i>&nbsp;&nbsp;Delete</a></li>
+							</ul>
+						</div>
+						{%endif%}
+					</div>
+					<!----------------------Only visible on Small and XS -------------------------------------->
+
+
+					<div class="three-btn col-sm-4 col-md-3 hidden-xs pull-right">
+						<a href="{% url 'worksheet_project.views.showNextPage' worksheet.id 1 %}">
+							<button type="button" class="col-xs-4 btn btn-default" data-container="body"
+									data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Edit">
+								<i class="fa fa-edit fa-2x"></i>
+							</button>
+						</a>
+						<a href="{% url 'worksheet_project.views.monitor' worksheet.id %}">
+							<button type="button" class="col-xs-4 btn btn-default" data-container="body"
+									data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Monitor">
+								<i class="fa fa-bar-chart-o fa-2x"></i>
+							</button>
+						</a>
+						<a href="{% url 'worksheet_project.views.assign' worksheet.id %}">
+							<button type="button" class="col-xs-4 btn btn-default" data-container="body"
+									data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Assign/Unassign">
+							<i class="fa fa-thumb-tack fa-2x"></i>
+							</button>
+						</a>
+					</div>
+
+
+
+				</li>
+				{% endfor %}
 			</ul>
-		</div>
-		{%endif%}
-		
-              </div>
-              <div class="profile-01 centered">
-                <a href="{% url "worksheet_project.views.worksheet_display" worksheet.id %}"><p class="ellipsis">{{ worksheet.title|capfirst }}</p></a>
-              </div>
-              {% if worksheet.status == "locked" %}
-                  <div class="profile-03 danger centered">
-                    <p><i class="fa fa-lock"></i>&nbsp;&nbsp;Locked</p>
-                  </div>
-              {% endif %}
-              <div class="centered">
-                <a href="{% url "worksheet_project.views.showNextPage" worksheet.id 1 %}"><button type="button" class="col-xs-4 btn btn-default" data-container="body"
-                  data-toggle="popover" data-placement="bottom" data-trigger="hover"
-                  data-content="Edit">
-                  <i class="fa fa-edit fa-2x"></i>
-                </button></a>
-                <a href="{% url "worksheet_project.views.monitor" worksheet.id %}"><button type="button" class="col-xs-4 btn btn-default" data-container="body"
-                  data-toggle="popover" data-placement="bottom" data-trigger="hover"
-                  data-content="Monitor">
-                  <i class="fa fa-bar-chart-o fa-2x"></i>
-                </button></a>
-                <a href="{% url "worksheet_project.views.assign" worksheet.id %}"><button type="button" class="col-xs-4 btn btn-default" data-container="body"
-                  data-toggle="popover" data-placement="bottom" data-trigger="hover"
-                  data-content="Assign/Unassign">
-                  <i class="fa fa-thumb-tack fa-2x"></i>
-                </button></a>
-              </div>
-            </div>
-          </div><! --/col-md-4 -->
-          <!------------------------------ End of Worksheet Display ------------------------------------->
-  {% endfor %}
-</div> <!--------------------------- End of Worksheet Grid View ----------------------------->
-          
-{% else %}
-  <h5 class="col-xs-12">Sorry, there are no assignments yet.</h5>
-{% endif %}
-					</div><! --  ROW OF PANELS -->
-          		
-					
+		</div> <!---------------------------- End of Worksheet List View --------------------------------->
+
+
+		<div id="worksheetGridView">
+			{% for worksheet in allProjects %}
+			<!------------------------------ Worksheet Display ------------------------------------->
+			<div class="col-lg-4 col-md-4 col-sm-5 mb">
+				<div class="content-panel pn">
+					<div id="profile-01" class="bg{{ randomNumber|random }}">
+						{% if worksheet.thumb %}
+						<img src="{{ worksheet.thumb }}" alt="eSheet">
+						{% endif %}
+
+						{% if classUser.teacher %}
+						<div class="dropdown worksheet-extras">
+							<i class="fa fa-ellipsis-v fa-3x" data-toggle="dropdown" aria-expanded="true"></i>
+							<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu1">
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#worksheetFormWorksheetID').val('{{ worksheet.id }}');
+				  $('#worksheetFormWorksheetName').val('{{ worksheet.title|capfirst }}');
+				  $('#worksheetFormNumberOfRetry').val('{{ worksheet.numberOfRetry }}');
+				  $('#renameWorksheet-modal').modal('show');"><i class="fa fa-repeat"></i>&nbsp;&nbsp;rename</a></li>
+
+
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#forceTurnIn-baseForm-WorksheetID').val({{ worksheet.id }});$('#forceTurnIn-modal').modal('show');">
+									<i class="fa fa-inbox"></i>&nbsp;&nbsp;force all to turn-in</a>
+								</li>
+
+
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#forceTurnIn-baseForm-WorksheetID').val({{ worksheet.id }});$('#forceTurnIn-baseForm-regrade').val('true');$('#forceTurnIn-baseForm').submit();">
+									<i class="fa fa-retweet"></i>&nbsp;&nbsp;regrade all students</a>
+								</li>
+
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#worksheetFormWorksheetID').val('{{ worksheet.id }}');
+				  $('#worksheetFormWorksheetName').val('{{ worksheet.title|capfirst }}');
+				  $('#worksheetFormNumberOfRetry').val('{{ worksheet.numberOfRetry }}');
+				  $('#renameWorksheet-modal').modal('show');"><i class="fa fa-arrows-v"></i>&nbsp;&nbsp;change retries</a></li>
+
+
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="{% url "worksheet_project.views.handGrade" worksheet.id %}"><i class="fa fa-check-circle"></i>&nbsp;&nbsp;hand grade</a></li>
+
+
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#toggle-lock-worksheet-base-form-WorksheetID').val({{ worksheet.id }});
+					$('#toggle-lock-worksheet-base-form').submit();">
+									{% if worksheet.status == "locked" %}
+									<i class="fa fa-unlock"></i>&nbsp;&nbsp;unlock this eSheet
+									{%else%}
+									<i class="fa fa-lock"></i>&nbsp;&nbsp;lock this eSheet
+									{%endif%}
+								</a></li>
+
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#share-worksheet-form-input').val({{ worksheet.id }});$('#share-worksheet-modal').modal('show');"><i class="fa fa-share"></i>&nbsp;&nbsp;Share</a></li>
+
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="$('#worksheetID-hidden-input').val({{ worksheet.id }});$('#delete-worksheet').modal('show');"><i class="fa fa-trash"></i>&nbsp;&nbsp;Delete</a></li>
+							</ul>
+						</div>
+						{%endif%}
+
+					</div>
+					<div class="profile-01 centered">
+						<a href="{% url "worksheet_project.views.worksheet_display" worksheet.id %}"><p class="ellipsis">{{ worksheet.title|capfirst }}</p></a>
+					</div>
+					{% if worksheet.status == "locked" %}
+					<div class="profile-03 danger centered">
+						<p><i class="fa fa-lock"></i>&nbsp;&nbsp;Locked</p>
+					</div>
+					{% endif %}
+					<div class="centered">
+						<a href="{% url "worksheet_project.views.showNextPage" worksheet.id 1 %}"><button type="button" class="col-xs-4 btn btn-default" data-container="body"
+																										  data-toggle="popover" data-placement="bottom" data-trigger="hover"
+																										  data-content="Edit">
+						<i class="fa fa-edit fa-2x"></i>
+					</button></a>
+						<a href="{% url "worksheet_project.views.monitor" worksheet.id %}"><button type="button" class="col-xs-4 btn btn-default" data-container="body"
+																								   data-toggle="popover" data-placement="bottom" data-trigger="hover"
+																								   data-content="Monitor">
+						<i class="fa fa-bar-chart-o fa-2x"></i>
+					</button></a>
+						<a href="{% url "worksheet_project.views.assign" worksheet.id %}"><button type="button" class="col-xs-4 btn btn-default" data-container="body"
+																								  data-toggle="popover" data-placement="bottom" data-trigger="hover"
+																								  data-content="Assign/Unassign">
+						<i class="fa fa-thumb-tack fa-2x"></i>
+					</button></a>
+					</div>
+				</div>
+			</div><! --/col-md-4 -->
+			<!------------------------------ End of Worksheet Display ------------------------------------->
+			{% endfor %}
+		</div> <!--------------------------- End of Worksheet Grid View ----------------------------->
+
+		{% else %}
+		<h5 class="col-xs-12">Sorry, there are no assignments yet.</h5>
+		{% endif %}
+	</div><! --  ROW OF PANELS -->
+
+</div> <!-- end of id="dashboard" -->
 {% endblock %}
 
 {% block modal %}
@@ -378,19 +351,69 @@
 		              </div>
 		          </div>
 		          <!-- modal -->
-			  
-			  
-			  
-			  
-			  
-			  
-			  
+
+<!-- *****************    Move a Folder or eSheet  ******************************************************* -->
+<div id="moveItem-modal" class="modal fade" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content rounded">
+			<div class="modal-header top-rounded">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+				<h4 class="modal-title"><i class="fa fa-arrow-left" style="cursor:pointer;"></i> {% if currentFolder %}{{ currentFolder.name|capfirst }}{% else %}Dashboard{% endif %}</h4>
+			</div>
+			<div class="modal-body">
+				<ul class="folderList">
+					<li>
+						<i class="fa fa-caret-right"></i><span>&nbsp;&nbsp;folder 1ld</span>
+					</li>
+					<li>
+						<i class="fa fa-caret-right"></i><span>&nbsp;&nbsp;folder 1ld</span>
+					</li>
+					<li>
+						<i class="fa fa-caret-right"></i><span>&nbsp;&nbsp;folder 1ld</span>
+					</li>
+					<li>
+						<i class="fa fa-caret-down"></i><span>&nbsp;&nbsp;folder 1ld</span>
+						<ul class="folderList">
+							<li>
+								<i class="fa fa-caret-down"></i><span>&nbsp;&nbsp;folder 1ld</span>
+								<ul class="folderList">
+									<li>
+										<i class="fa fa-caret-down"></i><span>&nbsp;&nbsp;folder 1ld</span>
+										<ul class="folderList">
+											<li>
+												<i class="fa fa-minus"></i><span>&nbsp;&nbsp;folder 1ld</span>
+											</li>
+										</ul>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</li>
+					<li>
+						<i class="fa fa-caret-right"></i><span>&nbsp;&nbsp;folder 1ld</span>
+					</li>
+					<li>
+						<i class="fa fa-caret-right"></i><span>&nbsp;&nbsp;folder 1ld</span>
+					</li>
+					<li>
+						<i class="fa fa-caret-right"></i><span>&nbsp;&nbsp;folder 1ld</span>
+					</li>
+				</ul>
+			</div>
+			<div class="modal-footer bottom-rounded">
+				<button type="button" class="btn btn-default rounded" data-dismiss="modal">cancel</button>
+				<button type="submit" form="deleteFolder-form" class="btn btn-success rounded disabled">Move</button>
+			</div>
+		</div>
+	</div>
+</div>
+
 {% endblock %}
 
 
 {% block extraScript %}
     <script src="{% static "adminBoot/js/dashboard.js" %}?version=1"></script>
-    
+
       {% if not classUser.teacher %}
 	<script>
 		window.location.href = "/classes/";
@@ -406,7 +429,6 @@
       });
     </script>
     {% endif %}
-
 {% endblock %}
 
 
