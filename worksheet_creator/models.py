@@ -63,7 +63,6 @@ class Project(models.Model):
 
 
 
-admin.site.register(Project)
 
 '''
 steps to remove shared with user
