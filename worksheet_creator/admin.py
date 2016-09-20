@@ -27,7 +27,9 @@ class ProjectAdmin(admin.ModelAdmin):
     email.admin_order_field = 'user__email'
 
     def backImages(self, obj):
-        return obj.backgroundImages.all()[0].imagePath
+        if obj.backgroundImages.all():
+            return obj.backgroundImages.all()[0].imagePath
+        return "0000"
     backImages.short_description = 'Background Images'
     backImages.admin_order_field = 'backgroundImages'
 
