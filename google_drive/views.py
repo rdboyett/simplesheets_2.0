@@ -112,7 +112,8 @@ def google_picker(request):
         
     
     if MyTour.objects.filter(name='pic_file', user=request.user):
-        myTour = MyTour.objects.get(name='pic_file', user=request.user)
+        myTours = MyTour.objects.filter(name='pic_file', user=request.user)
+        myTour = myTours[0]
         if myTour.nTimesRan >= myTour.nManditoryRuns:
             myTour = False
     else:
