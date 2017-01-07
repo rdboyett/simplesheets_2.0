@@ -8,8 +8,8 @@ from django.conf import settings
 class Migration(migrations.Migration):
 
     dependencies = [
+        ('worksheet_creator', '0005_project_sharedwithusers'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('worksheet_creator', '0001_initial'),
     ]
 
     operations = [
@@ -21,8 +21,10 @@ class Migration(migrations.Migration):
                 ('code', models.CharField(max_length=10)),
                 ('allowJoin', models.BooleanField(default=True)),
                 ('classOwnerID', models.IntegerField()),
+                ('googleClassFolderID', models.CharField(max_length=45, null=True, blank=True)),
             ],
             options={
+                'ordering': ['name'],
             },
             bases=(models.Model,),
         ),
@@ -38,6 +40,7 @@ class Migration(migrations.Migration):
                 ('classrooms', models.ManyToManyField(to='classrooms.Classroom', null=True, blank=True)),
             ],
             options={
+                'ordering': ['user__last_name'],
             },
             bases=(models.Model,),
         ),

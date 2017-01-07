@@ -42,7 +42,6 @@ settings.py
 ######################
 media/
 secrets/
-migrations/
 
 # Node #
 ###################

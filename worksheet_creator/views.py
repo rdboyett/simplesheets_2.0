@@ -268,7 +268,7 @@ def create(request):
                     '''
                     
                     if not bTooManyPages:
-                        try:
+                        if True:#try:
                             #Convert pages to images:-------------------------------------------------------------------------
                             bItConverted = covertPDFtoImage(pdfPath, os.path.join(baseFilePath, title+ '.jpg'))
                             if bItConverted:
@@ -348,7 +348,7 @@ def create(request):
                                 newProject.uploadedFileID = uploadedFileID
                                 
                             newProject.save()
-                        except:
+                        else: #except:
                             return HttpResponse(json.dumps({"error":"This is so embarrassing. Something went wrong, that's all we know."}))
                                 
                             
@@ -978,8 +978,7 @@ def covertPDFtoImage(input, output, quality=None, density=None):
     params = []
     #params += ["-unsharp", "0x0.4+0.6+0.008"]
     params += ["-density", str(250)]
-    subprocess.check_call(["convert"] + params + [input] + [output], 
-                                    shell=False)
+    subprocess.check_call(["convert"] + params + [input] + [output], shell=False)
     
     return True
 

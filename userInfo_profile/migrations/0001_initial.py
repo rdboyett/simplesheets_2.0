@@ -8,11 +8,21 @@ from django.conf import settings
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('worksheet_creator', '__first__'),
+        ('worksheet_creator', '0006_auto_20170107_1958'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+        ('classrooms', '0002_auto_20151014_0311'),
     ]
 
     operations = [
+        migrations.CreateModel(
+            name='LiveMonitorSession',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
         migrations.CreateModel(
             name='MyAnswer',
             fields=[
@@ -20,6 +30,7 @@ class Migration(migrations.Migration):
                 ('myAnswer', models.TextField(null=True, blank=True)),
                 ('bCorrect', models.BooleanField(default=True)),
                 ('workImagePath', models.FilePathField(null=True, blank=True)),
+                ('partialCredit', models.FloatField(null=True, blank=True)),
                 ('answer', models.ForeignKey(to='worksheet_creator.FormInput')),
                 ('project', models.ForeignKey(to='worksheet_creator.Project')),
             ],
@@ -33,10 +44,11 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('pointsPossible', models.IntegerField()),
-                ('pointsEarned', models.IntegerField()),
-                ('average', models.IntegerField()),
+                ('pointsEarned', models.FloatField()),
+                ('average', models.FloatField()),
                 ('timesGraded', models.IntegerField()),
                 ('dateTime', models.DateTimeField(auto_now_add=True)),
+                ('extraCredit', models.IntegerField(null=True, blank=True)),
                 ('highestGrade', models.BooleanField(default=False)),
                 ('project', models.ForeignKey(to='worksheet_creator.Project')),
             ],
@@ -69,6 +81,30 @@ class Migration(migrations.Migration):
             model_name='myanswer',
             name='userInfo',
             field=models.ForeignKey(to='userInfo_profile.UserInfo'),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='livemonitorsession',
+            name='answers',
+            field=models.ManyToManyField(to='userInfo_profile.MyAnswer', null=True, blank=True),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='livemonitorsession',
+            name='classroom',
+            field=models.ForeignKey(to='classrooms.Classroom'),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='livemonitorsession',
+            name='grades',
+            field=models.ManyToManyField(to='userInfo_profile.MyGrade', null=True, blank=True),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='livemonitorsession',
+            name='project',
+            field=models.ForeignKey(to='worksheet_creator.Project'),
             preserve_default=True,
         ),
     ]
