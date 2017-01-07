@@ -47,3 +47,7 @@ migrations/
 # Node #
 ###################
 node_modules/
+
+# Virtualenv #
+###################
+venv/

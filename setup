@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+RESET='\033[0m'
+RED='\033[1;31m'
+CYAN='\033[1;36m'
+
+[ -z $1 ] && echo -e "${RED}Pass APP_NAME argument (i.e. ffweb, purchase, www).${RESET}" && exit 1
+cwd=`pwd`
+
+# Python
+virtualenv --quiet venv/$1
+
+## Setup the postactivate with ENV vars that we need for setting discovery.
+dev="$2"
+if [ "$dev" = "dev" ]; then
+    echo 'Running Setup of virtual environment.'
+fi
+
+
+source venv/$1/bin/activate
+pip install --quiet -r requirements/mac.txt
+ln -sf venv/${1}/bin/activate activate-$1
+chmod 755 activate-$1
+
+echo -e "${CYAN}Run command \`${RESET}source activate-${1}${CYAN}\` to activate the virtualenv,${RESET}"
