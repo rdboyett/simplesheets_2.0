@@ -34,8 +34,6 @@ Thumbs.db
 #Python created files #
 ######################
 *.pyc
-settings.py
-*/settings.py
 
 
 # Media Directories #
