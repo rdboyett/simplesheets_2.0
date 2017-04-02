@@ -48,3 +48,5 @@ node_modules/
 # Virtualenv #
 ###################
 venv/
+activate-ducksoup
+env.py
