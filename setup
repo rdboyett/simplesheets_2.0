@@ -10,7 +10,7 @@ echo 'Running Setup of virtual environment.'
 
 source venv/ducksoup/bin/activate
 pip install --quiet -r requirements/mac.txt
-ln -sf venv/${1}/bin/activate activate-ducksoup
+ln -sf venv/ducksoup/bin/activate activate-ducksoup
 chmod 755 activate-ducksoup
 
 echo -e "${CYAN}Run command \`${RESET}source activate-ducksoup${CYAN}\` to activate the virtualenv,${RESET}"

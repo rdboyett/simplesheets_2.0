@@ -47,7 +47,7 @@ from google_login.models import CredentialsModel, GoogleUserInfo
 from worksheet_creator import settings
 from google_drive.views import get_service, rename_google_file
 from worksheet_project.views import checkPaidUp
-from worksheet_project import settings as projectSettings
+from django.conf import settings as projectSettings
 from payment_tracker.models import PaymentUser
 
 #Test where the settings file is located (in home computer or on the server)

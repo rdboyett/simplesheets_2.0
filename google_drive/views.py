@@ -29,7 +29,7 @@ from tourBuilder.models import MyTour
 from worksheet_creator.models import Project
 
 
-from worksheet_project import settings
+from django.conf import settings
 from worksheet_project.views import checkPaidUp
 
 

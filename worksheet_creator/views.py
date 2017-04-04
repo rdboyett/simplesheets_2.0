@@ -71,7 +71,7 @@ from google_login.models import CredentialsModel
 from worksheet_creator.models import Project, BackImage
 from google_drive.views import driveUpload, createGoogleShortcut, get_service, checkOrCreateGoogleFolder
 from worksheet_project.views import checkPaidUp
-from worksheet_project import settings
+from django.conf import settings
 from worksheet_creator.settings import DOMAIN
 from payment_tracker.models import PaymentUser
 
