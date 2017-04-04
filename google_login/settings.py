@@ -19,6 +19,8 @@ SCOPES = [
 #Change the redirect uri for your project
 if getattr(settings, 'PRODUCTION_ENV', False):
     redirect_uri='http://ducksoup.us/google/oauth2callback'
+elif settings.ENV_SETTINGS.get('redirect_uri'):
+    redirect_uri = settings.ENV_SETTINGS.get('redirect_uri')
 else:
     redirect_uri='http://127.0.0.1:8000/google/oauth2callback'
 

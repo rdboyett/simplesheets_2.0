@@ -8,7 +8,6 @@ from datetime import datetime, timedelta
 
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
-from email.MIMEImage import MIMEImage
 
 from django.shortcuts import render_to_response, redirect
 from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseBadRequest
@@ -561,14 +560,6 @@ def submitRegistration(request):
 	    msg.attach_alternative(html_content, "text/html")
 	    
 	    msg.mixed_subtype = 'related'
-	    '''
-	    for f in ['img1.png', 'img2.png']:
-		fp = open(os.path.join(os.path.dirname(__file__), f), 'rb')
-		msg_img = MIMEImage(fp.read())
-		fp.close()
-		msg_img.add_header('Content-ID', '<{}>'.format(f))
-		msg.attach(msg_img)
-	    '''
 	    msg.send()
 	    
 	    
