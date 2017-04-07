@@ -1,12 +1,13 @@
 from .base import *
 
+DATABASE_SETTINGS = ENV_SETTINGS.get('DATABASE_SETTINGS', {})
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'ducksoupbeta',
-        'USER': 'rdboyett',
-        'PASSWORD': 'dallas20',
+        'NAME': DATABASE_SETTINGS.get('NAME', ''),
+        'USER': DATABASE_SETTINGS.get('USER', ''),
+        'PASSWORD': DATABASE_SETTINGS.get('PASSWORD', ''),
         'HOST': '',
         'PORT': '',
     }
