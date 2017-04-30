@@ -54,3 +54,7 @@ env.py
 # Google Settings #
 ###################
 client_secrets.json
+
+# DEPLOYING #
+##################
+deploy_script
