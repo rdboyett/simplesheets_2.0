@@ -9,7 +9,7 @@ virtualenv --quiet venv/ducksoup
 echo 'Running Setup of virtual environment.'
 
 source venv/ducksoup/bin/activate
-pip install --quiet -r requirements/mac.txt
+pip install --quiet -r requirements/base.txt
 ln -sf venv/ducksoup/bin/activate activate-ducksoup
 chmod 755 activate-ducksoup
 
