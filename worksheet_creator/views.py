@@ -71,7 +71,7 @@ from google_login.models import CredentialsModel
 from worksheet_creator.models import Project, BackImage
 from google_drive.views import driveUpload, createGoogleShortcut, get_service, checkOrCreateGoogleFolder
 from worksheet_project.views import checkPaidUp
-from worksheet_project import settings
+from django.conf import settings
 from worksheet_creator.settings import DOMAIN
 from payment_tracker.models import PaymentUser
 
@@ -171,7 +171,7 @@ def create(request):
                     title = title.replace(" ", "")
                     if len(title) > 10:
                         title = title[:10]
-                    baseFilePath = os.path.join(ROOT_PATH,'media', request.user.first_name+request.user.last_name+str(request.user.id), str(title+str(fileId[-5:])))
+                    baseFilePath = os.path.join(settings.MEDIA_ROOT, request.user.first_name+request.user.last_name+str(request.user.id), str(title+str(fileId[-5:])))
                     duckThumbPath = os.path.join(ROOT_PATH, 'duckThumb')
                     make_sure_path_exists(duckThumbPath)
                     make_sure_path_exists(baseFilePath)
@@ -234,39 +234,7 @@ def create(request):
                             bTooManyPages = False
                     else:
                         return HttpResponse(json.dumps({"error":"You can only use 15 pages or less.  If this keeps happening, try printing the document as a pdf and reload the new document."}))
-                  
-                    
-                    
-                    
-                    '''
-        
-        try:
-            #count the number of pages and delete if too many:---------------------------------------------------
-            counter = 0
-                        
-            pdfFile = open(pdfPath, "rb")
-                        
-            try:
-                reader = PdfFileReader(pdfFile)
-                number_of_pages = reader.getNumPages()
-                for page_num in xrange(number_of_pages):
-                    counter += 1
-            except:
-                rxcountpages = re.compile(r"/Type\s*/Page([^s]|$)", re.MULTILINE|re.DOTALL)
-                pages = pdfFile.read()
-                counter =  len(rxcountpages.findall(pages))
-                number_of_pages = counter
-            
-            if counter > 15 and DOMAIN=='ducksoup.us':
-                bTooManyPages = True
-                pdfFile.close()
-                os.remove(pdfPath)
-            else:
-                bTooManyPages = False
-        except:
-            return HttpResponse(json.dumps({"error":"You can only use 15 pages or less.  If this keeps happening, try printing the document as a pdf and reload the new document."}))
-                    '''
-                    
+
                     if not bTooManyPages:
                         if True:#try:
                             #Convert pages to images:-------------------------------------------------------------------------
@@ -274,8 +242,8 @@ def create(request):
                             if bItConverted:
                                 pdfFile.close()
                                 os.remove(pdfPath)
-                                
-                            
+
+
                             #store file paths----------------------------------------------------------------------------------
                             filenames = []
                             if number_of_pages > 1:
@@ -283,16 +251,16 @@ def create(request):
                                     filenames.append(os.path.join(baseFilePath,title + '-' + str(pageNumber) + '.jpg'))
                             else:
                                 filenames.append(os.path.join(baseFilePath,title + '.jpg'))
-                                
-                                
-                                
+
+
+
                             if Project.objects.filter(title__istartswith=rawTitle):
                                 nameCount = Project.objects.filter(title__istartswith=rawTitle).count()
                                 nameCount+=1
                                 nameNumber=" ("+str(nameCount)+")"
                             else:
                                 nameNumber=""
-                                
+
                             #create a project-----------------------------------------------------------------------------------
                             newProject = Project.objects.create(
                                 title = rawTitle+str(nameNumber),
@@ -300,8 +268,8 @@ def create(request):
                                 ownerID = request.user.id,
                             )
                             userInfo.projects.add(newProject)
-                            
-                            
+
+
                             #create background images for the project----------------------------------------------------------
                             pageNum = 0
                             for filename in filenames:
@@ -313,15 +281,15 @@ def create(request):
                                     newList.append(fileComponentsList[number])
                                 lastFileName = os.path.join('/',*newList)
                                 newFilename = display_path(lastFileName)
-                                
-                                
+
+
                                 newBackImage = BackImage.objects.create(
                                     imagePath = newFilename,
                                     pageNumber = pageNum
                                 )
                                 newProject.backgroundImages.add(newBackImage)
-                            
-                            
+
+
                             #Create a json file to store all file information---------------------------------------------------
                             projectData = {
                                 'user_id':request.user.id,
@@ -330,7 +298,7 @@ def create(request):
                             }
                             jsonFilePath = makeJsonFile(request.user, projectData, title, baseFilePath)
                             #filenames.append(jsonFilePath)
-                            
+
                             if ClassUser.objects.filter(user=request.user):
                                 classUser = ClassUser.objects.get(user=request.user)
                                 if classUser.googleFolderID:
@@ -341,29 +309,30 @@ def create(request):
                                 else:
                                     classUser.googleFolderID = checkOrCreateGoogleFolder(request.user, False, False, False)
                                     classUser.save()
-                                    
+
                             uploadedFileID = driveUpload(request.user, os.path.join(baseFilePath,title), os.path.join(duckThumbPath,'icon_600.png'), json.dumps(projectData), newProject.title.title(), classUser.googleFolderID)
                             if uploadedFileID:
                                 os.remove(os.path.join(baseFilePath,title))
                                 newProject.uploadedFileID = uploadedFileID
-                                
+
                             newProject.save()
                         else: #except:
                             return HttpResponse(json.dumps({"error":"This is so embarrassing. Something went wrong, that's all we know."}))
                                 
                             
-                        try:
+                        if True: #try
                             size = 200, 260
                             thumbPath = os.path.join(baseFilePath,"thumbnail.png")
                             im = Image.open(filenames[0])
                             im.thumbnail(size)
                             im.save(thumbPath, "PNG")
                             #Now trim the thumbpath down for a url link to the image
-                            newThumbPath = thumbPath.split('worksheet_creator')
-                            
-                            newProject.thumb = newThumbPath[1]
+                            newThumbPath = thumbPath.split('media')
+                            edited_path = display_path(newThumbPath[1])
+                            edited_path = '/media{}'.format(edited_path)
+                            newProject.thumb = edited_path
                             newProject.save()
-                        except:
+                        else:
                             data = {
                                 'success': "success",
                                 'projectID':newProject.id,
@@ -492,7 +461,7 @@ def createFromPDF(request):
         rawTitle = pdfFile.name.split('.')[0]
         title = re.sub(r'[^\w]', '', rawTitle)
         title = title.replace(" ", "")
-        baseFilePath = os.path.join(ROOT_PATH,'media', request.user.first_name+request.user.last_name+str(request.user.id), str(title[:5]+str(generateCode())))
+        baseFilePath = os.path.join(settings.MEDIA_ROOT, request.user.first_name+request.user.last_name+str(request.user.id), str(title[:5]+str(generateCode())))
         make_sure_path_exists(baseFilePath)
         
         
@@ -885,7 +854,7 @@ def printStudentWork(request):
             '''
             pdf = pdfkit.from_url('http://amazon.com', False)
             
-            baseFilePath = os.path.join(ROOT_PATH,'media', request.user.first_name+request.user.last_name+str(request.user.id))
+            baseFilePath = os.path.join(settings.MEDIA_ROOT, request.user.first_name+request.user.last_name+str(request.user.id))
             make_sure_path_exists(baseFilePath)
                         
             pdfPath = os.path.join(baseFilePath,"temp.pdf")
@@ -901,7 +870,7 @@ def printStudentWork(request):
             }
             worksheet = render_to_string('google_drive/worksheet.html', args)
             
-            baseFilePath = os.path.join(ROOT_PATH,'media', request.user.first_name+request.user.last_name+str(request.user.id))
+            baseFilePath = os.path.join(settings.MEDIA_ROOT, request.user.first_name+request.user.last_name+str(request.user.id))
             make_sure_path_exists(baseFilePath)
                         
             #htmlPath = os.path.join(baseFilePath,"worksheet.html")
@@ -985,12 +954,13 @@ def covertPDFtoImage(input, output, quality=None, density=None):
 
 
 def display_path(path):
+    path = path.replace("qa_media", "media")
     return path.replace("\\", "/")
 
 
 
 def makeJsonFile(user, data ,title, basePath):
-    #basePath = os.path.join(settings.ROOT_PATH,'media', user.first_name+user.last_name+str(user.id))
+    #basePath = os.path.join(settings.MEDIA_ROOT, user.first_name+user.last_name+str(user.id))
     make_sure_path_exists(basePath)
     
     '''

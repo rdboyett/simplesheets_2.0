@@ -14,12 +14,20 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 ROOT_PATH = os.path.dirname(__file__)
 
 
+try:
+    from env import ENV_SETTINGS
+except:
+    ENV_SETTINGS = {}
+
+PRODUCTION_ENV = True
+if ENV_SETTINGS.get('DUCKSOUP_ENV') == 'localdev':
+    PRODUCTION_ENV = False
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-with open(os.path.join(BASE_DIR, 'secrets', 'secret_key.txt')) as f:
-    SECRET_KEY = f.read().strip()
+SECRET_KEY = ENV_SETTINGS.get('DJANGO_SECRET_KEY', 'x3w))_3q-qv3$bxaqz83$fcrh2gnt6rql6p7v*8=vw)%u*vn$b')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -32,7 +40,7 @@ ADMINS = (
     ('Robert Boyett', 'rdboyett@gmail.com'),
 )
 
-ALLOWED_HOSTS = ['rdboyett.webfactional.com', 'ducksoup.us', 'www.ducksoup.us']
+ALLOWED_HOSTS = ENV_SETTINGS.get('ALLOWED_HOSTS', ['*',])  # ['rdboyett.webfactional.com', 'ducksoup.us', 'www.ducksoup.us']
 
 
 # Application definition
@@ -53,7 +61,7 @@ INSTALLED_APPS = (
     'worksheet_creator',
     'beta_test',
     'tourBuilder',
-    
+
     'paypal.standard.ipn',
     'payment_tracker',
 )
@@ -77,12 +85,8 @@ WSGI_APPLICATION = 'worksheet_project.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'ducksoupbeta',
-        'USER': 'rdboyett',
-        'PASSWORD': 'dallas20',
-        'HOST': '',
-        'PORT': '',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, '..', 'db.sqlite3'),
     }
 }
 
@@ -103,10 +107,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
-STATIC_URL = 'http://ducksoup.us/static/'
-TEMPLATE_DIRS = (os.path.join(ROOT_PATH,'templates'),)
-STATICFILES_DIRS = (os.path.join(ROOT_PATH,'static'),)
-STATIC_ROOT = '/home/rdboyett/webapps/static/'
+STATIC_URL = '/static/'
+
+
+TEMPLATE_DIRS = (os.path.join(BASE_DIR,'templates'),)
+STATICFILES_DIRS = (os.path.join(BASE_DIR,'static'),)
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/var/www/example.com/media/"
@@ -121,80 +126,51 @@ LOGIN_URL          = '/'
 LOGIN_REDIRECT_URL = '/dashboard/'
 LOGIN_ERROR_URL    = '/google/error/'
 
-'''
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'rdboyett@gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-'''
-
 EMAIL_HOST = 'smtp.webfaction.com'
 EMAIL_HOST_USER = 'ducksoupwebmaster'
 DEFAULT_FROM_EMAIL = 'webmaster@ducksoup.us'
 SERVER_EMAIL = 'webmaster@ducksoup.us'
-
-with open(os.path.join(BASE_DIR, 'secrets', 'ducksoup_password.txt')) as f:
-    EMAIL_HOST_PASSWORD = f.read().strip()
+EMAIL_HOST_PASSWORD = ENV_SETTINGS.get('DUCKSOUP_EMAIL_PASSWORD')
 
 
 PAYMENT_TRACKER_ON = False
 PAYPAL_TEST = True
 PAYPAL_RECEIVER_EMAIL = "rdboyett-facilitator@ducksoup.us"
 
-SITE_URL="http://ducksoup.us/"
+SITE_URL="http://127.0.0.1:8000/"
 
 
-'''
-
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': True,
-    'formatters': {
-        'standard': {
-            'format' : "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
-            'datefmt' : "%d/%b/%Y %H:%M:%S",
+TEMPLATES = [
+    {
+        # See: https://docs.djangoproject.com/en/dev/ref/settings/#std:setting-TEMPLATES-BACKEND
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-dirs
+        'DIRS': [
+            os.path.join(BASE_DIR,'templates'),
+        ],
+        'OPTIONS': {
+            # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-debug
+            'debug': DEBUG,
+            # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-loaders
+            # https://docs.djangoproject.com/en/dev/ref/templates/api/#loader-types
+            'loaders': [
+                'django.template.loaders.filesystem.Loader',
+                'django.template.loaders.app_directories.Loader',
+            ],
+            # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-context-processors
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.template.context_processors.i18n',
+                'django.template.context_processors.media',
+                'django.template.context_processors.static',
+                'django.template.context_processors.tz',
+                'django.contrib.messages.context_processors.messages',
+            ],
         },
     },
-    'handlers': {
-        'null': {
-            'level':'DEBUG',
-            'class':'django.utils.log.NullHandler',
-        },
-        'logfile': {
-            'level':'DEBUG',
-            'class':'logging.handlers.RotatingFileHandler',
-            'filename': BASE_DIR + "/logfile",
-            'maxBytes': 50000,
-            'backupCount': 2,
-            'formatter': 'standard',
-        },
-        'console':{
-            'level':'INFO',
-            'class':'logging.StreamHandler',
-            'formatter': 'standard'
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers':['console'],
-            'propagate': True,
-            'level':'WARN',
-        },
-        'django.db.backends': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-            'propagate': False,
-        },
-        '': {
-            'handlers': ['console', 'logfile'],
-            'level': 'DEBUG',
-            'propagate': False,
-        },
-    }
-}
-
-'''
-
+]
 
 
 

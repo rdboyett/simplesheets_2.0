@@ -1,8 +1,10 @@
 import os
 ROOT_PATH = os.path.dirname(__file__)
 
+from django.conf import settings
+
 #place your goole client_secrects.json download in the same directory as this file.
-CLIENT_SECRETS = os.path.join(ROOT_PATH,'..', 'secrets', 'client_secrets.json')
+CLIENT_SECRETS = os.path.join(ROOT_PATH,'..','..', 'secrets', 'client_secrets.json')
 
 #Add any scopes that you want access to in the credentials file
 SCOPES = [
@@ -24,11 +26,11 @@ LOGIN_SUCCESS = '/dashboard/'
 SECRET_KEY = 't(641aasfrv6^^-1sj$uzq(fskmd%+!33199$axb1hu(2i_2n='
 
 #make sure this email is matched up to the project email settings.py
-WEBMASTER_EMAIL = 'rdboyett@gmail.com'
+WEBMASTER_EMAIL = getattr(settings, 'SERVER_EMAIL', 'rdboyett@gmail.com')
 
 WEBSITENAME = 'www.ducksoup.us'
 
-ROOT_WEBSITE_LINK = 'http://rdboyett.webfactional.com'
+ROOT_WEBSITE_LINK = getattr(settings, 'SITE_URL', 'http://ducksoup.us/')
 
 
 BETA_TEST_ON = False
