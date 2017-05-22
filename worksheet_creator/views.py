@@ -327,8 +327,9 @@ def create(request):
                             im.thumbnail(size)
                             im.save(thumbPath, "PNG")
                             #Now trim the thumbpath down for a url link to the image
-                            newThumbPath = thumbPath.split('worksheet_creator')
-                            edited_path = newThumbPath[1].replace('qa_media', 'media')
+                            thumbPath = thumbPath.replace('qa_media', 'media')
+                            newThumbPath = thumbPath.split('media')
+                            edited_path = os.path.join('media', newThumbPath[1])
                             newProject.thumb = edited_path
                             newProject.save()
                         else:
