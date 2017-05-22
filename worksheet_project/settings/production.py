@@ -18,4 +18,6 @@ ALLOWED_HOSTS = ['rdboyett.webfactional.com', 'ducksoup.us', 'www.ducksoup.us']
 STATIC_URL = 'http://ducksoup.us/static/'
 STATIC_ROOT = '/home/rdboyett/webapps/static/'
 
+MEDIA_ROOT = '/home/rdboyett/webapps/media/'
+
 SITE_URL="http://ducksoup.us/"
