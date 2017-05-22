@@ -242,8 +242,8 @@ def create(request):
                             if bItConverted:
                                 pdfFile.close()
                                 os.remove(pdfPath)
-                                
-                            
+
+
                             #store file paths----------------------------------------------------------------------------------
                             filenames = []
                             if number_of_pages > 1:
@@ -251,16 +251,16 @@ def create(request):
                                     filenames.append(os.path.join(baseFilePath,title + '-' + str(pageNumber) + '.jpg'))
                             else:
                                 filenames.append(os.path.join(baseFilePath,title + '.jpg'))
-                                
-                                
-                                
+
+
+
                             if Project.objects.filter(title__istartswith=rawTitle):
                                 nameCount = Project.objects.filter(title__istartswith=rawTitle).count()
                                 nameCount+=1
                                 nameNumber=" ("+str(nameCount)+")"
                             else:
                                 nameNumber=""
-                                
+
                             #create a project-----------------------------------------------------------------------------------
                             newProject = Project.objects.create(
                                 title = rawTitle+str(nameNumber),
@@ -268,8 +268,8 @@ def create(request):
                                 ownerID = request.user.id,
                             )
                             userInfo.projects.add(newProject)
-                            
-                            
+
+
                             #create background images for the project----------------------------------------------------------
                             pageNum = 0
                             for filename in filenames:
@@ -281,15 +281,15 @@ def create(request):
                                     newList.append(fileComponentsList[number])
                                 lastFileName = os.path.join('/',*newList)
                                 newFilename = display_path(lastFileName)
-                                
-                                
+
+
                                 newBackImage = BackImage.objects.create(
                                     imagePath = newFilename,
                                     pageNumber = pageNum
                                 )
                                 newProject.backgroundImages.add(newBackImage)
-                            
-                            
+
+
                             #Create a json file to store all file information---------------------------------------------------
                             projectData = {
                                 'user_id':request.user.id,
@@ -298,7 +298,7 @@ def create(request):
                             }
                             jsonFilePath = makeJsonFile(request.user, projectData, title, baseFilePath)
                             #filenames.append(jsonFilePath)
-                            
+
                             if ClassUser.objects.filter(user=request.user):
                                 classUser = ClassUser.objects.get(user=request.user)
                                 if classUser.googleFolderID:
@@ -309,12 +309,12 @@ def create(request):
                                 else:
                                     classUser.googleFolderID = checkOrCreateGoogleFolder(request.user, False, False, False)
                                     classUser.save()
-                                    
+
                             uploadedFileID = driveUpload(request.user, os.path.join(baseFilePath,title), os.path.join(duckThumbPath,'icon_600.png'), json.dumps(projectData), newProject.title.title(), classUser.googleFolderID)
                             if uploadedFileID:
                                 os.remove(os.path.join(baseFilePath,title))
                                 newProject.uploadedFileID = uploadedFileID
-                                
+
                             newProject.save()
                         else: #except:
                             return HttpResponse(json.dumps({"error":"This is so embarrassing. Something went wrong, that's all we know."}))
@@ -327,9 +327,9 @@ def create(request):
                             im.thumbnail(size)
                             im.save(thumbPath, "PNG")
                             #Now trim the thumbpath down for a url link to the image
-                            thumbPath = thumbPath.replace('qa_media', 'media')
                             newThumbPath = thumbPath.split('media')
-                            edited_path = os.path.join('media', newThumbPath[1])
+                            edited_path = display_path(newThumbPath[1])
+                            edited_path = '/media{}'.format(edited_path)
                             newProject.thumb = edited_path
                             newProject.save()
                         else:
