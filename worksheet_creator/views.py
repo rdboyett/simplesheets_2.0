@@ -171,7 +171,7 @@ def create(request):
                     title = title.replace(" ", "")
                     if len(title) > 10:
                         title = title[:10]
-                    baseFilePath = os.path.join(ROOT_PATH,'media', request.user.first_name+request.user.last_name+str(request.user.id), str(title[:5]+str(fileId[:5])))
+                    baseFilePath = os.path.join(ROOT_PATH,'media', request.user.first_name+request.user.last_name+str(request.user.id), str(title+str(fileId[-5:])))
                     duckThumbPath = os.path.join(ROOT_PATH, 'duckThumb')
                     make_sure_path_exists(duckThumbPath)
                     make_sure_path_exists(baseFilePath)
