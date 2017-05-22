@@ -39,7 +39,7 @@ from paypal.standard.models import ST_PP_COMPLETED, ST_PP_PENDING
 from paypal.standard.ipn.signals import valid_ipn_received
 from django.dispatch import receiver
 
-from worksheet_project import settings
+from django.conf import settings
 
 
 import logging

@@ -29,7 +29,7 @@ from tourBuilder.models import MyTour
 from worksheet_creator.models import Project
 
 
-from worksheet_project import settings
+from django.conf import settings
 from worksheet_project.views import checkPaidUp
 
 
@@ -41,11 +41,7 @@ log = logging.getLogger(__name__)
 @login_required
 def google_picker(request):
     userInfo = UserInfo.objects.get(user=request.user)
-    
-    #developerKey = settings.DEVELOPER_KEY
-    #clientId = settings.CLIENT_ID
-    
-    
+
     if not request.user.first_name or not request.user.last_name or not userInfo.teacher_student:
         return HttpResponseRedirect("/edit-profile/")
     

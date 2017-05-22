@@ -34,8 +34,6 @@ Thumbs.db
 #Python created files #
 ######################
 *.pyc
-settings.py
-*/settings.py
 
 
 # Media Directories #
@@ -50,4 +48,13 @@ node_modules/
 # Virtualenv #
 ###################
 venv/
+activate-ducksoup
 env.py
+
+# Google Settings #
+###################
+client_secrets.json
+
+# DEPLOYING #
+##################
+deploy_script
