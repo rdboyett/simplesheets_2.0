@@ -953,6 +953,7 @@ def covertPDFtoImage(input, output, quality=None, density=None):
 
 
 def display_path(path):
+    path = path.replace("qa_media", "media")
     return path.replace("\\", "/")
 
 
