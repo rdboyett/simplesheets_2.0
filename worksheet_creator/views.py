@@ -320,7 +320,7 @@ def create(request):
                             return HttpResponse(json.dumps({"error":"This is so embarrassing. Something went wrong, that's all we know."}))
                                 
                             
-                        try:
+                        if True: #try
                             size = 200, 260
                             thumbPath = os.path.join(baseFilePath,"thumbnail.png")
                             im = Image.open(filenames[0])
@@ -331,7 +331,7 @@ def create(request):
                             edited_path = newThumbPath[1].replace('qa_media', 'media')
                             newProject.thumb = edited_path
                             newProject.save()
-                        except:
+                        else:
                             data = {
                                 'success': "success",
                                 'projectID':newProject.id,
